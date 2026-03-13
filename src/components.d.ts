@@ -9,7 +9,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppToaster: typeof import('./components/AppToaster.vue')['default']
     DsfrAlert: typeof import('@gouvminint/vue-dsfr')['DsfrAlert']
-    DsfrButton: typeof import('@gouvminint/vue-dsfr')['DsfrButton']
     DsfrHeader: typeof import('@gouvminint/vue-dsfr')['DsfrHeader']
     ReloadPrompt: typeof import('./components/ReloadPrompt.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
