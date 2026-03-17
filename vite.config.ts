@@ -47,7 +47,7 @@ export default defineConfig({
       ],
     }),
   ],
-  base: process.env.BASE_URL || '/',
+  base: process.env.BASE_URL || '/extraction',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
