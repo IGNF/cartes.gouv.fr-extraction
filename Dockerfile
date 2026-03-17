@@ -1,4 +1,4 @@
-FROM node:23-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ RUN npm list --depth=0
 COPY . .
 
 # Construction de l'application avec Vite
-RUN npm run build
+RUN npm run build-only
 
 # Vérification du contenu du répertoire de construction
 RUN ls -l /app/dist
