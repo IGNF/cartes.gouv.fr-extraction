@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import Main from '../views/Main.vue'
+import Extraction from '@/views/CreateExtraction/Extraction.vue'
+import MyExtractions from '@/views/MyExtraction/MyExtractions.vue'
 
 const MAIN_TITLE = 'Gabarit de démarrage VueDsfr'
 
@@ -8,8 +9,14 @@ const routes = [
   {
     path: '/',
     name: 'extraction',
-    component: Main,
+    component: Extraction,
     alias: '/extraction',
+  },
+  {
+    path: '/myextractions/repositories',
+    name: 'repositories',
+    component: MyExtractions,
+    alias: '/myextractions',
   },
 ]
 
