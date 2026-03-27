@@ -1,44 +1,37 @@
 <script setup lang="ts">
-import { useNormalizeString } from '@/composables/utils'
-import { DsfrSideMenu } from '@gouvminint/vue-dsfr';
+import { useGetMyExtractions } from '@/composables/GetMyExtractions'
+import type { RepositoryItem } from '@/types/my-extractions.types'
+
+const route = useRoute();
 
 const props = defineProps<{
 }>()
 
-// const headerRows = [
-//           { label: 'Nom', key: 'name' },
-//           { label: 'Création', key: 'creation' },
-//           { label: 'Tag', key: 'tag' }
-//         ]
+const { repoExtractionList } = useGetMyExtractions()
 
-// const rows = computed(() => {
-//     return props.extractibles.filter(o => useNormalizeString(o.name).includes(useNormalizeString(searchedString.value)))  
-// })
+const selectedRepositoryId = computed(() => {
+    const repoId = route.params.repo_id
+    return Array.isArray(repoId) ? repoId[0] : repoId
+})
 
-// const selection = ref<string[]>([])
-// const currentPage = ref<number>(0)
-// const selectedRow = ref<string[]>([])
-// const searchedString = ref<string>("")
-// // function selectRow(e : Event)  {
-// //     console.log(e)
-// // }
-// onMounted(() => {
-//   console.log('ChooseExtraction component mounted');
-//   console.log('Extractible data:', props.extractibles);
-// });
-const menuItems = [
-    {
-      "id": "1",
-      "to": "/myextractions/repositories",
-      "text": "Tout mes dossiers",
-      "active": true
-    },
-    {
-      "id": "2",
-      "to": "/repositories/repository-1",
-      "text": "Repository-1",
-    }
-];
+const selectedRepository = computed<RepositoryItem | undefined>(() =>
+    repoExtractionList.value.find(repo => repo.url_name === selectedRepositoryId.value)
+)
+
+const menuItems = computed(() => [
+  {
+    id: '1',
+    to: '/myextractions',
+    text: 'Tout mes dossiers',
+    active: route.path === '/myextractions'
+  },
+    ...repoExtractionList.value.map((repo, index) => ({
+    id: String(index + 2),
+    to: `/myextractions/${repo.url_name}`,
+    text: repo.title,
+    active: route.path === `/myextractions/${repo.url_name}`
+  }))
+])
 </script>
 <template>
     <MyExtractionSkeleton>
@@ -50,15 +43,19 @@ const menuItems = [
                 :menuItems="menuItems" />
         </template>
         <template #main-column>
-            <SearchableCardList
-                :items="[
-                    { title: 'Dossier d\'extraction 1', description: 'Description du dossier d\'extraction 1' },
-                    { title: 'Dossier d\'extraction 2', description: 'Description du dossier d\'extraction 2' },
-                    { title: 'Dossier d\'extraction 3', description: 'Description du dossier d\'extraction 3' },
-                    { title: 'Dossier d\'extraction 4', description: 'Description du dossier d\'extraction 4' },
-                    { title: 'Dossier d\'extraction 5', description: 'Description du dossier d\'extraction 5' },
-                ]"
-            />
+            <router-view v-slot="{ Component, route }"  >
+                <component
+                    :is="Component"
+                    :repo-extraction-list="repoExtractionList"
+                    v-if="route.name === 'RepositoriesList'"
+                />
+                <component
+                    :is="Component"
+                    :repository="selectedRepository"
+                    :id="selectedRepositoryId"
+                    v-if="route.name === 'RepositoryDetail' && selectedRepository && selectedRepositoryId"
+                />
+            </router-view>
         </template>
     </MyExtractionSkeleton>
 </template>

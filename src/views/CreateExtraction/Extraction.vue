@@ -29,7 +29,7 @@ const currentStep = ref(1)
     <div class="fr-grid-row">
       <ChooseArea v-if="currentStep === 1" :extractibles="extractibles"/>
       <ChooseExtraction v-if="currentStep === 2"  :extractibles="extractibles"/>
-      <ChooseExtraction v-if="currentStep === 3" />
+      <ChooseExtraction v-if="currentStep === 3" :extractibles="extractibles" />
     </div>
     <div class="fr-grid-row nav-row">
         <DsfrButton secondary @click="currentStep--" :disabled="currentStep <= 1">Précédent</DsfrButton>

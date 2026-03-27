@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Patience from '@/components/Patience.vue'
-import StoreData from '@/components/StoreData.vue';
+import Patience from '@/components/utils/Patience.vue'
+import StoreData from '@/components/async-data/StoreData.vue';
 
 const serviceTitle = 'Service'
 const serviceDescription = 'Description du service'
