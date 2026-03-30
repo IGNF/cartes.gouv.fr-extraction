@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import { useNormalizeString } from '@/composables/utils';
 import ExtractionListElement from './ExtractionListElement.vue';
 
 const router = useRouter();
@@ -14,6 +15,19 @@ const props = defineProps<{
     } []
     repositoryId: string
 }>()
+
+const searchValue = ref<string>('')
+
+const filteredExtractions = computed(() => {
+    const query = useNormalizeString(searchValue.value)
+
+    if (!query)
+        return props.extractions
+
+    return props.extractions.filter((extraction) => {
+        return useNormalizeString(extraction.title).includes(query)
+    })
+})
 
 </script>
 <template>
@@ -33,9 +47,10 @@ const props = defineProps<{
     <DsfrSearchBar
         class="mw-50 fr-mb-20v"
         placeholder="Rechercher"
+        v-model="searchValue"
     />  
     <ExtractionListElement
-        v-for="extraction in extractions"
+        v-for="extraction in filteredExtractions"
         :key="extraction.title"
         :extraction="extraction"
     />

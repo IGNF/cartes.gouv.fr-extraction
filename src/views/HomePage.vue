@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { DsfrButton, DsfrCard } from '@gouvminint/vue-dsfr'
-
 const router = useRouter()
 </script>
 
@@ -12,29 +10,35 @@ const router = useRouter()
 		</div>
 
 		<div class="card-layer">
-			<DsfrCard
-				class="home-card"
-				title="Extraire une donnée"
-				description="Un service pour filtrer, sélectionner et extraire précisément les données géographiques dont vous avez besoin."
-				:horizontal="false"
-				:no-arrow="true"
-			>
-				<template #end-details>
-					<div class="home-card-actions">
-						<DsfrButton
-							secondary
-							label="Mes extractions"
-							@click="() => router.push('/myextractions')"
-						/>
-						<DsfrButton
-							label="Créer une extraction"
-							icon="fr-icon-arrow-right-line"
-							icon-right
-							@click="() => router.push('/new-extraction')"
-						/>
-					</div>
-				</template>
-			</DsfrCard>
+			<div class="icon-container">
+			<span class="fr-icon-inbox-unarchive-line"></span>
+			</div>
+			<div>
+				<h1>
+					Extraire une donnée
+				</h1>
+				<div class="fr-text--lead">
+					Filtrez, téléchargez et exploitez
+				</div>
+			</div>
+			<div class="description">
+				Un service pour filtrer, sélectionner et extraire précisément les données géographiques dont vous avez besoin.
+			</div>
+			<div>
+				<DsfrButton
+					secondary
+					label="Mes extractions"
+					@click="() => router.push('/myextractions')"
+				/>
+				<DsfrButton
+					class="fr-ml-2v"
+					label="Créer une extraction"
+					icon="fr-icon-arrow-right-line"
+					icon-right
+					@click="() => router.push('/new-extraction')"
+				/>
+			</div>
+
 		</div>
 	</section>
 </template>
@@ -42,6 +46,8 @@ const router = useRouter()
 <style scoped>
 .home-page {
 	position: relative;
+	display: flex;
+	align-items: center;
 	width: 100%;
 	min-height: 75vh;
 	overflow: hidden;
@@ -67,21 +73,33 @@ const router = useRouter()
 
 .card-layer {
 	position: relative;
+	display: flex;
+	width: 480px;
+	padding: 40px;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 40px;
+	flex-shrink: 0;
+	background-color: var(--background-default-grey);
 	z-index: 1;
-	min-height: 75vh;
+	box-shadow: 0 6px 18px 0 rgba(0, 0, 18, 0.16);
+}
+
+.description {
+	text-align: justify;
+	text-justify: auto;
+}
+
+.icon-container {
 	display: flex;
-	align-items: center;
 	justify-content: center;
-	padding: 2rem 1rem;
-}
-
-.home-card {
-	width: min(32rem, 100%);
-}
-
-.home-card-actions {
-	display: flex;
-	gap: 0.75rem;
-	flex-wrap: wrap;
+	align-items: center;
+	background-color: var(--light-options-illustration-color-925-default-pink-macaron-925, #FDDFDA);
+	border-radius: 500px;
+	width: 6rem;
+	height: 6rem;
+	span {
+		scale: 2;
+	}
 }
 </style>
