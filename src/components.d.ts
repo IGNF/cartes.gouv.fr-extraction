@@ -7,10 +7,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AppToaster: typeof import('./components/AppToaster.vue')['default']
     DsfrAlert: typeof import('@gouvminint/vue-dsfr')['DsfrAlert']
     DsfrHeader: typeof import('@gouvminint/vue-dsfr')['DsfrHeader']
-    ReloadPrompt: typeof import('./components/ReloadPrompt.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     VIcon: typeof import('@gouvminint/vue-dsfr')['VIcon']

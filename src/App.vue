@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import useToaster from './composables/use-toaster'
-
-const toaster = useToaster()
-
 const serviceTitle = 'Service'
 const serviceDescription = 'Description du service'
 const logoText = ['Ministère', 'de l’intérieur']
@@ -38,8 +34,4 @@ const searchQuery = ref('')
     <router-view />
   </div>
 
-  <AppToaster
-    :messages="toaster.messages"
-    @close-message="toaster.removeMessage($event)"
-  />
 </template>
