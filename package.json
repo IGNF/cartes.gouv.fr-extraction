@@ -18,8 +18,8 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
-    "@gouvfr/dsfr": "^1.14.3",
-    "@gouvminint/vue-dsfr": "^6.0.0",
+    "@gouvfr/dsfr": "^1.14.4",
+    "@gouvminint/vue-dsfr": "^8.16.1",
     "focus-trap": "^7.5.4",
     "focus-trap-vue": "^4.0.3",
     "pinia": "^2.2.2",
