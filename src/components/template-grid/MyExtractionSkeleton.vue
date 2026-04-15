@@ -1,6 +1,8 @@
 <template>
     <div class="fr-container">
-        <div class="fr-grid-row">
+        concon
+        <slot></slot>
+        <!-- <div class="fr-grid-row">
 
             <div class="fr-col-3">
                 <slot name="left-column">
@@ -10,6 +12,6 @@
                 <slot name="main-column">
                 </slot>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>

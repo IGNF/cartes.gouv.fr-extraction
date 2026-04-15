@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useNormalizeString } from '@/composables/utils'
+import type { Extractible } from '@/types/extractibles.types';
 
 const props = defineProps<{
     extractibles: Extractible[] // props à définir si nécessaire
@@ -12,6 +13,7 @@ const headerRows = [
         ]
 
 const rows = computed(() => {
+    if (!props.extractibles) return []
     return props.extractibles.filter(o => useNormalizeString(o.name).includes(useNormalizeString(searchedString.value)))  
 })
 
@@ -23,17 +25,13 @@ const searchedString = ref<string>("")
 //     console.log(e)
 // }
 onMounted(() => {
-  console.log('ChooseExtraction component mounted');
+  console.log('ChooseExtractible component mounted');
   console.log('Extractible data:', props.extractibles);
 });
 </script>
 <template>
-    <div class="extract-list-container">
-        <div class="extract-list-header fr-grid-row fr-mb-8v fr-pl-3v ">
-            <span class="fr-icon-database-line" aria-hidden="true"></span>
-            <h3>Données extractibles</h3>
-        </div>
-        <div class="fr-container">
+    <ExtractibleGrid icon-class="fr-icon-database-line" title="Données extractibles">
+        <div class="fr-container--fluid">
             <div class="fr-grid-row">
                 <DsfrSearchBar class="fr-mr-2v" 
                     v-model="searchedString"
@@ -74,23 +72,9 @@ onMounted(() => {
             </DsfrDataTable>
             IDs sélectionnées : {{ selection }}
         </div>
-    </div> 
+    </ExtractibleGrid>
 </template>
 <style scoped> 
-.extract-list-header {
-    background-color: var(--background-alt-grey);
-    align-items: center;
-    height: 4rem;
-}
-.extract-list-header h3 {
-    margin: 0 0 0 1rem;
-}
-.extract-list-container {
-  margin-top: 2rem;
-  border: 1px solid var(--light-decisions-border-border-default-grey, #DDD);
-  width: 100%;
-}
-
 .tag-name {
   background-color: var(--background-alt-blue-france);
   color: var(--text-action-high-blue-france);

@@ -1,18 +1,5 @@
 import { defineStore } from 'pinia'
-
-type Link = {
-  rel: string;
-  type: string;
-  title: string;
-  href: string;
-};
-
-type Extractible = {
-    name: string;
-    extent: any
-    creation: string;
-  [key: string]: any;  // autres propriétés autorisées
-}
+import type { Extractible, ProcessLink } from '@/types/extractibles.types'
 
 export const useDataStore = defineStore('data', () => {
     const extractible = ref<Extractible[]>([])
@@ -45,7 +32,7 @@ export const useDataStore = defineStore('data', () => {
         const data = await response.json()
         const results = await Promise.all(
         data.processes.map(async (p) => {
-          const href = p.links.find((link: Link) => link.rel === "describedby")?.href;
+          const href = p.links.find((link: ProcessLink) => link.rel === "describedby")?.href;
           if (!href) return null;
             const res = await fetch(href,      {
             headers: {

@@ -1,4 +1,4 @@
-import type { RepositoryItem } from '@/types/my-extractions.types'
+import type { ExtractionItem, RepositoryItem } from '@/types/my-extractions.types'
 
 const repoExtractionListData: RepositoryItem[] = [
   {
@@ -153,10 +153,12 @@ const repoExtractionListData: RepositoryItem[] = [
   },
 ]
 
+const extractionListData: ExtractionItem[] = repoExtractionListData.flatMap(({ extractions }) => extractions)
+
 export function useGetMyExtractions() {
-  const repoExtractionList = computed<RepositoryItem[]>(() => repoExtractionListData)
+  const extractionList = computed<ExtractionItem[]>(() => extractionListData)
 
   return {
-    repoExtractionList,
+    extractionList
   }
 }

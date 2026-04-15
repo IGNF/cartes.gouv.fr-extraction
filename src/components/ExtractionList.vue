@@ -13,7 +13,6 @@ const props = defineProps<{
         launch_date: Date
         execution_url: string
     } []
-    repositoryId: string
 }>()
 
 const searchValue = ref<string>('')

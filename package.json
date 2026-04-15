@@ -18,15 +18,19 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
-    "@gouvfr/dsfr": "^1.14.3",
-    "@gouvminint/vue-dsfr": "^6.0.0",
+    "@gouvfr/dsfr": "^1.14.4",
+    "@gouvminint/vue-dsfr": "^8.16.1",
     "@vueuse/core": "^14.2.1",
+    "cartes.gouv.fr-vue-components": "github:IGNF/cartes.gouv.fr-vue-components",
     "focus-trap": "^7.5.4",
     "focus-trap-vue": "^4.0.3",
-    "geopf-extensions-openlayers": "^1.0.0-beta.7",
+    "geopf-extensions-openlayers": "github:IGNF/geopf-extensions-openlayers",
     "notivue": "^2.4.5",
+    "ol-mapbox-style": "^13.4.0",
+    "openlayers": "^4.6.5",
     "pinia": "^2.3.1",
     "vue": "^3.4.38",
+    "vue-logger-plugin": "^2.2.3",
     "vue-router": "^4.4.3"
   },
   "devDependencies": {
