@@ -24,7 +24,7 @@
     "cartes.gouv.fr-vue-components": "github:IGNF/cartes.gouv.fr-vue-components",
     "focus-trap": "^7.5.4",
     "focus-trap-vue": "^4.0.3",
-    "geopf-extensions-openlayers": "github:IGNF/geopf-extensions-openlayers",
+    "geopf-extensions-openlayers": "^1.0.0-beta.7",
     "notivue": "^2.4.5",
     "ol-mapbox-style": "^13.4.0",
     "openlayers": "^4.6.5",

@@ -3,6 +3,9 @@ import Patience from '@/components/utils/Patience.vue'
 import StoreData from '@/components/async-data/StoreData.vue';
 import { CgfrFooter, CgfrHeader } from 'cartes.gouv.fr-vue-components'
 
+import "ol/ol.css";
+import "geopf-extensions-openlayers/css/Dsfr.css";
+
 const serviceTitle = 'Service'
 const serviceDescription = 'Description du service'
 const logoText = ['Ministère', 'de l’intérieur']
