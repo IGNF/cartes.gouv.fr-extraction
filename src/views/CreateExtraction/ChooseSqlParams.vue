@@ -1,31 +1,13 @@
 <script setup lang="ts">
 import type { Extractible } from '@/types/extractibles.types';
 import { CgfrSqlEditor } from 'cartes.gouv.fr-vue-components'
-
-
-import { sqlMap } from "@/composables/mapkeys.js";
-import { useMapStore } from "@/stores/mapStore";
-import { useLogger } from "vue-logger-plugin";
-
-const mapStore = useMapStore()
+import ChooseSqlParamsMap from '../Cartes/ChooseSqlParamsMap.vue';
 
 const props = defineProps<{
     extractible: Extractible | null
 }>()
 
-const DEFAULT_LAYER = {
-  name: "ORTHOIMAGERY.ORTHOPHOTOS",
-  service: "WMTS", // issu de serviceParams.id = "OGC:WMTS" -> split(":")[1]
-  key: "ORTHOIMAGERY.ORTHOPHOTOS$GEOPORTAIL:OGC:WMTS",
-  position: -1,
-  opacity: 1,
-  visible: true,
-  grayscale: false
-};
-
 const code = ref()
-
-
 </script>
 <template>
     <ExtractibleGrid icon-class="fr-icon-equalizer-line" title="Paramètres d'extraction">
@@ -82,22 +64,7 @@ const code = ref()
                     </div>
                 </div>
                 <div class="fr-col">
-                    <Map 
-                        class="map" 
-                        :map-id="sqlMap">
-                        <View
-                          :map-id="sqlMap"
-                          :center="mapStore.center"
-                          :zoom="mapStore.zoom"
-                        />
-                        <Layer  
-                            :map-id="sqlMap" 
-                            :layerOptions="DEFAULT_LAYER"
-                        />
-                        <Controls
-                            :map-id="sqlMap" 
-                        />
-                    </Map>
+                    <ChooseSqlParamsMap />
                 </div>
             </div>
         </div>

@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { useLogger } from 'vue-logger-plugin';
-
-import IconGeolocationSVG from "@/assets/geolocation.svg";
-
 import { LoggerUtils } from 'geopf-extensions-openlayers';
 
 const props = defineProps({
@@ -23,40 +20,6 @@ if (isProduction) {
 
 const log = useLogger();
 
-const layerImportOptions = {
-  id: "20",
-  position: "top-right",
-  gutter: true,
-  listable: true,
-};
-const drawingOptions = {
-  id: "3",
-  position: "top-right",
-  gutter: false,
-  tools : {
-    "export" : false
-  }
-}
-const searchEngineOptions = {
-  id: "1",
-  collapsed: false,
-  collapsible: false,
-  returnTrueGeometry: true,
-  autocompleteOptions : {
-    serviceOptions : {
-        maximumResponses : 10
-    },
-    prettifyResults : true,
-    maximumEntries : 5
-  },
-  markerUrl : IconGeolocationSVG,
-  placeholder: "Rechercher un lieu...",
-
-};
-const zoomOptions = {
-  position: "top-left",
-  id: "9",
-};
 
 
 onMounted(() => {
@@ -68,27 +31,7 @@ onMounted(() => {
 >>> sinon, visibility:false
 -->
 <template>
-  <Drawing
-    visibility
-    :drawing-options="drawingOptions"
-    :map-id="mapId"
-  />
-
-  <LayerImport
-    visibility
-    :layer-import-options="layerImportOptions"
-    :map-id="mapId"
-  />
-  <Zoom
-    visibility
-    :zoom-options="zoomOptions"
-    :map-id="mapId"
-  />
-  <SearchEngine
-    visibility
-    :search-engine-options="searchEngineOptions"
-    :map-id="mapId"
-  />
+  <slot></slot>
 </template>
 
 <style lang="scss">
