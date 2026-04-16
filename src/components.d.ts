@@ -19,7 +19,7 @@ declare module 'vue' {
     ControlList: typeof import('./components/carte/control/ControlList.vue')['default']
     Controls: typeof import('./components/map/Controls/Controls.vue')['default']
     copy: typeof import('./components/map/Map copy.vue')['default']
-    CreateExtractionGrid: typeof import('./components/template-grid/CreateExtractionGrid.vue')['default']
+    CreateExtractionGrid: typeof import('./components/template-grid/ExtractibleGrid.vue')['default']
     Drawing: typeof import('./components/map/Controls/Drawing.vue')['default']
     DsfrAlert: typeof import('@gouvminint/vue-dsfr')['DsfrAlert']
     DsfrButton: typeof import('@gouvminint/vue-dsfr')['DsfrButton']
