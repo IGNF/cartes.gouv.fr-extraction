@@ -1,0 +1,105 @@
+<script setup lang="ts">
+const router = useRouter()
+</script>
+
+<template>
+	<section class="home-page">
+		<div class="background-layer" aria-hidden="true">
+			<div class="background-left" />
+			<div class="background-right" />
+		</div>
+
+		<div class="card-layer">
+			<div class="icon-container">
+			<span class="fr-icon-inbox-unarchive-line"></span>
+			</div>
+			<div>
+				<h1>
+					Extraire une donnée
+				</h1>
+				<div class="fr-text--lead">
+					Filtrez, téléchargez et exploitez
+				</div>
+			</div>
+			<div class="description">
+				Un service pour filtrer, sélectionner et extraire précisément les données géographiques dont vous avez besoin.
+			</div>
+			<div>
+				<DsfrButton
+					secondary
+					label="Mes extractions"
+					@click="() => router.push('/myextractions')"
+				/>
+				<DsfrButton
+					class="fr-ml-2v"
+					label="Créer une extraction"
+					icon="fr-icon-arrow-right-line"
+					icon-right
+					@click="() => router.push('/new-extraction')"
+				/>
+			</div>
+
+		</div>
+	</section>
+</template>
+
+<style scoped>
+.home-page {
+	position: relative;
+	display: flex;
+	align-items: center;
+	width: 100%;
+	min-height: 75vh;
+	overflow: hidden;
+}
+
+.background-layer {
+	position: absolute;
+	inset: 0;
+	display: flex;
+}
+
+.background-left {
+	width: 33.3333%;
+	background: transparent;
+}
+
+.background-right {
+	width: 66.6667%;
+	background-image: url('https://picsum.photos/1600/1000?random=7');
+	background-size: cover;
+	background-position: center;
+}
+
+.card-layer {
+	position: relative;
+	display: flex;
+	width: 480px;
+	padding: 40px;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 40px;
+	flex-shrink: 0;
+	background-color: var(--background-default-grey);
+	z-index: 1;
+	box-shadow: 0 6px 18px 0 rgba(0, 0, 18, 0.16);
+}
+
+.description {
+	text-align: justify;
+	text-justify: auto;
+}
+
+.icon-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: var(--light-options-illustration-color-925-default-pink-macaron-925, #FDDFDA);
+	border-radius: 500px;
+	width: 6rem;
+	height: 6rem;
+	span {
+		scale: 2;
+	}
+}
+</style>
