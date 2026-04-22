@@ -3,7 +3,6 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { vueDsfrAutoimportPreset, vueDsfrComponentResolver } from '@gouvminint/vue-dsfr/meta'
 import vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vite'
@@ -13,10 +12,10 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   plugins: [
     vue(),
-    vueJsx(),
     VueDevTools(),
     AutoImport({
-      include: [/\.[tj]sx?$/, /\.vue$/, /\.vue\?vue/],
+      include: [/\/src\/.*\.[tj]sx?$/, /\/src\/.*\.vue$/, /\/src\/.*\.vue\?vue/],
+      exclude: [/node_modules/],
       imports: [
         // @ts-expect-error TS2322
         'vue',
@@ -48,10 +47,11 @@ export default defineConfig({
     }),
   ],
   base: process.env.BASE_URL || '/extraction',
+  envPrefix: ['VITE_', 'IAM_'],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
-    dedupe: ['vue'],
-  },
+    dedupe: ['vue', 'pinia', 'vue-demi'],
+  }
 })

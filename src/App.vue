@@ -2,32 +2,72 @@
 import Patience from '@/components/utils/Patience.vue'
 import StoreData from '@/components/async-data/StoreData.vue';
 import { CgfrFooter, CgfrHeader } from 'cartes.gouv.fr-vue-components'
+import { getService, useAuth } from 'cartes.gouv.fr-service';
+import { setSettings } from 'cartes.gouv.fr-service';
+
+  setSettings({
+    IamCheckSsoDisable : import.meta.env.IAM_CHECK_SSO_DISABLE,
+    IamCheckSsoAutoAuth : import.meta.env.IAM_CHECK_SSO_AUTO_AUTH,
+    IamCheckSsoType : import.meta.env.IAM_CHECK_SSO_TYPE,
+    IamCheckSsoTimeout : import.meta.env.IAM_CHECK_SSO_TIMEOUT,
+    IamCheckSsoClientId : import.meta.env.IAM_CHECK_SSO_CLIENT_ID,
+    IamDisable : import.meta.env.IAM_DISABLE,
+    IamAuthMode : import.meta.env.IAM_AUTH_MODE,
+    IamUrl : import.meta.env.IAM_URL,
+    IamRealm : import.meta.env.IAM_REALM,
+    IamClientId : import.meta.env.IAM_CLIENT_ID,
+    IamClientSecret : import.meta.env.IAM_CLIENT_SECRET,
+    IamEntrepotApiUrl : import.meta.env.IAM_ENTREPOT_API_URL,
+    IamRedirectRemote : import.meta.env.IAM_REDIRECT_REMOTE,
+    IamEntrepotApiUrlRemote : import.meta.env.IAM_ENTREPOT_API_URL_REMOTE
+  });
+console.log('import.meta.env', import.meta.env);
+const service = getService({ mode: 'local' });
+const { isAuthenticated, user } = useAuth({ service });
 
 import "ol/ol.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
 
-const serviceTitle = 'Service'
-const serviceDescription = 'Description du service'
-const logoText = ['Ministère', 'de l’intérieur']
-
-const quickLinks = [
-  {
-    label: 'Home',
-    to: '/',
-    icon: 'ri-home-4-line',
-    iconAttrs: { color: 'var(--red-marianne-425-625)' },
-  }
-]
-const searchQuery = ref('')
+const onConnect = () => {
+  service.getAccessLogin()
+  .then((url) => {
+    console.log(url);
+    window.location.href = url; // redirection vers la page ssosS
+  });
+}
+const onDisconnect = () => {
+  service.getAccessLogout()
+  .then((url) => {
+    console.log(url);
+    // window.location.href = url; // redirection vers la page sso
+  });
+}
 </script>
 
 <template>
-  <CgfrHeader
+  <DsfrButton
+    v-if="!isAuthenticated"
+    class="fr-mt-2w fr-mb-2w"
+    label="Connection"
+    @click="onConnect"
+  />
+    <DsfrButton
+    v-else
+    class="fr-mt-2w fr-mb-2w"
+    label="Déconnexion"
+    @click="onDisconnect"
+  >
+  Déconnecte : {{ user }}
+  </DsfrButton>
+  <!-- <CgfrHeader
     class="CgfrHeader"
     badge-text="Extraction"
     badge-icon="fr-icon-road-map-fill"
     badge-color="pink-macaron"
-  />
+    :authenticated="isAuthenticated"
+    :user="user" /> -->
+    {{ isAuthenticated }}
+    {{ user }}
   <Suspense>
     <!-- Chargement du dataStore avec une patience 
           avant afficahge de la cartographie 
