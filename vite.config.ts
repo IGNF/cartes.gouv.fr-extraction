@@ -1,12 +1,12 @@
-import process from 'node:process'
-import { fileURLToPath, URL } from 'node:url'
+import process from "node:process";
+import { fileURLToPath, URL } from "node:url";
 
-import { vueDsfrAutoimportPreset, vueDsfrComponentResolver } from '@gouvminint/vue-dsfr/meta'
-import vue from '@vitejs/plugin-vue'
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import { defineConfig } from 'vite'
-import VueDevTools from 'vite-plugin-vue-devtools'
+import { vueDsfrAutoimportPreset, vueDsfrComponentResolver } from "@gouvminint/vue-dsfr/meta";
+import vue from "@vitejs/plugin-vue";
+import AutoImport from "unplugin-auto-import/vite";
+import Components from "unplugin-vue-components/vite";
+import { defineConfig } from "vite";
+import VueDevTools from "vite-plugin-vue-devtools";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -18,40 +18,41 @@ export default defineConfig({
       exclude: [/node_modules/],
       imports: [
         // @ts-expect-error TS2322
-        'vue',
+        "vue",
         // @ts-expect-error TS2322
-        'vue-router',
+        "vue-router",
         // @ts-expect-error TS2322
-        'pinia',
+        "pinia",
         // @ts-expect-error TS2322
-        'vitest',
+        "vitest",
         // @ts-expect-error TS2322
         vueDsfrAutoimportPreset,
       ],
       vueTemplate: true,
-      dts: './src/auto-imports.d.ts',
+      dts: "./src/auto-imports.d.ts",
       eslintrc: {
         enabled: true,
-        filepath: './.eslintrc-auto-import.json',
+        filepath: "./.eslintrc-auto-import.json",
         globalsPropValue: true,
       },
     }),
     Components({
-      extensions: ['vue'],
-      dirs: ['src/components'], // Autoimport de vos composants qui sont dans le dossier `src/components`
+      extensions: ["vue"],
+      dirs: ["src/components"], // Autoimport de vos composants qui sont dans le dossier `src/components`
       include: [/\.vue$/, /\.vue\?vue/],
-      dts: './src/components.d.ts',
+      dts: "./src/components.d.ts",
       resolvers: [
         vueDsfrComponentResolver, // Autoimport des composants de VueDsfr dans les templates
       ],
     }),
   ],
-  base: process.env.BASE_URL || '/extraction',
-  envPrefix: ['VITE_', 'IAM_'],
+  base: process.env.BASE_URL || "/extraction",
+  envPrefix: ["VITE_", "IAM_"],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "cartes.gouv.fr-service": fileURLToPath(new URL("./node_modules/cartes.gouv.fr-service/src/index.js", import.meta.url)),
     },
-    dedupe: ['vue', 'pinia', 'vue-demi'],
-  }
-})
+    dedupe: ["vue", "pinia", "vue-demi"],
+  },
+});

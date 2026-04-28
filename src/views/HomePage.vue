@@ -1,18 +1,36 @@
 <script setup lang="ts">
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAppStore } from '@/stores/appStore';
+import { getService } from 'cartes.gouv.fr-service';
+
 const appStore = useAppStore();
 const router = useRouter();
 
+const createNewAuthService = () => {
+	if (appStore.service) {
+		return appStore.service;
+	}
+
+	const newAuthService = getService({ mode: 'local' });
+	appStore.setService(newAuthService); // sauvegarde du service dans le store
+	return newAuthService;
+};
 
 const onConnect = () => {
-  appStore.service?.getAccessLogin()
-  .then((url) => {
-    console.log(url);
-    window.location.href = url; // redirection vers la page ssosS
-  });
+  // création d'une nouvelle instance du service d'authentification
+	const service = createNewAuthService();
+
+	service.getAccessLogin()
+		.then((url: string) => {
+			window.location.href = url;
+		});
 }
-const user = appStore.service?.getUser();
+
+// si authentifié, on récupère l'utilisateur depuis le store 
+// pour l'afficher dans la page d'accueil
+const user = computed(() => appStore.service?.getUser()); // String
+
 onMounted(() => {
   console.log('HomePage mounted');
   console.log('User:', user);
@@ -26,7 +44,7 @@ onMounted(() => {
 			<div class="background-left" />
 			<div class="background-right" />
 		</div>
-		HOME PAGE.VUE
+		[DEBUG] HOME PAGE.VUE
 		{{ appStore.service?.authenticated }}
 		{{ user }}
 		<div class="card-layer">

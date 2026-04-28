@@ -1,47 +1,64 @@
 <script setup lang="ts">
 import "ol/ol.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
+import { watch } from 'vue';
 import Patience from '@/components/utils/Patience.vue'
 import StoreData from '@/components/async-data/StoreData.vue';
 import { CgfrFooter, CgfrHeader } from 'cartes.gouv.fr-vue-components'
 import { useAppStore } from '@/stores/appStore';
 import HomePage from "./HomePage.vue";
 
+import { getService, useAuth } from 'cartes.gouv.fr-service';
+
 const appStore = useAppStore();
 
+// initialisation du service
+const service = getService({ mode: 'local' });
+// authentification
+const { isAuthenticated, user } = useAuth({ service });
+
+// sauvegarde du service dans le store dès que l'authentification 
+// est établie. On pourrait ausi utilise un provider/inject.
+watch(isAuthenticated, (authenticated) => {
+  if (authenticated) {
+    appStore.setService(service);
+  }
+}, { immediate: true });
+
+// gestion de la connexion
 const onConnect = () => {
-  console.log(appStore.service);
-  appStore.service?.getAccessLogin()
-  .then((url) => {
-    console.log(url);
-    window.location.href = url; // redirection vers la page ssosS
-  });
-}
-const onDisconnect = () => {
-  appStore.service?.getAccessLogout()
-  .then((url) => {
-    console.log(url);
+  service.getAccessLogin()
+  .then((url:string) => {
     window.location.href = url; // redirection vers la page sso
   });
 }
-const user = computed(() => appStore.service?.getUser());
+// gestion de la déconnexion
+const onDisconnect = () => {
+  service.getAccessLogout()
+  .then((url:string) => {
+    window.location.href = url; // redirection vers la page sso
+  });
+}
 </script>
 
 <template>
+  <!-- INFO : on ne peut pas utiliser user directement depuis useAuth 
+   car user est une string, alors que le composant CgfrHeader 
+   attend un objet utilisateur -->
   <CgfrHeader
     class="CgfrHeader"
     badge-text="Extraction"
     badge-icon="fr-icon-road-map-fill"
     badge-color="pink-macaron"
-    :authenticated="appStore.service?.authenticated"
+    :authenticated="isAuthenticated"
     :user="appStore.service?.user" 
     @login="onConnect"
     @logout="onDisconnect"
   />
-  INDEX.VUE
-  		{{ appStore.service?.authenticated }}
+  [DEBUG] INDEX.VUE
+  	{{ isAuthenticated }}
 		{{ user }}
-    <HomePage v-if="!appStore.service?.authenticated"/>
+    <HomePage v-if="!isAuthenticated"/>
     <Suspense v-else>
       <!-- Chargement du dataStore avec une patience 
             avant afficahge de la cartographie 
