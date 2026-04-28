@@ -1,5 +1,23 @@
 <script setup lang="ts">
-const router = useRouter()
+import { useRouter } from 'vue-router';
+import { useAppStore } from '@/stores/appStore';
+const appStore = useAppStore();
+const router = useRouter();
+
+
+const onConnect = () => {
+  appStore.service?.getAccessLogin()
+  .then((url) => {
+    console.log(url);
+    window.location.href = url; // redirection vers la page ssosS
+  });
+}
+const user = appStore.service?.getUser();
+onMounted(() => {
+  console.log('HomePage mounted');
+  console.log('User:', user);
+  console.log('Service:', appStore.service);
+});
 </script>
 
 <template>
@@ -8,7 +26,9 @@ const router = useRouter()
 			<div class="background-left" />
 			<div class="background-right" />
 		</div>
-
+		HOME PAGE.VUE
+		{{ appStore.service?.authenticated }}
+		{{ user }}
 		<div class="card-layer">
 			<div class="icon-container">
 			<span class="fr-icon-inbox-unarchive-line"></span>
@@ -25,18 +45,28 @@ const router = useRouter()
 				Un service pour filtrer, sélectionner et extraire précisément les données géographiques dont vous avez besoin.
 			</div>
 			<div>
-				<DsfrButton
-					secondary
-					label="Mes extractions"
-					@click="() => router.push('/myextractions')"
-				/>
-				<DsfrButton
-					class="fr-ml-2v"
-					label="Créer une extraction"
-					icon="fr-icon-arrow-right-line"
-					icon-right
-					@click="() => router.push('/new-extraction')"
-				/>
+				<template name="connected" v-if="appStore.service?.authenticated">
+					<DsfrButton
+						secondary
+						label="Mes extractions"
+						@click="() => router.push('/myextractions')"
+					/>
+					<DsfrButton
+						class="fr-ml-2v"
+						label="Créer une extraction"
+						icon="fr-icon-arrow-right-line"
+						icon-right
+						@click="() => router.push('/new-extraction')"
+					/>
+				</template>
+				<template name="not-connected" v-else>
+					<DsfrButton
+						label="Connectez-vous pour commencer"
+						icon="fr-icon-arrow-right-line"
+						icon-right
+						@click="onConnect"
+					/>
+				</template>
 			</div>
 
 		</div>
