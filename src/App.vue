@@ -2,8 +2,14 @@
 import "ol/ol.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
 
+import { useAppStore } from "./stores/appStore";
+
 import { setSettings } from "cartes.gouv.fr-service";
 import Index from "./views/Index.vue";
+
+import { getService, useAuth } from 'cartes.gouv.fr-service';
+
+const appStore = useAppStore();
 
 // Configuration du service d'authentification avec les variables d'environnement
 // Ces variables sont injectées au moment de la construction de l'application,
@@ -27,6 +33,13 @@ setSettings({
   IamRedirectRemote : import.meta.env.IAM_REDIRECT_REMOTE,
   IamEntrepotApiUrlRemote : import.meta.env.IAM_ENTREPOT_API_URL_REMOTE,
 });
+
+const service = getService({ mode: 'local' });
+appStore.service = service;
+
+const { isAuthenticated, user } = useAuth({ service, options: { routing : false} });
+appStore.isAuthenticated = isAuthenticated.value;
+appStore.user = user.value;
 
 </script>
 

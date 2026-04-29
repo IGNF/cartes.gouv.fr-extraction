@@ -2,26 +2,13 @@
 import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAppStore } from '@/stores/appStore';
-import { getService } from 'cartes.gouv.fr-service';
 
 const appStore = useAppStore();
 const router = useRouter();
 
-const createNewAuthService = () => {
-	if (appStore.service) {
-		return appStore.service;
-	}
-
-	const newAuthService = getService({ mode: 'local' });
-	appStore.setService(newAuthService); // sauvegarde du service dans le store
-	return newAuthService;
-};
-
 const onConnect = () => {
   // création d'une nouvelle instance du service d'authentification
-	const service = createNewAuthService();
-
-	service.getAccessLogin()
+	appStore.service?.getAccessLogin()
 		.then((url: string) => {
 			window.location.href = url;
 		});
@@ -51,7 +38,7 @@ const onConnect = () => {
 				Un service pour filtrer, sélectionner et extraire précisément les données géographiques dont vous avez besoin.
 			</div>
 			<div>
-				<template name="connected" v-if="appStore.service?.authenticated">
+				<template name="connected" v-if="appStore.isAuthenticated">
 					<DsfrButton
 						secondary
 						label="Mes extractions"

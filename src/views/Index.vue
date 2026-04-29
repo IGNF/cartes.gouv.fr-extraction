@@ -8,33 +8,18 @@ import { CgfrFooter, CgfrHeader } from 'cartes.gouv.fr-vue-components'
 import { useAppStore } from '@/stores/appStore';
 import HomePage from "./HomePage.vue";
 
-import { getService, useAuth, getSettings } from 'cartes.gouv.fr-service';
-
 const appStore = useAppStore();
-
-// initialisation du service
-const service = getService({ mode: 'local' });
-// authentification
-const { isAuthenticated, user } = useAuth({ service, options: { routing : false} });
-
-// sauvegarde du service dans le store dès que l'authentification 
-// est établie. On pourrait ausi utilise un provider/inject.
-watch(isAuthenticated, (authenticated) => {
-  if (authenticated) {
-    appStore.setService(service);
-  }
-}, { immediate: true });
 
 // gestion de la connexion
 const onConnect = () => {
-  service.getAccessLogin()
+  appStore.service?.getAccessLogin()
   .then((url:string) => {
     window.location.href = url; // redirection vers la page sso
   });
 }
 // gestion de la déconnexion
 const onDisconnect = () => {
-  service.getAccessLogout()
+  appStore.service?.getAccessLogout()
   .then((url:string) => {
     window.location.href = url; // redirection vers la page sso
   });
@@ -55,9 +40,8 @@ const baseUrl = import.meta.env.BASE_URL;
       badge-text="Extraction"
       badge-icon="fr-icon-road-map-fill"
       badge-color="pink-macaron"
-      :baseUrl="baseUrl"
-      :authenticated="isAuthenticated"
-      :user="appStore.service?.user" 
+      :authenticated="appStore.isAuthenticated"
+      :user="appStore.user" 
       @login="onConnect"
       @logout="onDisconnect"
     />

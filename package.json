@@ -32,6 +32,7 @@
     "ol": "^10.8.0",
     "ol-mapbox-style": "^13.4.0",
     "pinia": "^2.3.1",
+    "pinia-plugin-store": "^3.0.8",
     "vue": "^3.4.38",
     "vue-logger-plugin": "^2.2.3",
     "vue-router": "^4.4.3"

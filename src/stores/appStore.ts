@@ -1,25 +1,27 @@
 import { defineStore } from 'pinia'
-import { shallowRef } from 'vue'
-import { getService } from 'cartes.gouv.fr-service'
-import { setSettings } from 'cartes.gouv.fr-service'
+import { shallowRef, ref } from 'vue'
+import { getService, useAuth } from 'cartes.gouv.fr-service'
 
 export const useAppStore = defineStore('app', () => {
   const service = shallowRef<ReturnType<typeof getService> | null>(null)
 
-  function setService(nextService: ReturnType<typeof getService>) {
-    service.value = nextService
-  }
+  const isAuthenticated = ref<boolean>(false)
+
+  const user = shallowRef<any | string | null>(null)
 
   watch(service, (newService) => { 
     if (newService) {
-      console.log("Service updated:", newService);
+      user.value = newService.user || null;
+      isAuthenticated.value = newService.authenticated || false;
     } else {
-      console.log("Service is now null");
+      user.value = null;
+      isAuthenticated.value = false;
     }
-  })
+  }, { flush: 'pre' })
 
   return {
     service,
-    setService
+    isAuthenticated,
+    user,
   }
 })
