@@ -47,6 +47,14 @@ const routes = [
     //   }
     // ]
   },
+  {
+    path: '/login',
+    redirect: '/extraction',
+  },
+  {
+    path: '/logout',
+    redirect: '/extraction',
+  },
 ]
 
 const router = createRouter({

@@ -45,37 +45,47 @@ const onDisconnect = () => {
   <!-- INFO : on ne peut pas utiliser user directement depuis useAuth 
    car user est une string, alors que le composant CgfrHeader 
    attend un objet utilisateur -->
-  <CgfrHeader
-    class="CgfrHeader"
-    badge-text="Extraction"
-    badge-icon="fr-icon-road-map-fill"
-    badge-color="pink-macaron"
-    :authenticated="isAuthenticated"
-    :user="appStore.service?.user" 
-    @login="onConnect"
-    @logout="onDisconnect"
-  />
-  [DEBUG] INDEX.VUE
-  	{{ isAuthenticated }}
-		{{ user }}
-    <HomePage v-if="!isAuthenticated"/>
-    <Suspense v-else>
-      <!-- Chargement du dataStore avec une patience 
-            avant afficahge de la cartographie 
-        -->
-      <StoreData>
-          <div class="Alerts" />
-          <div class="fr-container  fr-mt-3w  fr-mt-md-5w  fr-mb-5w Content">
-            <RouterView />
-          </div>
-          <CgfrFooter />
-          <Modals />
-      </StoreData>
-      <!-- loading state via #fallback slot -->
-      <template #fallback>
-        <Patience />
-      </template>
-    </Suspense>
+  <div id="app">
+
+
+    <!-- FIRST GRID ROW -->
+    <CgfrHeader
+      class="CgfrHeader header"
+      badge-text="Extraction"
+      badge-icon="fr-icon-road-map-fill"
+      badge-color="pink-macaron"
+      :authenticated="isAuthenticated"
+      :user="appStore.service?.user" 
+      @login="onConnect"
+      @logout="onDisconnect"
+    />
+
+
+    <!-- SECOND GRID ROW -->
+    <div class="alerts" />
+
+
+    <!-- THIRD GRID ROW -->
+    <div class="fr-container  fr-mt-3w  fr-mt-md-5w  fr-mb-5w Content">
+      <!-- <Suspense v-else> -->
+        <!-- Chargement du dataStore avec une patience 
+              avant afficahge de la cartographie 
+          -->
+        <!-- <StoreData> -->
+              <RouterView />
+            <Modals />
+        <!-- </StoreData> -->
+        <!-- loading state via #fallback slot -->
+        <!-- <template #fallback>
+          <Patience />
+        </template> -->
+      <!-- </Suspense> -->
+    </div>
+
+
+    <!-- LAST GRID ROW -->
+    <CgfrFooter class="footer"/>
+  </div>
 </template>
 
 <style lang="scss">

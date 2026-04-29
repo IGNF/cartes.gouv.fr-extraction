@@ -27,15 +27,6 @@ const onConnect = () => {
 		});
 }
 
-// si authentifié, on récupère l'utilisateur depuis le store 
-// pour l'afficher dans la page d'accueil
-const user = computed(() => appStore.service?.getUser()); // String
-
-onMounted(() => {
-  console.log('HomePage mounted');
-  console.log('User:', user);
-  console.log('Service:', appStore.service);
-});
 </script>
 
 <template>
@@ -44,9 +35,6 @@ onMounted(() => {
 			<div class="background-left" />
 			<div class="background-right" />
 		</div>
-		[DEBUG] HOME PAGE.VUE
-		{{ appStore.service?.authenticated }}
-		{{ user }}
 		<div class="card-layer">
 			<div class="icon-container">
 			<span class="fr-icon-inbox-unarchive-line"></span>
