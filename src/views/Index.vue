@@ -8,14 +8,14 @@ import { CgfrFooter, CgfrHeader } from 'cartes.gouv.fr-vue-components'
 import { useAppStore } from '@/stores/appStore';
 import HomePage from "./HomePage.vue";
 
-import { getService, useAuth } from 'cartes.gouv.fr-service';
+import { getService, useAuth, getSettings } from 'cartes.gouv.fr-service';
 
 const appStore = useAppStore();
 
 // initialisation du service
 const service = getService({ mode: 'local' });
 // authentification
-const { isAuthenticated, user } = useAuth({ service });
+const { isAuthenticated, user } = useAuth({ service, options: { routing : false} });
 
 // sauvegarde du service dans le store dès que l'authentification 
 // est établie. On pourrait ausi utilise un provider/inject.
@@ -39,6 +39,7 @@ const onDisconnect = () => {
     window.location.href = url; // redirection vers la page sso
   });
 }
+const baseUrl = import.meta.env.BASE_URL;
 </script>
 
 <template>
@@ -54,6 +55,7 @@ const onDisconnect = () => {
       badge-text="Extraction"
       badge-icon="fr-icon-road-map-fill"
       badge-color="pink-macaron"
+      :baseUrl="baseUrl"
       :authenticated="isAuthenticated"
       :user="appStore.service?.user" 
       @login="onConnect"

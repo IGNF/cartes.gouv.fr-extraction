@@ -11,6 +11,7 @@ import Index from "./views/Index.vue";
 // Note : on utilise un fichier .env.local pour définir ces variables en local, 
 // et elles peuvent être définies différemment en production.
 setSettings({
+  BaseUrl : import.meta.env.BASE_URL,
   IamCheckSsoDisable : import.meta.env.IAM_CHECK_SSO_DISABLE,
   IamCheckSsoAutoAuth : import.meta.env.IAM_CHECK_SSO_AUTO_AUTH,
   IamCheckSsoType : import.meta.env.IAM_CHECK_SSO_TYPE,
@@ -25,7 +26,6 @@ setSettings({
   IamEntrepotApiUrl : import.meta.env.IAM_ENTREPOT_API_URL,
   IamRedirectRemote : import.meta.env.IAM_REDIRECT_REMOTE,
   IamEntrepotApiUrlRemote : import.meta.env.IAM_ENTREPOT_API_URL_REMOTE,
-  BaseUrl : import.meta.env.BASE_URL,
 });
 
 </script>
