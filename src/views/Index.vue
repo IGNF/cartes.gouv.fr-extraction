@@ -53,19 +53,19 @@ const baseUrl = import.meta.env.BASE_URL;
 
     <!-- THIRD GRID ROW -->
     <div class="fr-container  fr-mt-3w  fr-mt-md-5w  fr-mb-5w Content">
-      <!-- <Suspense v-else> -->
+      <Suspense>
         <!-- Chargement du dataStore avec une patience 
               avant afficahge de la cartographie 
           -->
-        <!-- <StoreData> -->
+        <StoreData>
               <RouterView />
             <Modals />
-        <!-- </StoreData> -->
+        </StoreData>
         <!-- loading state via #fallback slot -->
-        <!-- <template #fallback>
+        <template #fallback>
           <Patience />
-        </template> -->
-      <!-- </Suspense> -->
+        </template>
+      </Suspense>
     </div>
 
 

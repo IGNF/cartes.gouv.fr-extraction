@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import "ol/ol.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
+import { watch } from "vue";
 
+import { useLogger } from "vue-logger-plugin";
 import { useAppStore } from "./stores/appStore";
 
 import { setSettings } from "cartes.gouv.fr-service";
 import Index from "./views/Index.vue";
 
-import { getService, useAuth } from 'cartes.gouv.fr-service';
+import { getService, useAuth } from "cartes.gouv.fr-service";
+
+const log = useLogger();
 
 const appStore = useAppStore();
 
@@ -38,8 +42,13 @@ const service = getService({ mode: 'local' });
 appStore.service = service;
 
 const { isAuthenticated, user } = useAuth({ service, options: { routing : false} });
-appStore.isAuthenticated = isAuthenticated.value;
-appStore.user = user.value;
+
+// Nécessaire de watch les deux porpriétés car elles sont mises à jour de manière asynchrone, 
+// et on veut s'assurer que le store est mis à jour dès que l'une ou l'autre change.
+watch([isAuthenticated, user], ([authenticated, currentUser]) => {
+  appStore.isAuthenticated = authenticated;
+  appStore.user = currentUser;
+}, { immediate: true });
 
 </script>
 

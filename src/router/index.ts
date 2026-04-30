@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAppStore } from '@/stores/appStore'
 
 import MyExtractions from '@/views/MyExtraction/MyExtractions.vue'
-import RepositoryList from '@/views/MyExtraction/RepositoryList.vue'
-import RepositoryDetail from '@/views/MyExtraction/RepositoryDetail.vue'
-import ExtractionDetail from '@/views/MyExtraction/ExtractionDetail.vue'
 import HomePage from '@/views/HomePage.vue'
 import CreateExtraction from '@/views/CreateExtraction/CreateExtraction.vue'
 
@@ -20,11 +18,13 @@ const routes = [
     path: '/new-extraction',
     name: 'new-extraction',
     component: CreateExtraction,
+    meta: { requiresAuth: true },
   },
   {
     path: '/myextractions',
     name: 'repositories',
     component: MyExtractions,
+    meta: { requiresAuth: true },
     //    children: [
     //   {
     //     path: '', // /repositories
@@ -66,6 +66,16 @@ router.beforeEach((to) => {
   // Cf. https://github.com/vueuse/head pour des transformations avancées de Head
   const specificTitle = to.meta.title ? `${to.meta.title} - ` : ''
   document.title = `${specificTitle}${MAIN_TITLE}`
+
+  // si la route cible nécessite une connexion
+  // (`meta.requiresAuth`) et que l'utilisateur n'est pas authentifié,
+  // on redirige vers la page d'accueil
+  const appStore = useAppStore()
+  if (to.meta.requiresAuth && !appStore.isAuthenticated) {
+    return {
+      path: '/extraction',
+    }
+  }
 })
 
 export default router
