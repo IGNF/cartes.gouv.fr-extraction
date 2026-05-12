@@ -21,11 +21,9 @@ export const useDataStore = defineStore('data', () => {
           log.debug("API URL:", service)
         try {
         const response = await service.getFetch()(
-          // `${appStore.service.api}/extraction/processes?page=1&limit=10`,
           'https://data.geopf.fr/extraction/processes?page=1&limit=10',
           {
             headers: {
-              // 'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
             }
           }

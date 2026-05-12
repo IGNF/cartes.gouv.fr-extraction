@@ -7,6 +7,8 @@
     "clean:dist": "rimraf dist",
     "build-only": "vite build",
     "dev": "vite",
+    "dev:qua": "vite --mode qua",
+    "dev:prod": "vite --mode prod",
     "build": "run-p type-check \"build-only {@}\" --",
     "format": "eslint . --fix",
     "lint": "eslint .",

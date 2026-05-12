@@ -11,14 +11,10 @@ const dataStore = useDataStore()
 const { getExtractible } = dataStore;
 const extractibles = computed(() => getExtractible())
 
-onMounted(() => {
-  console.log('Extraction view mounted');
-});
-
 const currentStep = ref(1)
 watch(currentStep, (newStep) => {
   if (newStep === 3 && !selectedExtractible.value) {
-    // currentStep.value = 2; // Retourner à l'étape précédente si aucune extraction n'est sélectionnée
+    currentStep.value = 2; // Retourner à l'étape précédente si aucune extraction n'est sélectionnée
     alert('Veuillez sélectionner une extraction avant de continuer.');
   }
 })
@@ -41,7 +37,7 @@ const selectedExtractible = ref<Extractible | null>(null)
       <ChooseExtractible 
         v-show="currentStep === 2"  
         :extractibles="extractibles" 
-        v-model="selectedExtractible"/>
+        v-model:selectedExtractible="selectedExtractible"/>
       <ChooseSqlParams 
       v-show="currentStep === 3" 
       :extractible="selectedExtractible" 
