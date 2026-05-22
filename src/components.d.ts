@@ -28,6 +28,7 @@ declare module 'vue' {
     Map: typeof import('./components/map/Map.vue')['default']
     Modals: typeof import('./components/Modals.vue')['default']
     MyExtractionSkeleton: typeof import('./components/template-grid/MyExtractionSkeleton.vue')['default']
+    NameExtractionModal: typeof import('./components/Modals/NameExtractionModal.vue')['default']
     Patience: typeof import('./components/utils/Patience.vue')['default']
     RequestBuilder: typeof import('./components/requestBuilder/RequestBuilder.vue')['default']
     RequestForm: typeof import('./components/requestBuilder/RequestForm.vue')['default']

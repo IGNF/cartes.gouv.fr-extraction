@@ -5,7 +5,7 @@ import ChooseArea from './ChooseArea.vue';
 import { useDataStore } from '@/stores/dataStoreExtraction'
 import ChooseSqlParams from './ChooseSqlParams.vue';
 import type { Extractible, ExtractionRequestBody } from '@/types/extractibles.types';
-import { useCreateExtraction } from '@/composables/gpfRequests';
+import NameExtractionModal from '@/components/Modals/NameExtractionModal.vue';
 
 
 const dataStore = useDataStore()
@@ -22,15 +22,7 @@ watch(currentStep, (newStep) => {
 
 const selectedExtractible = ref<Extractible | null>(null)
 const request = ref<ExtractionRequestBody | undefined>(undefined)
-const response= ref<createExtractionResponse | createExtractionErrorResponse | undefined>(undefined)
-function createExtraction() {
-    console.log('Création de l\'extraction avec les paramètres suivants :', request.value);
-    if (!request.value) {
-        console.error('Aucun paramètre d\'extraction défini.');
-        return;
-    }
-    response.value = useCreateExtraction(request.value);
-}
+const nameExtractionModalRef = ref<InstanceType<typeof NameExtractionModal> | null>(null)
 </script>
 <template>
   <div class="fr-container">
@@ -73,11 +65,14 @@ function createExtraction() {
         <DsfrButton 
           v-show="currentStep === 3"
           :disabled="!request?.inputs?.relations || Object.keys(request.inputs.relations).length === 0"
-          @click="createExtraction">
+          @click="nameExtractionModalRef?.openModal()">
           Lancer l'extraction
         </DsfrButton>
     </div>
-    <!-- {{ response }} -->
+    <NameExtractionModal
+      ref="nameExtractionModalRef"
+      :request="request"
+    />
   </div>
 </template>
 <style scoped> 
