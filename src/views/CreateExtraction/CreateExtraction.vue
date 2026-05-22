@@ -4,7 +4,8 @@ import ChooseExtractible from './ChooseExtractible.vue';
 import ChooseArea from './ChooseArea.vue';
 import { useDataStore } from '@/stores/dataStoreExtraction'
 import ChooseSqlParams from './ChooseSqlParams.vue';
-import type { Extractible } from '@/types/extractibles.types';
+import type { Extractible, ExtractionRequestBody } from '@/types/extractibles.types';
+import { useCreateExtraction } from '@/composables/gpfRequests';
 
 
 const dataStore = useDataStore()
@@ -20,6 +21,16 @@ watch(currentStep, (newStep) => {
 })
 
 const selectedExtractible = ref<Extractible | null>(null)
+const request = ref<ExtractionRequestBody | undefined>(undefined)
+const response= ref<createExtractionResponse | createExtractionErrorResponse | undefined>(undefined)
+function createExtraction() {
+    console.log('Création de l\'extraction avec les paramètres suivants :', request.value);
+    if (!request.value) {
+        console.error('Aucun paramètre d\'extraction défini.');
+        return;
+    }
+    response.value = useCreateExtraction(request.value);
+}
 </script>
 <template>
   <div class="fr-container">
@@ -41,12 +52,32 @@ const selectedExtractible = ref<Extractible | null>(null)
       <ChooseSqlParams 
       v-show="currentStep === 3" 
       :extractible="selectedExtractible" 
-      />
+      v-model="request"/>
     </div>
+        <!-- {{ request }} -->
     <div class="fr-grid-row nav-row">
-        <DsfrButton secondary @click="currentStep--" :disabled="currentStep <= 1">Précédent</DsfrButton>
-        <DsfrButton @click="currentStep++" :disabled="currentStep >= 3">Suivant</DsfrButton>
+        <!-- Bouton Précédent -->
+        <DsfrButton 
+          secondary 
+          @click="currentStep--" 
+          :disabled="currentStep <= 1">
+          Précédent
+        </DsfrButton>
+        <!-- Les boutons Suivant -->
+        <DsfrButton 
+          v-show="currentStep < 3"
+          @click="currentStep++" 
+          :disabled="currentStep == 2 && !selectedExtractible">
+          Suivant
+        </DsfrButton>
+        <DsfrButton 
+          v-show="currentStep === 3"
+          :disabled="!request?.inputs?.relations || Object.keys(request.inputs.relations).length === 0"
+          @click="createExtraction">
+          Lancer l'extraction
+        </DsfrButton>
     </div>
+    <!-- {{ response }} -->
   </div>
 </template>
 <style scoped> 

@@ -1,5 +1,5 @@
 
-
+// Types pour les extractions de l'utilisateur
 export type ExtractionItem = {
   title: string
   status: string
@@ -7,6 +7,7 @@ export type ExtractionItem = {
   launch_date: Date
   execution_url: string
 }
+
 
 export type RepositoryItem = {
   title: string
