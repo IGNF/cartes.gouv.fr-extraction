@@ -35,15 +35,17 @@ export const useDataStore = defineStore('data', () => {
 
         const data = await response.json()
         const results = await Promise.all(
-        data.processes.map(async (p) => {
-          const href = p.links.find((link: ProcessLink) => link.rel === "describedby")?.href;
-          if (!href) return null;
-            const res = await service.getFetch()(href,      {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-            return res.json();
+          data.processes.map(async (p) => {
+            const href = p.links.find((link: ProcessLink) => link.rel === "describedby")?.href;
+            if (!href) return null;
+              const res = await service.getFetch()(href,      {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+            const json = await res.json();
+            // on ajoute le processID à l'extractible pour faciliter les requêtes d'extraction
+            return { ...json, processID: p.id }
           })
         );
           extractible.value = results.filter((r): r is Extractible => r !== null);

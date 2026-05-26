@@ -71,7 +71,8 @@ const nameExtractionModalRef = ref<InstanceType<typeof NameExtractionModal> | nu
     </div>
     <NameExtractionModal
       ref="nameExtractionModalRef"
-      :request="request"
+      :request="request"  
+      :processID="selectedExtractible?.processID"
     />
   </div>
 </template>

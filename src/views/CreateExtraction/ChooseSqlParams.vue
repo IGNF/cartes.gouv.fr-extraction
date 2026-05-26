@@ -28,7 +28,7 @@ const requestBody = computed((): ExtractionRequestBody => {
     return {
         inputs: {
             format: format.value, 
-            projection: projection.value,
+            srs: projection.value,
             relations: relations.value,
         },
         outputs: {

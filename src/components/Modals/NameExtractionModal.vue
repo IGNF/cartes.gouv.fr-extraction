@@ -9,6 +9,7 @@ import type {
 
 const props = defineProps<{
   request: ExtractionRequestBody | undefined
+  processID: string | undefined
 }>()
 
 const isCreateModalOpened = ref(false)
@@ -34,7 +35,11 @@ async function createExtraction() {
     console.error('Aucun paramètre d\'extraction défini.')
     return
   }
-  response.value = await useCreateExtraction(props.request)
+  if (!props.processID) {
+    console.error('Aucun processID défini.')
+    return
+  }
+  response.value = await useCreateExtraction(props.request, props.processID)
 }
 
 defineExpose({

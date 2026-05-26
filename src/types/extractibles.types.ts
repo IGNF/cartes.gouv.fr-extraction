@@ -29,6 +29,9 @@ export type Extractible = {
     status: string;
     type_infos: { relations: ExtractibleRelation[] };
     [key: string]: any;  // autres propriétés autorisées
+    _id: string; // ID de l'extractible
+    // ajouté pour faciliter les requêtes d'extraction
+    processID: string; // ID du process associé à l'extractible
 }
 
 export type ExtractibleRelation = {
@@ -48,7 +51,7 @@ export type ExtractionRequestBody = {
         relations?: RelationInput;
         format?: string;
         append?: boolean;
-        srs?: string;
+        srs: string;
     },
     outputs : {
         logs?: Object;

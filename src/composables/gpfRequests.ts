@@ -6,7 +6,7 @@ import type {
 } from '@/types/extractibles.types';
 import { useAppStore } from '@/stores/appStore';
 
-export async function useCreateExtraction(requestBody: ExtractionRequestBody) {
+export async function useCreateExtraction(requestBody: ExtractionRequestBody, processID: string) {
     const appStore = useAppStore();
     const service = appStore.service;
 
@@ -14,14 +14,13 @@ export async function useCreateExtraction(requestBody: ExtractionRequestBody) {
         throw new Error('Service API non initialisé');
     }
 
-    // Ici, vous pouvez faire une requête POST à votre API pour lancer l'extraction
-    // Par exemple, en utilisant fetch :
+    console.log('Lancement de l\'extraction avec les données suivantes :', requestBody);
+    console.log('Service API utilisé :', service);
     try {
-        const response = await service.getFetch()('https://data.geopf.fr/api/processes/{processID}/execution', {
+        const response = await service.getFetch()(`https://data.geopf.fr/extraction/processes/${processID}/execution`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            // Ajoutez d'autres en-têtes si nécessaire, comme l'authentification
         },
         body: JSON.stringify(requestBody),
     });
