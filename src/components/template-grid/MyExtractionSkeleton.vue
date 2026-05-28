@@ -1,6 +1,5 @@
 <template>
     <div class="fr-container">
-        concon
         <slot></slot>
         <!-- <div class="fr-grid-row">
 

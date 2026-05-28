@@ -1,78 +1,57 @@
 <script setup lang="ts">
-import Patience from '@/components/utils/Patience.vue'
-import StoreData from '@/components/async-data/StoreData.vue';
-import { CgfrFooter, CgfrHeader } from 'cartes.gouv.fr-vue-components'
-
 import "ol/ol.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
+import { watch } from "vue";
 
-const serviceTitle = 'Service'
-const serviceDescription = 'Description du service'
-const logoText = ['Ministère', 'de l’intérieur']
+import { useLogger } from "vue-logger-plugin";
+import { useAppStore } from "./stores/appStore";
 
-const quickLinks = [
-  {
-    label: 'Home',
-    to: '/',
-    icon: 'ri-home-4-line',
-    iconAttrs: { color: 'var(--red-marianne-425-625)' },
-  }
-]
-const searchQuery = ref('')
+import { setSettings } from "cartes.gouv.fr-service";
+import Index from "./views/Index.vue";
+
+import { getService, useAuth } from "cartes.gouv.fr-service";
+
+const log = useLogger();
+
+const appStore = useAppStore();
+
+// Configuration du service d'authentification avec les variables d'environnement
+// Ces variables sont injectées au moment de la construction de l'application,
+// et permettent de configurer le comportement du service d'authentification.
+// Note : on utilise un fichier .env.local pour définir ces variables en local, 
+// et elles peuvent être définies différemment en production.
+setSettings({
+  BaseUrl : import.meta.env.BASE_URL,
+  IamCheckSsoDisable : import.meta.env.IAM_CHECK_SSO_DISABLE,
+  IamCheckSsoAutoAuth : import.meta.env.IAM_CHECK_SSO_AUTO_AUTH,
+  IamCheckSsoType : import.meta.env.IAM_CHECK_SSO_TYPE,
+  IamCheckSsoTimeout : import.meta.env.IAM_CHECK_SSO_TIMEOUT,
+  IamCheckSsoClientId : import.meta.env.IAM_CHECK_SSO_CLIENT_ID,
+  IamDisable : import.meta.env.IAM_DISABLE,
+  IamAuthMode : import.meta.env.IAM_AUTH_MODE,
+  IamUrl : import.meta.env.IAM_URL,
+  IamRealm : import.meta.env.IAM_REALM,
+  IamClientId : import.meta.env.IAM_CLIENT_ID,
+  IamClientSecret : import.meta.env.IAM_CLIENT_SECRET,
+  IamEntrepotApiUrl : import.meta.env.IAM_ENTREPOT_API_URL,
+  IamRedirectRemote : import.meta.env.IAM_REDIRECT_REMOTE,
+  IamEntrepotApiUrlRemote : import.meta.env.IAM_ENTREPOT_API_URL_REMOTE,
+});
+
+const service = getService({ mode: 'local' });
+appStore.service = service;
+
+const { isAuthenticated, user } = useAuth({ service, options: { routing : false} });
+
+// Nécessaire de watch les deux porpriétés car elles sont mises à jour de manière asynchrone, 
+// et on veut s'assurer que le store est mis à jour dès que l'une ou l'autre change.
+watch([isAuthenticated, user], ([authenticated, currentUser]) => {
+  appStore.isAuthenticated = authenticated;
+  appStore.user = currentUser;
+}, { immediate: true });
+
 </script>
 
 <template>
-  <CgfrHeader
-    class="CgfrHeader"
-    badge-text="Extraction"
-    badge-icon="fr-icon-road-map-fill"
-    badge-color="pink-macaron"
-  />
-  <Suspense>
-    <!-- Chargement du dataStore avec une patience 
-          avant afficahge de la cartographie 
-      -->
-    <StoreData>
-        <div class="Alerts" />
-        <div class="fr-container  fr-mt-3w  fr-mt-md-5w  fr-mb-5w Content">
-          <RouterView />
-        </div>
-        <CgfrFooter />
-        <Modals />
-    </StoreData>
-    <!-- loading state via #fallback slot -->
-    <template #fallback>
-      <Patience />
-    </template>
-  </Suspense>
+  <Index />
 </template>
-
-<style lang="scss">
-body {
-  min-height: 100vh;
-}
-#app {
-  display: grid;
-  // on définit 4 lignes (attention, il faut bien 4 enfants dans #app)
-  // [nom] taille
-  grid-template-rows:
-    [header] auto
-    [alerts] auto
-    [content] 1fr
-    [footer] auto;
-  min-height: 100vh;
-}
-// on place les éléments
-.CgfrHeader {
-  grid-row: header;
-}
-.Alerts {
-  grid-row: alerts;
-}
-.Content {
-  grid-row: content;
-}
-.CgfrFooter {
-  grid-row: footer;
-}
-</style>

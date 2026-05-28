@@ -1,0 +1,61 @@
+<script setup lang="ts">
+import type { ExtractibleRelation } from '@/types/extractibles.types'
+
+type TableParams = Record<string, { attributes: string[] }>
+
+const props = withDefaults(defineProps<{
+	relations: ExtractibleRelation[]
+}>(), {
+	relations: () => [],
+})
+
+const tableParams = defineModel<TableParams>({ required: true })
+
+const selectedTable = ref('')
+const selectedAttribute = ref('')
+
+const tableOptions = computed(() => props.relations.map((relation) => relation.name))
+
+const attributeOptions = computed(() => {
+	const relation = props.relations.find((item) => item.name === selectedTable.value)
+	if (!relation) return []
+	return Object.keys(relation.attributes || {})
+})
+
+watch(selectedTable, () => {
+	selectedAttribute.value = ''
+})
+
+watch([selectedTable, selectedAttribute], () => {
+	if (!selectedTable.value) {
+		tableParams.value = {}
+		return
+	}
+
+	tableParams.value = {
+		[selectedTable.value]: {
+			attributes: selectedAttribute.value ? [selectedAttribute.value] : [],
+		},
+	}
+}, { immediate: true })
+</script>
+
+<template>
+	<div class="fr-grid-row fr-grid-row--gutters">
+		<div class="fr-col-12 fr-col-md-6">
+			<DsfrSelect
+				label="Table"
+				:options="tableOptions"
+				v-model="selectedTable"
+			/>
+		</div>
+		<div class="fr-col-12 fr-col-md-6">
+			<DsfrSelect
+				label="Attributes"
+				:options="attributeOptions"
+				v-model="selectedAttribute"
+				:disabled="!selectedTable"
+			/>
+		</div>
+	</div>
+</template>

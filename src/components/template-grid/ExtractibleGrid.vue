@@ -17,7 +17,7 @@ const props = defineProps<{
 </template>
 <style scoped> 
 .extract-list-header {
-    background-color: var(--background-alt-grey);
+    background: var(--background-alt-grey-hover);
     align-items: center;
     height: 4rem;
 }

@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { useNormalizeString } from '@/composables/utils';
+import type { Extraction } from '@/types/my-extractions.types';
 import ExtractionListElement from './ExtractionListElement.vue';
 
 const router = useRouter();
 
 const props = defineProps<{
-    extractions: {
-        status: string
-        title: string
-        url: string
-        launch_date: Date
-        execution_url: string
-    } []
+    extractions: Extraction[]
+}>()
+
+const emit = defineEmits<{
+    (e: 'download', extraction: Extraction): void
+    (e: 'delete', extraction: Extraction): void
 }>()
 
 const searchValue = ref<string>('')
@@ -20,12 +20,13 @@ const searchValue = ref<string>('')
 const filteredExtractions = computed(() => {
     const query = useNormalizeString(searchValue.value)
 
-    if (!query)
-        return props.extractions
+    const extractions = query
+        ? props.extractions.filter((extraction) => useNormalizeString(extraction.name).includes(query))
+        : props.extractions
 
-    return props.extractions.filter((extraction) => {
-        return useNormalizeString(extraction.title).includes(query)
-    })
+    return [...extractions].sort(
+        (a, b) => new Date(b.updated).getTime() - new Date(a.updated).getTime(),
+    )
 })
 
 </script>
@@ -50,8 +51,10 @@ const filteredExtractions = computed(() => {
     />  
     <ExtractionListElement
         v-for="extraction in filteredExtractions"
-        :key="extraction.title"
+        :key="extraction.name"
         :extraction="extraction"
+        @download="emit('download', $event)"
+        @delete="emit('delete', $event)"
     />
 </template>
 

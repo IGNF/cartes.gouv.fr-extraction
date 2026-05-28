@@ -1,5 +1,19 @@
 <script setup lang="ts">
-const router = useRouter()
+import { computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAppStore } from '@/stores/appStore';
+
+const appStore = useAppStore();
+const router = useRouter();
+
+const onConnect = () => {
+  // création d'une nouvelle instance du service d'authentification
+	appStore.service?.getAccessLogin()
+		.then((url: string) => {
+			window.location.href = url;
+		});
+}
+
 </script>
 
 <template>
@@ -8,7 +22,6 @@ const router = useRouter()
 			<div class="background-left" />
 			<div class="background-right" />
 		</div>
-
 		<div class="card-layer">
 			<div class="icon-container">
 			<span class="fr-icon-inbox-unarchive-line"></span>
@@ -25,18 +38,28 @@ const router = useRouter()
 				Un service pour filtrer, sélectionner et extraire précisément les données géographiques dont vous avez besoin.
 			</div>
 			<div>
-				<DsfrButton
-					secondary
-					label="Mes extractions"
-					@click="() => router.push('/myextractions')"
-				/>
-				<DsfrButton
-					class="fr-ml-2v"
-					label="Créer une extraction"
-					icon="fr-icon-arrow-right-line"
-					icon-right
-					@click="() => router.push('/new-extraction')"
-				/>
+				<template name="connected" v-if="appStore.isAuthenticated">
+					<DsfrButton
+						secondary
+						label="Mes extractions"
+						@click="() => router.push('/myextractions')"
+					/>
+					<DsfrButton
+						class="fr-ml-2v"
+						label="Créer une extraction"
+						icon="fr-icon-arrow-right-line"
+						icon-right
+						@click="() => router.push('/new-extraction')"
+					/>
+				</template>
+				<template name="not-connected" v-else>
+					<DsfrButton
+						label="Connectez-vous pour commencer"
+						icon="fr-icon-arrow-right-line"
+						icon-right
+						@click="onConnect"
+					/>
+				</template>
 			</div>
 
 		</div>

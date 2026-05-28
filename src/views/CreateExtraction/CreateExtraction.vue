@@ -4,26 +4,31 @@ import ChooseExtractible from './ChooseExtractible.vue';
 import ChooseArea from './ChooseArea.vue';
 import { useDataStore } from '@/stores/dataStoreExtraction'
 import ChooseSqlParams from './ChooseSqlParams.vue';
-import type { Extractible } from '@/types/extractibles.types';
+import type { Extractible, ExtractionRequestBody } from '@/types/extractibles.types';
+import NameExtractionModal from '@/components/Modals/NameExtractionModal.vue';
+import SuccessModal from '@/components/Modals/SuccessModal.vue';
 
 
 const dataStore = useDataStore()
 const { getExtractible } = dataStore;
 const extractibles = computed(() => getExtractible())
 
-onMounted(() => {
-  console.log('Extraction view mounted');
-});
-
 const currentStep = ref(1)
 watch(currentStep, (newStep) => {
   if (newStep === 3 && !selectedExtractible.value) {
-    // currentStep.value = 2; // Retourner à l'étape précédente si aucune extraction n'est sélectionnée
+    currentStep.value = 2; // Retourner à l'étape précédente si aucune extraction n'est sélectionnée
     alert('Veuillez sélectionner une extraction avant de continuer.');
   }
 })
 
 const selectedExtractible = ref<Extractible | null>(null)
+const request = ref<ExtractionRequestBody | undefined>(undefined)
+const nameExtractionModalRef = ref<InstanceType<typeof NameExtractionModal> | null>(null)
+const successModalRef = ref<InstanceType<typeof SuccessModal> | null>(null)
+
+function handleExtractionSuccess() {
+  successModalRef.value?.openModal()
+}
 </script>
 <template>
   <div class="fr-container">
@@ -41,16 +46,42 @@ const selectedExtractible = ref<Extractible | null>(null)
       <ChooseExtractible 
         v-show="currentStep === 2"  
         :extractibles="extractibles" 
-        v-model="selectedExtractible"/>
+        v-model:selectedExtractible="selectedExtractible"/>
       <ChooseSqlParams 
       v-show="currentStep === 3" 
       :extractible="selectedExtractible" 
-      />
+      v-model="request"/>
     </div>
+        <!-- {{ request }} -->
     <div class="fr-grid-row nav-row">
-        <DsfrButton secondary @click="currentStep--" :disabled="currentStep <= 1">Précédent</DsfrButton>
-        <DsfrButton @click="currentStep++" :disabled="currentStep >= 3">Suivant</DsfrButton>
+        <!-- Bouton Précédent -->
+        <DsfrButton 
+          secondary 
+          @click="currentStep--" 
+          :disabled="currentStep <= 1">
+          Précédent
+        </DsfrButton>
+        <!-- Les boutons Suivant -->
+        <DsfrButton 
+          v-show="currentStep < 3"
+          @click="currentStep++" 
+          :disabled="currentStep == 2 && !selectedExtractible">
+          Suivant
+        </DsfrButton>
+        <DsfrButton 
+          v-show="currentStep === 3"
+          :disabled="!request?.inputs?.relations || Object.keys(request.inputs.relations).length === 0"
+          @click="nameExtractionModalRef?.openModal()">
+          Lancer l'extraction
+        </DsfrButton>
     </div>
+    <NameExtractionModal
+      ref="nameExtractionModalRef"
+      :request="request"  
+      :processID="selectedExtractible?.processID"
+      @success="handleExtractionSuccess"
+    />
+    <SuccessModal ref="successModalRef" />
   </div>
 </template>
 <style scoped> 
