@@ -6,6 +6,7 @@ import { useDataStore } from '@/stores/dataStoreExtraction'
 import ChooseSqlParams from './ChooseSqlParams.vue';
 import type { Extractible, ExtractionRequestBody } from '@/types/extractibles.types';
 import NameExtractionModal from '@/components/Modals/NameExtractionModal.vue';
+import SuccessModal from '@/components/Modals/SuccessModal.vue';
 
 
 const dataStore = useDataStore()
@@ -23,6 +24,11 @@ watch(currentStep, (newStep) => {
 const selectedExtractible = ref<Extractible | null>(null)
 const request = ref<ExtractionRequestBody | undefined>(undefined)
 const nameExtractionModalRef = ref<InstanceType<typeof NameExtractionModal> | null>(null)
+const successModalRef = ref<InstanceType<typeof SuccessModal> | null>(null)
+
+function handleExtractionSuccess() {
+  successModalRef.value?.openModal()
+}
 </script>
 <template>
   <div class="fr-container">
@@ -73,7 +79,9 @@ const nameExtractionModalRef = ref<InstanceType<typeof NameExtractionModal> | nu
       ref="nameExtractionModalRef"
       :request="request"  
       :processID="selectedExtractible?.processID"
+      @success="handleExtractionSuccess"
     />
+    <SuccessModal ref="successModalRef" />
   </div>
 </template>
 <style scoped> 

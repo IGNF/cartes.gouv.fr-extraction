@@ -37,6 +37,7 @@ declare module 'vue' {
     SearchableCardList: typeof import('./components/SearchableCardList.vue')['default']
     SearchEngine: typeof import('./components/map/Controls/SearchEngine.vue')['default']
     StoreData: typeof import('./components/async-data/StoreData.vue')['default']
+    SuccessModal: typeof import('./components/Modals/SuccessModal.vue')['default']
     TableAttributeSelector: typeof import('./components/requestBuilder/TableAttributeSelector.vue')['default']
     'TableAttributeSelector copy': typeof import('./components/requestBuilder/TableAttributeSelector copy.vue')['default']
     View: typeof import('./components/map/View.vue')['default']

@@ -1,34 +1,59 @@
 <script setup lang="ts">
+import type { Extraction } from '@/types/my-extractions.types';
+
 const props = defineProps<{
-    extraction: {
-        status: string
-        title: string
-        url: string
-        launch_date: Date
-        execution_url: string
-    }
+    extraction: Extraction
+}>()
+
+const emit = defineEmits<{
+    (e: 'download', extraction: Extraction): void
+    (e: 'delete', extraction: Extraction): void
 }>()
 
 const formattedDate = computed(() =>
-    new Date(props.extraction.launch_date).toLocaleDateString('fr-FR', {
+    new Date(props.extraction.updated).toLocaleDateString('fr-FR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
     })
 )
 
+function statusLinter(status: string) {
+    var ret = ''
+    switch (status) {
+        case 'successful':
+            ret = 'Prête'
+            break;
+        case 'failed':
+            ret = 'En erreur'
+            break;
+        case 'running':
+            ret = 'En cours'
+            break;
+        case 'dismissed':
+            ret = 'Annulée'
+            break;
+        default:
+            ret = status
+            break;
+    }
+    return ret.toUpperCase()
+}
+
 </script>
 <template>
     <div class="fr-container execution-card  execution-card fr-mb-10v w-100 fr-p-10v">
         <div class="row">
-            <div class="status">{{ extraction.status.toUpperCase() }}</div>
+            <div class="status fr-text--sm" :data-status="extraction.status">{{ statusLinter(extraction.status) }}</div>
             <DsfrButton
                 secondary
+                :disabled="extraction.status == 'dismissed'"
+                @click="emit('delete', extraction)"
             >
                 <span class="fr-icon-delete-bin-line fr-ml-auto"></span>
             </DsfrButton>
         </div>
-        <h4 class="fr-mt-4v">{{ extraction.title }}</h4>
+        <h4 class="fr-mt-4v">{{ extraction.name }}</h4>
         <div class="row">
             <div>
                 <p>Dernier lancement le {{ formattedDate }}</p>
@@ -41,6 +66,8 @@ const formattedDate = computed(() =>
                 </DsfrButton>
                 <DsfrButton
                     secondary
+                    :disabled="extraction.status != 'successful'"
+                    @click="emit('download', extraction)"
                 >
                     Télécharger les données
                 </DsfrButton>
@@ -57,11 +84,29 @@ const formattedDate = computed(() =>
 h4 {
     color: var(--text-action-high-blue-france);
 }
-
 .status {
-    background-color: var(--background-action-low-blue-france);
+    padding: 0rem 0.3rem;
+    border-radius: 4px;
+    font-weight: 500;
+    text-align: center;
+    width: fit-content;
 }
-
+.status[data-status="successful"] {
+    background-color: var(--light-options-illustration-color-950-default-green-bourgeon-950, #C9FCAC);
+    color: var(--text-default-green-bourgeon-sun-425, #447049);
+}
+.status[data-status="failed"]     { 
+    background-color: var(--light-options-illustration-color-950-default-orange-terre-battue-950, #FEE9E5);
+    color: var(--text-default-orange-terre-battue-sun-370, #755348);
+}
+.status[data-status="running"]    {
+    background-color: var(--light-options-illustration-color-950-default-yellow-tournesol-950, #FEECC2);
+    color: var(--text-default-yellow-tournesol-sun-407, #716043);
+}
+.status[data-status="dismissed"]  {
+    background-color: var(--light-options-illustration-color-950-default-beige-gris-galet-950, #F3EDE5);
+    color: var(--text-default-beige-gris-galet-sun-407, #6A6156);
+}
 .row {
     display: flex;
     flex-direction: row;
