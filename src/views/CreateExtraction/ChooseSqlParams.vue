@@ -10,7 +10,7 @@ const props = defineProps<{
 const model = defineModel<ExtractionRequestBody>()
 
 const code = ref()
-const format = ref('CSV')
+const format = ref('GPKG')
 const projection = ref('EPSG:4326')
 const encoding = ref('UTF-8')
 const relations = ref<RelationInput>({})
@@ -63,7 +63,7 @@ watch(requestBody, (newValue) => {
                             <div class="fr-col ">
                                 <DsfrSelect
                                     label="Format"
-                                    :options="['CSV', 'GPKG', 'SHP', 'PARQUET']"
+                                    :options="['GPKG', 'SHP', 'PARQUET']"
                                     v-model="format"
                                 />
                                 <!-- <DsfrSelect
