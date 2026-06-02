@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useLogger } from 'vue-logger-plugin';
 import { LoggerUtils } from 'geopf-extensions-openlayers';
+import { isProduction } from '@/config/configService';
 
 const props = defineProps({
   mapId: {
@@ -8,8 +9,10 @@ const props = defineProps({
     default: 'mainMap'
   }
 });
-const isProduction = (import.meta.env.MODE === "production");
-if (isProduction) {
+
+// Use centralized config service instead of import.meta.env
+const isProductionMode = isProduction();
+if (isProductionMode) {
   LoggerUtils.disableAll();
 } else {
   LoggerUtils.enableAll();

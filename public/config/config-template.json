@@ -1,0 +1,18 @@
+{
+  "BASE_URL": "/extraction",
+  "MODE": "production",
+  "IAM_CHECK_SSO_DISABLE": "1",
+  "IAM_CHECK_SSO_AUTO_AUTH": "1",
+  "IAM_CHECK_SSO_TYPE": "keycloak",
+  "IAM_CHECK_SSO_TIMEOUT": "5000",
+  "IAM_CHECK_SSO_CLIENT_ID": "cartes-gouv-public",
+  "IAM_DISABLE": "0",
+  "IAM_AUTH_MODE": "local",
+  "IAM_URL": "https://sso.geopf.fr",
+  "IAM_REALM": "geoplateforme",
+  "IAM_CLIENT_ID": "cartes-gouv-public",
+  "IAM_CLIENT_SECRET": "",
+  "IAM_ENTREPOT_API_URL": "https://data.geopf.fr/api",
+  "IAM_REDIRECT_REMOTE": "https://cartes.gouv.fr",
+  "IAM_ENTREPOT_API_URL_REMOTE": "https://cartes.gouv.fr/api"
+}

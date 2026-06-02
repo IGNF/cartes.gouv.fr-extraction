@@ -19,13 +19,24 @@ RUN npm run build-only
 # Vérification du contenu du répertoire de construction
 RUN ls -l /app/dist
 
+# Copie des fichiers de configuration et scripts
+COPY public/config/config-template.json /app/dist/config/config-template.json
+COPY .docker/nginx-default.conf /app/nginx-default.conf
+COPY --chmod=0755 .docker/entrypoint.sh /app/entrypoint.sh
+
+# Ajuster les permissions du répertoire config
+RUN chmod -R 777 /app/dist/config
+
 FROM nginxinc/nginx-unprivileged:stable-alpine AS production
 
 # Copie de la configuration Nginx
-COPY .docker/nginx-default.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/nginx-default.conf /etc/nginx/conf.d/default.conf
 
-# Copie des fichiers construits
+# Copie des fichiers construits avec permissions correctes
 COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copie du script d'entrypoint avec permissions d'exécution
+COPY --from=builder /app/entrypoint.sh /entrypoint.sh
 
 # Définir le répertoire de travail
 WORKDIR /usr/share/nginx/html
@@ -33,9 +44,11 @@ WORKDIR /usr/share/nginx/html
 # Exposer le port 8080
 EXPOSE 8080
 
-
 # Vérification du contenu du répertoire de production
 RUN ls -l /usr/share/nginx/html
+
+# Utiliser l'entrypoint pour substituer les variables
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Démarrer Nginx
 CMD ["nginx", "-g", "daemon off;"]

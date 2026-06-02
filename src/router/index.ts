@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAppStore } from '@/stores/appStore'
+import { getBaseUrl } from '@/config/configService'
 
 import MyExtractions from '@/views/MyExtraction/MyExtractions.vue'
 import HomePage from '@/views/HomePage.vue'
@@ -57,12 +58,13 @@ const routes = [
   },
 ]
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env?.BASE_URL || ''),
-  routes,
-})
+function createAppRouter() {
+  const router = createRouter({
+    history: createWebHistory(getBaseUrl()),
+    routes,
+  })
 
-router.beforeEach((to) => {
+  router.beforeEach((to) => {
   // Cf. https://github.com/vueuse/head pour des transformations avancées de Head
   const specificTitle = to.meta.title ? `${to.meta.title} - ` : ''
   document.title = `${specificTitle}${MAIN_TITLE}`
@@ -76,6 +78,11 @@ router.beforeEach((to) => {
       path: '/extraction',
     }
   }
-})
+  })
 
-export default router
+  return router
+}
+
+export default createAppRouter
+
+
