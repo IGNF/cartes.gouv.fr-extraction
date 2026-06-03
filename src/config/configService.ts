@@ -1,8 +1,10 @@
 /**
  * Service de configuration
  *
- * En développement : lit les variables depuis import.meta.env
- * En production : charge /config/config.json monté via un ConfigMap Kubernetes
+ * Priorité 1 : charge /config/config.json quand il est disponible
+ * Priorité 2 : en développement local, fallback sur import.meta.env
+ *
+ * Important : `import.meta.env.*` est injecté par Vite au build.
  */
 
 type Config = Record<string, string>;
@@ -40,26 +42,33 @@ function loadConfigFromEnv(): Config {
 /**
  * Initialise le service de configuration.
  * Doit être appelé avant tout appel à getRuntimeConfig().
- * 
- * En production : charge obligatoirement depuis le fichier config.json
- * En développement : utilise les variables d'environnement
+ *
+ * Sur Kubernetes, la configuration runtime provient de /config/config.json.
+ * En développement local, si ce fichier n'existe pas, on utilise import.meta.env.
  */
 export async function initializeConfig(options: { configPath?: string } = {}): Promise<void> {
   const { configPath = `${import.meta.env.BASE_URL}/config/config.json` } = options;
 
-  try {
-    // Variable présente au moment du build
-    const mode = import.meta.env.MODE || 'development';
+  console.log(`[Config] Chemin de configuration : ${configPath}`);
 
-    if (mode === 'production') {
-      // En production : le fichier est obligatoire, pas de fallback sur les env
+  try {
+    try {
+      // Sur Kubernetes / Docker, on privilégie toujours la configuration runtime.
       configInstance = await loadConfigFromFile(configPath);
       configLoaded = true;
-    } else {
-      // Mode développement : on utilise les variables d'environnement
+      console.log('[Config] Configuration runtime chargée depuis le fichier JSON');
+      return;
+    } catch (fileError) {
+      const buildMode = import.meta.env.MODE || 'development';
+
+      if (buildMode === 'production') {
+        throw fileError;
+      }
+
+      // En développement local, on tolère l'absence du fichier JSON.
       configInstance = loadConfigFromEnv();
       configLoaded = true;
-      console.log('[Config] Variables d\'environnement utilisées (mode développement)');
+      console.warn('[Config] Fallback sur import.meta.env (mode développement local)', fileError);
     }
   } catch (error) {
     configError = error instanceof Error ? error : new Error(String(error));

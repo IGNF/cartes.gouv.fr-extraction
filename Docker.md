@@ -36,7 +36,8 @@ docker run -p 8080:8080 \
   -e IAM_ENTREPOT_API_URL="https://data.geopf.fr/api" \
   -e IAM_REDIRECT_REMOTE="https://cartes.gouv.fr" \
   -e IAM_ENTREPOT_API_URL_REMOTE="https://cartes.gouv.fr/api" \
-  extraction:latest | grep IAM_URL
+  -e MODE="production" \
+  extraction:latest 
 ```
 
 ## 5. **Accéder au shell du conteneur pour déboguer**
