@@ -20,7 +20,7 @@ RUN npm run build-only
 RUN ls -l /app/dist
 
 # Copie des fichiers de configuration et scripts
-COPY public/config/config-template.json /app/dist/config/config-template.json
+COPY /public/config/config-template.json /app/dist/config/config-template.json
 COPY .docker/nginx-default.conf /app/nginx-default.conf
 COPY --chmod=0755 .docker/entrypoint.sh /app/entrypoint.sh
 
@@ -32,14 +32,15 @@ FROM nginxinc/nginx-unprivileged:stable-alpine AS production
 # Copie de la configuration Nginx
 COPY --from=builder /app/nginx-default.conf /etc/nginx/conf.d/default.conf
 
-# Copie des fichiers construits avec permissions correctes
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copie des fichiers construits dans un sous-dossier /extraction
+# pour correspondre au base path Vite (/extraction)
+COPY --from=builder /app/dist /usr/share/nginx/html/extraction
 
 # Copie du script d'entrypoint avec permissions d'exécution
 COPY --from=builder /app/entrypoint.sh /entrypoint.sh
 
 # Définir le répertoire de travail
-WORKDIR /usr/share/nginx/html
+WORKDIR /usr/share/nginx/html/extraction
 
 # Exposer le port 8080
 EXPOSE 8080

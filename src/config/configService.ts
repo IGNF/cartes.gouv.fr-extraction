@@ -12,13 +12,22 @@ let configLoaded = false;
 let configError: Error | null = null;
 
 // Charge la configuration depuis un fichier JSON (typiquement monté via ConfigMap)
-async function loadConfigFromFile(configPath = '/config/config.json'): Promise<Config> {
+async function loadConfigFromFile(configPath = `${import.meta.env.BASE_URL}/config/config.json`): Promise<Config> {
+  console.log(`[Config] Chargement de la configuration depuis ${configPath}...`);
   const response = await fetch(configPath);
   if (!response.ok) {
     throw new Error(`Impossible de charger la configuration depuis ${configPath} : ${response.status} ${response.statusText}`);
   }
-  const data = await response.json();
-  return data as Config;
+  const text = await response.text();
+  try {
+    return JSON.parse(text) as Config;
+  } catch {
+    throw new Error(
+      `Le fichier de configuration "${configPath}" n'est pas du JSON valide. ` +
+      `Vérifiez que le ConfigMap Kubernetes est correctement monté. ` +
+      `Contenu reçu : ${text.slice(0, 100)}...`
+    );
+  }
 }
 
 // Charge la configuration depuis les variables d'environnement Vite
@@ -36,7 +45,7 @@ function loadConfigFromEnv(): Config {
  * En développement : utilise les variables d'environnement
  */
 export async function initializeConfig(options: { configPath?: string } = {}): Promise<void> {
-  const { configPath = '/config/config.json' } = options;
+  const { configPath = `${import.meta.env.BASE_URL}/config/config.json` } = options;
 
   try {
     // Variable présente au moment du build

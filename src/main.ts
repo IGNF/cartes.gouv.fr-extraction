@@ -26,9 +26,7 @@ import "./main.css";
 async function bootstrap() {
   try {
     // Initialisation de la configuration — doit précéder tout accès à getRuntimeConfig()
-    await initializeConfig({
-      configPath: '/config/config.json',
-    });
+    await initializeConfig();
 
     const pinia = createPinia();
     const store = storePlugin({

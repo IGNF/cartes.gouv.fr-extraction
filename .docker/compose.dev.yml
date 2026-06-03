@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .docker/Dockerfile.dev
+    ports:
+      - "5173:5173"
+    develop:
+      watch:
+        # Synchronise les sources sans rebuild
+        - action: sync
+          path: ../src
+          target: /app/src
+        - action: sync
+          path: ../public
+          target: /app/public
+        - action: sync
+          path: ../index.html
+          target: /app/index.html
+        # Rebuild si les dépendances changent
+        - action: rebuild
+          path: ../package.json
+        - action: rebuild
+          path: ../package-lock.json
+        # Rebuild si la config Vite change
+        - action: rebuild
+          path: ../vite.config.ts

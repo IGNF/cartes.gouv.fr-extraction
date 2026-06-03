@@ -9,13 +9,9 @@ declare module 'vue' {
   export interface GlobalComponents {
     CardList: typeof import('./components/CardList.vue')['default']
     Controls: typeof import('./components/map/Controls/Controls.vue')['default']
-    copy: typeof import('./components/requestBuilder/TableAttributeSelector copy.vue')['default']
     Drawing: typeof import('./components/map/Controls/Drawing.vue')['default']
-    DsfrAccordion: typeof import('@gouvminint/vue-dsfr')['DsfrAccordion']
-    DsfrAccordionsGroup: typeof import('@gouvminint/vue-dsfr')['DsfrAccordionsGroup']
     DsfrButton: typeof import('@gouvminint/vue-dsfr')['DsfrButton']
     DsfrDataTable: typeof import('@gouvminint/vue-dsfr')['DsfrDataTable']
-    DsfrInput: typeof import('@gouvminint/vue-dsfr')['DsfrInput']
     DsfrSearchBar: typeof import('@gouvminint/vue-dsfr')['DsfrSearchBar']
     DsfrSelect: typeof import('@gouvminint/vue-dsfr')['DsfrSelect']
     ExpertRequestBuilder: typeof import('./components/requestBuilder/ExpertRequestBuilder.vue')['default']
