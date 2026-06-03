@@ -36,6 +36,10 @@ COPY --from=builder /app/nginx-default.conf /etc/nginx/conf.d/default.conf
 # pour correspondre au base path Vite (/extraction)
 COPY --from=builder /app/dist /usr/share/nginx/html/extraction
 
+# Rendre le répertoire config accessible en écriture pour l'entrypoint
+# (substitution des variables d'environnement dans config.json au démarrage)
+RUN chmod -R 777 /usr/share/nginx/html/extraction/config
+
 # Copie du script d'entrypoint avec permissions d'exécution
 COPY --from=builder /app/entrypoint.sh /entrypoint.sh
 
