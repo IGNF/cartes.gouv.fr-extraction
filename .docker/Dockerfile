@@ -33,16 +33,18 @@ RUN chmod -R 777 /app/dist/config
 #----------------------------------------------------------------------
 FROM nginxinc/nginx-unprivileged:stable-alpine AS production
 
-# On prevoit de monter un volume sous k8s 
-# pour écriture du fichier d'environnement de la webapp
-VOLUME ["/usr/share/nginx/html/extraction/config"]
-
 # Copie de la configuration Nginx
 COPY --from=builder /app/nginx-default.conf /etc/nginx/conf.d/default.conf
 
 # Copie des fichiers construits dans un sous-dossier /extraction
 # pour correspondre au base path Vite (/extraction)
 COPY --from=builder /app/dist /usr/share/nginx/html/extraction
+
+# On prevoit de monter un volume sous k8s 
+# pour écriture du fichier d'environnement de la webapp
+VOLUME ["/usr/share/nginx/html/extraction/config"]
+
+COPY --from=builder /app/dist/config /usr/share/nginx/html/extraction/config
 
 # Copie du script d'entrypoint avec permissions d'exécution
 COPY --from=builder /app/entrypoint.sh /entrypoint.sh
