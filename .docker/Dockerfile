@@ -33,6 +33,9 @@ RUN chmod -R 777 /app/dist/config
 #----------------------------------------------------------------------
 FROM nginxinc/nginx-unprivileged:stable-alpine AS production
 
+# Utilisateur par défaut pour nginx
+ARG USER_ENV=nginx
+
 # Copie de la configuration Nginx
 COPY --from=builder /app/nginx-default.conf /etc/nginx/conf.d/default.conf
 
@@ -40,26 +43,27 @@ COPY --from=builder /app/nginx-default.conf /etc/nginx/conf.d/default.conf
 # pour correspondre au base path Vite (/extraction)
 COPY --from=builder /app/dist /usr/share/nginx/html/extraction
 
+USER ${USER_ENV}
+
 # On prevoit de monter un volume sous k8s 
 # pour écriture du fichier d'environnement de la webapp
 VOLUME ["/usr/share/nginx/html/extraction/config"]
 
-COPY --from=builder /app/dist/config /usr/share/nginx/html/extraction/config
+COPY --from=builder /app/dist/config /app/dist/config
 
 # Copie du script d'entrypoint avec permissions d'exécution
 COPY --from=builder /app/entrypoint.sh /entrypoint.sh
 
-# Définir le répertoire de travail
-WORKDIR /usr/share/nginx/html/extraction
 
-# Exposer le port 8080
-EXPOSE 8080
 
 # Vérification du contenu du répertoire de production
 RUN ls -l /usr/share/nginx/html
 
 # Utiliser l'entrypoint pour substituer les variables
 ENTRYPOINT ["/entrypoint.sh"]
+
+# Exposer le port 8080
+EXPOSE 8080
 
 # Démarrer Nginx
 CMD ["nginx", "-g", "daemon off;"]
