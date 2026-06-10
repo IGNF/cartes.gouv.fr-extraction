@@ -8,6 +8,7 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: 'download', extraction: Extraction): void
     (e: 'delete', extraction: Extraction): void
+    (e: 'relaunch', extraction: Extraction): void
 }>()
 
 const formattedDate = computed(() =>
@@ -58,18 +59,18 @@ function statusLinter(status: string) {
             <div>
                 <p>Dernier lancement le {{ formattedDate }}</p>
             </div>
-            <div>
+            <div class="row">
                 <DsfrButton
-                    class="fr-mr-2v"
-                >
-                    Relancer l'extraction
-                </DsfrButton>
-                <DsfrButton
-                    secondary
                     :disabled="extraction.status != 'successful'"
                     @click="emit('download', extraction)"
                 >
                     Télécharger les données
+                </DsfrButton>
+                <DsfrButton
+                    secondary
+                    @click="emit('relaunch', extraction)"
+                >
+                    Relancer l'extraction
                 </DsfrButton>
             </div>
         </div>
@@ -112,6 +113,8 @@ h4 {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
+
 }
 
 .row p {

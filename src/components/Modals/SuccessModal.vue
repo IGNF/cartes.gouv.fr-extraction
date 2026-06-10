@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { DsfrModal } from '@gouvminint/vue-dsfr'
-
+import svgSuccess from '@gouvfr/dsfr/dist/artwork/pictograms/system/success.svg'
+import type { ModalInterface } from '@/types/UITypes'
 const isSuccessModalOpened = ref(false)
 
 function openModal() {
@@ -11,10 +12,12 @@ function closeModal() {
   isSuccessModalOpened.value = false
 }
 
-defineExpose({
+const modalInterface: ModalInterface = {
   openModal,
   closeModal,
-})
+}
+
+defineExpose(modalInterface)
 </script>
 
 <template>
@@ -23,7 +26,10 @@ defineExpose({
     :opened="isSuccessModalOpened"
     @close="closeModal"
   >
-    <p>
+  <div class="icon">
+    <img :src="svgSuccess" alt="Success" />
+  </div>
+    <p class="fr-mb-2w">
       Votre extraction de données a été lancée avec succès. Vous pouvez suivre son avancement depuis l’espace
       <RouterLink
         to="/myextractions"
@@ -35,8 +41,19 @@ defineExpose({
 
     <hr>
 
-    <p>
+    <p class="fr-mb-2w">
       Vous recevrez un courriel une fois l’extraction terminée à l’adresse associée à votre compte.
     </p>
   </DsfrModal>
 </template>
+<style scoped>
+.icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+p {
+  text-align: center;
+}
+</style>

@@ -6,6 +6,7 @@ import type {
   createExtractionResponse,
 } from '@/types/extractibles.types'
 import type { ExtractionErrorResponse } from '@/types/my-extractions.types'
+import type { ModalInterface } from '@/types/UITypes'
 
 const props = defineProps<{
   request: ExtractionRequestBody | undefined
@@ -61,10 +62,12 @@ async function createExtraction() {
   return response.value
 }
 
-defineExpose({
+const modalInterface: ModalInterface = {
   openModal,
   closeModal,
-})
+}
+
+defineExpose(modalInterface)
 </script>
 
 <template>
@@ -109,5 +112,6 @@ defineExpose({
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+  width: 100%;
 }
 </style>
