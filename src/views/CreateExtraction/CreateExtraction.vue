@@ -8,7 +8,6 @@ import type { Extractible, ExtractionRequestBody } from '@/types/extractibles.ty
 import NameExtractionModal from '@/components/Modals/NameExtractionModal.vue';
 import SuccessModal from '@/components/Modals/SuccessModal.vue';
 
-
 const dataStore = useDataStore()
 const { getExtractible } = dataStore;
 const extractibles = computed(() => getExtractible())

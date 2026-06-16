@@ -13,6 +13,7 @@ export type Extraction = {
   name: string
   url: string
   updated: Date
+  jobID: string
 }
 
 export type RepositoryItem = {

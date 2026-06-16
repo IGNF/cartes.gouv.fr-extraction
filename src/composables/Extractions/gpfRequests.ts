@@ -25,12 +25,15 @@ export function isExtractionErrorResponse(value: unknown): value is ExtractionEr
 }
 
 
-export async function useCreateExtraction(requestBody: ExtractionRequestBody, processID: string) {
+export async function useCreateExtractionRequest(requestBody: ExtractionRequestBody, processID: string | undefined): Promise<createExtractionResponse | createExtractionErrorResponse | createExtractionUnauthorizedErrorResponse> {
     const appStore = useAppStore();
     const service = appStore.service;
 
     if (!service) {
         throw new Error('Service API non initialisé');
+    }
+        if (!processID) {
+        throw new Error('Process ID non défini');
     }
 
     console.log('Lancement de l\'extraction avec les données suivantes :', requestBody);
@@ -136,6 +139,37 @@ export async function useGetJobs(options?: {
     }
 }
 
+export async function useGetJobByID(jobID: string) {
+    const appStore = useAppStore();
+    const service = appStore.service;
+
+    if (!service) {
+        throw new Error('Service API non initialisé');
+    }
+
+    try {
+        const url = `https://data.geopf.fr/extraction/jobs/${jobID}`;
+        const response = await service.getFetch()(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json() as ExtractionJob;
+
+        if (!response.ok) {
+            throw data;
+        }
+
+        console.log('Job récupéré avec succès :', data);
+        return data;
+    } catch (error: unknown) {
+        console.error('Erreur lors de la récupération du job :', error);
+        throw error;
+    }
+}
+
 export async function useGetExtractionResults(jobID: string) {
     const appStore = useAppStore();
     const service = appStore.service;
@@ -167,7 +201,7 @@ export async function useGetExtractionResults(jobID: string) {
     }
 }
 
-export async function useDeleteExtraction(jobID: string): Promise<DeleteExtractionResponse | null> {
+export async function useDeleteExtractionRequest(jobID: string): Promise<DeleteExtractionResponse | null> {
     const appStore = useAppStore();
     const service = appStore.service;
 
