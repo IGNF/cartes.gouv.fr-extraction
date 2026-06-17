@@ -4,6 +4,7 @@ import type { ExtractionRequestBody, createExtractionResponse } from "@/types/ex
 import type { HistoricFileContent } from "@/types/historique.types";
 import { isExtractionErrorResponse } from '@/composables/Extractions/gpfRequests'
 import { useCreateHistoricDocument, useDeleteExtractionHistoricDocument } from "./historicRequests";
+import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 
 
 export async function useCreateExtraction(
@@ -100,5 +101,7 @@ export function useRelaunchExtractionWithNewParams(
   processID: string | undefined,
 ): void {
   console.log('Relance de l\'extraction avec de nouveaux paramètres :', requestBody)
-
+  const store = useCreateExtractionStore()
+  store.selectedExtractibleID = processID ?? null
+  store.requestBody = requestBody
 }

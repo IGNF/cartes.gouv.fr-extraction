@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { downloadAllItemsAsZip, getResultDownloadList, useGetExtractionResults, useGetJobByID } from '@/composables/Extractions/gpfRequests'
 import { useGetHistoricDocumentList } from '@/composables/Extractions/historicRequests'
-import { useDeleteExtraction, useRelaunchExtraction } from '@/composables/Extractions/useExtraction'
+import { useDeleteExtraction, useRelaunchExtraction, useRelaunchExtractionWithNewParams } from '@/composables/Extractions/useExtraction'
 import type { ExtractionJob, Extraction } from '@/types/my-extractions.types'
 import type { HistoricContentWithDocumentID } from '@/types/historique.types'
 import type { RelaunchAction } from '@/types/UITypes'
+import { useRouter } from 'vue-router'
 
 type EnrichedExtractionJob = HistoricContentWithDocumentID & ExtractionJob
 const jobs = ref<EnrichedExtractionJob[]>([])
 const deleteModalRef = ref<InstanceType<typeof DeleteModal>>()
 const relaunchModalRef = ref<InstanceType<typeof RelaunchModal>>()
 const selectedExtraction = ref<Extraction | undefined>()
+const router = useRouter()
 
 async function fetchJobs() {
   try {
@@ -92,18 +94,19 @@ async function onConfirmRelaunchExtraction(action: RelaunchAction) {
     console.error('Aucune extraction sélectionnée pour la relance.')
     return
   }
+  let currentJob = jobs.value.find(job => job.jobID === selectedExtraction.value?.jobID)
+  if (!currentJob) {
+    console.error('Job actuel introuvable pour la relance.')
+    return
+  }
   if (action === 'replace') {
     console.log(`Relancer l'extraction ${selectedExtraction.value} en mode remplacement`)
-    let currentJob = jobs.value.find(job => job.jobID === selectedExtraction.value?.jobID)
-    if (!currentJob) {
-      console.error('Job actuel introuvable pour la relance.')
-      return
-    }
     await useRelaunchExtraction(currentJob.params, selectedExtraction.value.jobID, currentJob.documentID, currentJob.uuidStoredData, currentJob.name)
     await fetchJobs() // Rafraîchir la liste des jobs après la suppression
   } else if (action === 'duplicate') {
     console.log(`Relancer l'extraction ${selectedExtraction.value} en mode duplication`)
-    // Appeler la fonction de relance en mode duplication ici
+    useRelaunchExtractionWithNewParams(currentJob.params, currentJob.processID)
+    router.push('/new-extraction')
   }
   relaunchModalRef.value?.closeModal()
 }

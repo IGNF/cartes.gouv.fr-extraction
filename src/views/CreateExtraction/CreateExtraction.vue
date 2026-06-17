@@ -7,6 +7,8 @@ import ChooseSqlParams from './ChooseSqlParams.vue';
 import type { Extractible, ExtractionRequestBody } from '@/types/extractibles.types';
 import NameExtractionModal from '@/components/Modals/NameExtractionModal.vue';
 import SuccessModal from '@/components/Modals/SuccessModal.vue';
+import { onMounted } from 'vue'
+import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 
 const dataStore = useDataStore()
 const { getExtractible } = dataStore;
@@ -24,6 +26,25 @@ const selectedExtractible = ref<Extractible | null>(null)
 const request = ref<ExtractionRequestBody | undefined>(undefined)
 const nameExtractionModalRef = ref<InstanceType<typeof NameExtractionModal> | null>(null)
 const successModalRef = ref<InstanceType<typeof SuccessModal> | null>(null)
+const createExtractionStore = useCreateExtractionStore()
+
+onBeforeMount(() => {
+  if (createExtractionStore.selectedExtractibleID !== null || createExtractionStore.requestBody !== undefined) {
+    const match = extractibles.value.find(
+      (e) => e.processID === createExtractionStore.selectedExtractibleID
+    )
+    if (match) selectedExtractible.value = match
+    if (createExtractionStore.requestBody !== undefined) {
+      request.value = createExtractionStore.requestBody
+    }
+    console.log('Restoring state from store:', {
+      selectedExtractible: selectedExtractible.value,
+      request: request.value,
+    } )
+    currentStep.value = 3
+    createExtractionStore.reset()
+  }
+})
 
 function handleExtractionSuccess() {
   successModalRef.value?.openModal()
