@@ -13,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: 'download', extraction: Extraction): void
     (e: 'delete', extraction: Extraction): void
+    (e: 'relaunch', extraction: Extraction): void
 }>()
 
 const searchValue = ref<string>('')
@@ -55,6 +56,7 @@ const filteredExtractions = computed(() => {
         :extraction="extraction"
         @download="emit('download', $event)"
         @delete="emit('delete', $event)"
+        @relaunch="emit('relaunch', $event)"
     />
 </template>
 

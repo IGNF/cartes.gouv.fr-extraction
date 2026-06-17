@@ -1,30 +1,32 @@
 <script setup lang="ts">
 import { DsfrAlert, DsfrInput, DsfrModal } from '@gouvminint/vue-dsfr'
-import { isExtractionErrorResponse, useCreateExtraction } from '@/composables/gpfRequests'
+import { isExtractionErrorResponse } from '@/composables/Extractions/gpfRequests'
+import { useCreateExtraction } from '@/composables/Extractions/useExtraction'
 import type {
   ExtractionRequestBody,
   createExtractionResponse,
 } from '@/types/extractibles.types'
 import type { ExtractionErrorResponse } from '@/types/my-extractions.types'
+import type { ModalInterface } from '@/types/UITypes'
 
 const props = defineProps<{
   request: ExtractionRequestBody | undefined
   processID: string | undefined
 }>()
 
-const emit = defineEmits(['success'])
+const emit = defineEmits<{
+  success: [extractionName: string, jobID: string]
+}>()
 
 const isCreateModalOpened = ref(false)
 const extractionName = ref('')
-const response = ref<createExtractionResponse | ExtractionErrorResponse | undefined>(undefined)
+const response = ref<Error | any>(undefined)
 const closeAfterSuccess = ref(false)
+const jobID = ref<string>('')
 
-const extractionError = computed(() => {
-  if (isExtractionErrorResponse(response.value)) {
-    return response.value
-  }
-  return undefined
-})
+const extractionError = computed(() =>
+  response.value instanceof Error ? response.value : undefined
+)
 
 function openModal() {
   response.value = undefined
@@ -34,37 +36,30 @@ function openModal() {
 function closeModal() {
   isCreateModalOpened.value = false
   if (closeAfterSuccess.value) {
-    emit('success')
+    emit('success', extractionName.value, jobID.value)
     closeAfterSuccess.value = false
   }
 }
 
 async function validateCreateExtraction() {
-  const result = await createExtraction()
-  if (result && !isExtractionErrorResponse(result)) {
-    closeAfterSuccess.value = true
-    closeModal()
-  }
-}
+  const result = await useCreateExtraction(props.request, props.processID, extractionName.value)
+  response.value = result
 
-async function createExtraction() {
-  console.log('Création de l\'extraction avec les paramètres suivants :', props.request)
-  if (!props.request) {
-    console.error('Aucun paramètre d\'extraction défini.')
+  if (result instanceof Error) {
     return
   }
-  if (!props.processID) {
-    console.error('Aucun processID défini.')
-    return
-  }
-  response.value = await useCreateExtraction(props.request, props.processID)
-  return response.value
+
+  jobID.value = result.jobID
+  closeAfterSuccess.value = true
+  closeModal()
 }
 
-defineExpose({
+const modalInterface: ModalInterface = {
   openModal,
   closeModal,
-})
+}
+
+defineExpose(modalInterface)
 </script>
 
 <template>
@@ -83,8 +78,8 @@ defineExpose({
     <DsfrAlert
       v-if="extractionError"
       type="error"
-      :title="extractionError.title || 'Erreur lors du lancement de l\'extraction'"
-      :description="extractionError.detail || 'Une erreur est survenue lors du lancement de l\'extraction.'"
+      title="Erreur lors du lancement de l'extraction"
+      :description="extractionError.message || 'Une erreur est survenue lors du lancement de l\'extraction.'"
     />
     <template #footer>
       <div class="modal-actions">
@@ -109,5 +104,6 @@ defineExpose({
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+  width: 100%;
 }
 </style>
