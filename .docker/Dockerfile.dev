@@ -1,0 +1,14 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Installation des dépendances
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Le code source sera synchronisé par docker compose watch
+COPY . .
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

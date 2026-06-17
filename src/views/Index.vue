@@ -7,6 +7,7 @@ import StoreData from '@/components/async-data/StoreData.vue';
 import { CgfrFooter, CgfrHeader } from 'cartes.gouv.fr-vue-components'
 import { useAppStore } from '@/stores/appStore';
 import HomePage from "./HomePage.vue";
+import { getBaseUrl } from '@/config/configService';
 
 const appStore = useAppStore();
 
@@ -24,7 +25,9 @@ const onDisconnect = () => {
     window.location.href = url; // redirection vers la page sso
   });
 }
-const baseUrl = import.meta.env.BASE_URL;
+
+// Get baseUrl from centralized configuration service
+const baseUrl = getBaseUrl();
 </script>
 
 <template>

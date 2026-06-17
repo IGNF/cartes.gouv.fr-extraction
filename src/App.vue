@@ -10,32 +10,36 @@ import { setSettings } from "cartes.gouv.fr-service";
 import Index from "./views/Index.vue";
 
 import { getService, useAuth } from "cartes.gouv.fr-service";
+import { getRuntimeConfig } from "./config/configService";
 
 const log = useLogger();
 
 const appStore = useAppStore();
 
+// Get the runtime configuration (loaded from config.json or import.meta.env)
+const config = getRuntimeConfig();
+
 // Configuration du service d'authentification avec les variables d'environnement
-// Ces variables sont injectées au moment de la construction de l'application,
-// et permettent de configurer le comportement du service d'authentification.
-// Note : on utilise un fichier .env.local pour définir ces variables en local, 
-// et elles peuvent être définies différemment en production.
+// Ces variables proviennent maintenant du service centralisé de configuration
+// qui peut charger depuis:
+// - import.meta.env en développement local
+// - /config/config.json en production (via Kubernetes ConfigMap)
 setSettings({
-  BaseUrl : import.meta.env.BASE_URL,
-  IamCheckSsoDisable : import.meta.env.IAM_CHECK_SSO_DISABLE,
-  IamCheckSsoAutoAuth : import.meta.env.IAM_CHECK_SSO_AUTO_AUTH,
-  IamCheckSsoType : import.meta.env.IAM_CHECK_SSO_TYPE,
-  IamCheckSsoTimeout : import.meta.env.IAM_CHECK_SSO_TIMEOUT,
-  IamCheckSsoClientId : import.meta.env.IAM_CHECK_SSO_CLIENT_ID,
-  IamDisable : import.meta.env.IAM_DISABLE,
-  IamAuthMode : import.meta.env.IAM_AUTH_MODE,
-  IamUrl : import.meta.env.IAM_URL,
-  IamRealm : import.meta.env.IAM_REALM,
-  IamClientId : import.meta.env.IAM_CLIENT_ID,
-  IamClientSecret : import.meta.env.IAM_CLIENT_SECRET,
-  IamEntrepotApiUrl : import.meta.env.IAM_ENTREPOT_API_URL,
-  IamRedirectRemote : import.meta.env.IAM_REDIRECT_REMOTE,
-  IamEntrepotApiUrlRemote : import.meta.env.IAM_ENTREPOT_API_URL_REMOTE,
+  BaseUrl: config.BASE_URL,
+  IamCheckSsoDisable: config.IAM_CHECK_SSO_DISABLE,
+  IamCheckSsoAutoAuth: config.IAM_CHECK_SSO_AUTO_AUTH,
+  IamCheckSsoType: config.IAM_CHECK_SSO_TYPE,
+  IamCheckSsoTimeout: config.IAM_CHECK_SSO_TIMEOUT,
+  IamCheckSsoClientId: config.IAM_CHECK_SSO_CLIENT_ID,
+  IamDisable: config.IAM_DISABLE,
+  IamAuthMode: config.IAM_AUTH_MODE,
+  IamUrl: config.IAM_URL,
+  IamRealm: config.IAM_REALM,
+  IamClientId: config.IAM_CLIENT_ID,
+  IamClientSecret: config.IAM_CLIENT_SECRET,
+  IamEntrepotApiUrl: config.IAM_ENTREPOT_API_URL,
+  IamRedirectRemote: config.IAM_REDIRECT_REMOTE,
+  IamEntrepotApiUrlRemote: config.IAM_ENTREPOT_API_URL_REMOTE,
 });
 
 const service = getService({ mode: 'local' });
