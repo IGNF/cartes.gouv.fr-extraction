@@ -8,9 +8,11 @@ const props = defineProps<{
 }>()
 
 const model = defineModel<ExtractionRequestBody>()
+const initModel = ref<ExtractionRequestBody | undefined>(model.value)
+const isHydrating = ref(false)
 
 const code = ref()
-const format = ref('GPKG')
+const format = ref<ExtractionRequestBody['inputs']['format']>('GPKG')
 const projection = ref('EPSG:4326')
 const encoding = ref('UTF-8')
 const relations = ref<RelationInput>({})
@@ -22,7 +24,31 @@ const tables = computed(() => {
 
 onMounted(() => {
     console.log('Extractible reçu dans ChooseSqlParams :', props.extractible);
+    
 })
+
+watch(
+  initModel,
+  async (newModel) => {
+    if (!newModel) return
+    console.log("Nouveau modèle reçu dans ChooseSqlParams :", newModel);
+
+    isHydrating.value = true
+    console.log("Hydratation du modèle avec les valeurs reçues :", {
+      format: newModel.inputs?.format,
+      projection: newModel.inputs?.srs,
+      relations: newModel.inputs?.relations,
+    });
+    format.value = newModel.inputs?.format ?? 'GPKG'
+    projection.value = newModel.inputs?.srs ?? 'EPSG:4326'
+    relations.value = newModel.inputs?.relations ?? {}
+
+    await nextTick()
+    model.value = requestBody.value
+    isHydrating.value = false
+  },
+  { deep: true, immediate: true }
+)
 
 const requestBody = computed((): ExtractionRequestBody => {
     return {
@@ -40,6 +66,8 @@ const requestBody = computed((): ExtractionRequestBody => {
 })
 
 watch(requestBody, (newValue) => {
+    if (isHydrating.value) return
+    console.log("Nouveau requestBody dans ChooseSqlParams :", newValue);
     model.value = newValue
 }, { deep: true })
 
@@ -63,7 +91,7 @@ watch(requestBody, (newValue) => {
                             <div class="fr-col ">
                                 <DsfrSelect
                                     label="Format"
-                                    :options="['GPKG', 'SHP', 'PARQUET']"
+                                    :options="['GPKG', 'PGDUMP', 'ESRI SHAPEFILE', 'GEOJSON', 'GML', 'PARQUET']"
                                     v-model="format"
                                 />
                                 <!-- <DsfrSelect

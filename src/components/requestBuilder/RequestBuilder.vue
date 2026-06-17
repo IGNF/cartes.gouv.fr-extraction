@@ -9,12 +9,38 @@ const props = withDefaults(defineProps<{
 })
 
 const model = defineModel<RelationInput>({ required: true })
+const initModel = ref<RelationInput | undefined>(model.value)
+const isHydrating = ref(false)
 
 const selectedTableNames = ref<string[]>([])
 
 const tableOptions = computed(() => props.relations.map((relation) => relation.name))
 
+watch(
+	() => model.value,
+	(newModel) => {
+		initModel.value = newModel
+	},
+	{ deep: true, immediate: true }
+)
+
+watch(
+	initModel,
+	async (newModel) => {
+		if (!newModel) return
+
+		isHydrating.value = true
+		selectedTableNames.value = Object.keys(newModel)
+
+		await nextTick()
+		isHydrating.value = false
+	},
+	{ deep: true, immediate: true }
+)
+
 watch(selectedTableNames, () => {
+	if (isHydrating.value) return
+
 	if (!selectedTableNames.value.length) {
 		model.value = {}
 		return

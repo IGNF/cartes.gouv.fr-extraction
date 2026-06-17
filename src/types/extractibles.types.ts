@@ -48,10 +48,33 @@ export type ExtractibleRelation = {
 export type ExtractionRequestBody = {
     inputs : {
         [key: string]: any;
-        relations?: RelationInput;
-        format?: string;
+        /** La compression de sortie */
+        compression?: '7zip';
+        /**
+         * Détails des tables à extraire et filtres à appliquer sous la forme
+         * {"nom_table" :{"attributes" :["champ1","champ2"],"filters" :"champ1 ='valeur_a_respecter'.."},
+         *  "nom_table2" :{"attributes" :["champ1","champ2"],"filters" :"champ1='valeur_a_respecter'.."}...}.
+         * La syntaxe du filtre est une clause WHERE POSTGRESQL/POSTGIS qui peut inclure
+         * une ou plusieurs fonctions spatiales.
+         */
+        relations: RelationInput;
+        /**
+         * La projection de sortie des données géométrie sous la forme EPSG:xxxx
+         * où xxxx est le code EPSG de la projection souhaitée.
+         */
+        srs?: string;
+        /** Le format de sortie */
+        format: 'PGDUMP' | 'ESRI SHAPEFILE' | 'GEOJSON' | 'GPKG' | 'GML' | 'PARQUET';
+        /**
+         * Indique pour les formats possible si un seul fichiers doit être produit
+         * en sortie pour l'ensemble des relations.
+         */
         append?: boolean;
-        srs: string;
+        /**
+         * Durée (en heures) du temps de conservation des données extraites à partir
+         * de leur mise à disposition via l'API de résultats (par défaut : {DEFAULT_LIFETIME) heures).
+         */
+        retentionDuration?: number;
     },
     outputs : {
         logs?: Object;

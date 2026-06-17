@@ -9,6 +9,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     CardList: typeof import('./components/CardList.vue')['default']
     Controls: typeof import('./components/map/Controls/Controls.vue')['default']
+    copy: typeof import('./components/requestBuilder/TableAttributeSelector copy.vue')['default']
+    DeleteModal: typeof import('./components/Modals/DeleteModal.vue')['default']
     Drawing: typeof import('./components/map/Controls/Drawing.vue')['default']
     DsfrButton: typeof import('@gouvminint/vue-dsfr')['DsfrButton']
     DsfrDataTable: typeof import('@gouvminint/vue-dsfr')['DsfrDataTable']
@@ -26,6 +28,7 @@ declare module 'vue' {
     MyExtractionSkeleton: typeof import('./components/template-grid/MyExtractionSkeleton.vue')['default']
     NameExtractionModal: typeof import('./components/Modals/NameExtractionModal.vue')['default']
     Patience: typeof import('./components/utils/Patience.vue')['default']
+    RelaunchModal: typeof import('./components/Modals/RelaunchModal.vue')['default']
     RequestBuilder: typeof import('./components/requestBuilder/RequestBuilder.vue')['default']
     RequestForm: typeof import('./components/requestBuilder/RequestForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
