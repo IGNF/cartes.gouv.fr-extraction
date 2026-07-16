@@ -50,6 +50,7 @@ const extractionList = computed<Extraction[]>(() => {
     name: job.name?.trim() || "Extraction sans nom",
     jobID: job.jobID,
     params: job.params,
+    message: job.message || '',
     url: `https://data.geopf.fr/extraction${job.links?.[0]?.href || ''}`,
     updated: new Date(job.updated)
   }))
@@ -101,7 +102,7 @@ async function onConfirmRelaunchExtraction(action: RelaunchAction) {
   }
   if (action === 'replace') {
     console.log(`Relancer l'extraction ${selectedExtraction.value} en mode remplacement`)
-    await useRelaunchExtraction(currentJob.params, selectedExtraction.value.jobID, currentJob.documentID, currentJob.uuidStoredData, currentJob.name)
+    await useRelaunchExtraction(currentJob.params, selectedExtraction.value.jobID, currentJob.documentID, currentJob.uuidStoredData, currentJob.name, currentJob.status)
     await fetchJobs() // Rafraîchir la liste des jobs après la suppression
   } else if (action === 'duplicate') {
     console.log(`Relancer l'extraction ${selectedExtraction.value} en mode duplication`)

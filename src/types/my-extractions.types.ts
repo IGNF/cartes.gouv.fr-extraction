@@ -14,6 +14,7 @@ export type Extraction = {
   url: string
   updated: Date
   jobID: string
+  message?: string
 }
 
 export type RepositoryItem = {
