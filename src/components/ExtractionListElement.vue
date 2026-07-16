@@ -32,6 +32,9 @@ function statusLinter(status: string) {
             ret = 'En cours'
             break;
         case 'dismissed':
+            if (props.extraction.message == "Données extraites supprimées" ) {
+                ret = 'Expirée'
+            } else
             ret = 'Annulée'
             break;
         default:
@@ -57,7 +60,8 @@ function statusLinter(status: string) {
         <h4 class="fr-mt-4v">{{ extraction.name }}</h4>
         <div class="row">
             <div>
-                <p>Dernier lancement le {{ formattedDate }}</p>
+                <p v-if="extraction.updated && statusLinter(extraction.status) === 'EXPIRÉE'">Expirée le {{ formattedDate }}</p>
+                <p v-else>Dernier lancement le {{ formattedDate }}</p>
             </div>
             <div class="row">
                 <DsfrButton

@@ -46,16 +46,19 @@ export async function useCreateExtraction(
 
 export async function useDeleteExtraction(
   jobID: string,
-  documentID: string
-): Promise<DeleteExtractionResponse | Error> {
+  documentID: string,
+  jobStatus?: string
+): Promise<DeleteExtractionResponse | Error | null> {
   let deleteExtractionResponse: DeleteExtractionResponse | null
 
-  try {
-    deleteExtractionResponse = await useDeleteExtractionRequest(jobID)
-  } catch (error) {
-    return error instanceof Error
-      ? error
-      : new Error('Erreur lors de la suppression du job d’extraction.')
+  if (jobStatus !== 'dismissed') {
+    try {
+      deleteExtractionResponse = await useDeleteExtractionRequest(jobID)
+    } catch (error) {
+      return error instanceof Error
+        ? error
+        : new Error('Erreur lors de la suppression du job d’extraction.')
+    }
   }
 
   try {
@@ -65,7 +68,7 @@ export async function useDeleteExtraction(
       ? error
       : new Error('Erreur lors de la suppression du document historique.')
   }
-
+ 
   return deleteExtractionResponse
 }
 
@@ -74,7 +77,8 @@ export async function useRelaunchExtraction(
   jobID: string,
   documentID: string,
   processID: string | undefined,
-  extractionName: string
+  extractionName: string,
+  jobStatus?: string
 ): Promise<createExtractionResponse | Error> {
   console.log('Relance de l\'extraction avec les paramètres suivants :', requestBody)
 
@@ -82,7 +86,7 @@ export async function useRelaunchExtraction(
   if (!jobID) return new Error('Aucun jobID défini.')
 
   // 1) Suppression du job d'extraction existant et du document historique associé
-  const deleteResponse = await useDeleteExtraction(jobID, documentID)
+  const deleteResponse = await useDeleteExtraction(jobID, documentID, jobStatus)
   if (deleteResponse instanceof Error) {
     return deleteResponse
   }
