@@ -48,11 +48,11 @@ onMounted(() => {
         <Controls
           :map-id="mainMap" 
         >
-            <Drawing
+            <!-- <Drawing
               visibility
               :drawing-options="drawingOptions"
               :map-id="mainMap"
-            />
+            /> -->
 
             <LayerImport
               visibility
