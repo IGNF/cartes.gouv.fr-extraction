@@ -131,6 +131,7 @@ watch(requestBody, (newValue) => {
                                 />
                         </div>
                     </div>
+                    {{ requestBody }}
                 </div>
                 <div class="fr-col">
                     <ChooseSqlParamsMap />
