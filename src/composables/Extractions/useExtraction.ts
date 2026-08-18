@@ -23,6 +23,14 @@ export async function useCreateExtraction(
     if (isExtractionErrorResponse(createResult)) {
       return new Error(createResult.detail || createResult.title || 'Erreur lors de la création du job d\'extraction.')
     }
+
+    if (!('jobID' in createResult)) {
+      const unauthorizedMessage = Array.isArray(createResult.errorDescription)
+        ? createResult.errorDescription.join(', ')
+        : createResult.errorDescription
+      return new Error(unauthorizedMessage || createResult.error || 'Erreur d\'authentification lors de la création du job d\'extraction.')
+    }
+
     response = createResult
   } catch (error) {
     return error instanceof Error ? error : new Error('Erreur inconnue lors de la création du job d\'extraction.')
@@ -49,7 +57,7 @@ export async function useDeleteExtraction(
   documentID: string,
   jobStatus?: string
 ): Promise<DeleteExtractionResponse | Error | null> {
-  let deleteExtractionResponse: DeleteExtractionResponse | null
+  let deleteExtractionResponse: DeleteExtractionResponse | null = null
 
   if (jobStatus !== 'dismissed') {
     try {
@@ -108,4 +116,7 @@ export function useRelaunchExtractionWithNewParams(
   const store = useCreateExtractionStore()
   store.selectedExtractibleID = processID ?? null
   store.requestBody = requestBody
+  // Recrée la couche d'emprise à partir des filtres SQL du requestBody
+  // pour réafficher la géométrie dans le parcours de relance.
+  store.setExtentLayerFromRequestBody(requestBody)
 }

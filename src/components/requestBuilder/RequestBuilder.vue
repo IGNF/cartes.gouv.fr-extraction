@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { CgfrSelectList } from 'cartes.gouv.fr-vue-components'
+import { storeToRefs } from 'pinia'
+import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 import type { ExtractibleRelation, RelationInput } from '@/types/extractibles.types'
 
 const props = withDefaults(defineProps<{
@@ -11,10 +13,27 @@ const props = withDefaults(defineProps<{
 const model = defineModel<RelationInput>({ required: true })
 const initModel = ref<RelationInput | undefined>(model.value)
 const isHydrating = ref(false)
+const createExtractionStore = useCreateExtractionStore()
+const { extentGeometries } = storeToRefs(createExtractionStore)
 
 const selectedTableNames = ref<string[]>([])
 
 const tableOptions = computed(() => props.relations.map((relation) => relation.name))
+
+const extentFilter = computed(() => {
+	if (!extentGeometries.value.length) return ''
+
+	const geometrySqlList = extentGeometries.value.map((geometry: Record<string, unknown>) => {
+		const geometryJson = JSON.stringify(geometry)
+		return `ST_SetSRID(ST_GeomFromGeoJSON('${geometryJson}'), 3857)`
+	})
+
+	if (geometrySqlList.length === 1) {
+		return `ST_Intersects(geometrie, ${geometrySqlList[0]})`
+	}
+
+	return `ST_Intersects(geometrie, ST_Collect(ARRAY[${geometrySqlList.join(', ')}]))`
+})
 
 watch(
 	() => model.value,
@@ -38,7 +57,7 @@ watch(
 	{ deep: true, immediate: true }
 )
 
-watch(selectedTableNames, () => {
+watch([selectedTableNames, extentFilter], () => {
 	if (isHydrating.value) return
 
 	if (!selectedTableNames.value.length) {
@@ -52,7 +71,7 @@ watch(selectedTableNames, () => {
 
 		accumulator[tableName] = {
 			attributes: Object.keys(relation.attributes || {}),
-			filters: '',
+			filters: extentFilter.value,
 		}
 
 		return accumulator

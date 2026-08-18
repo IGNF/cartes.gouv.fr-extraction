@@ -50,6 +50,7 @@ onBeforeMount(() => {
     } )
     currentStep.value = 3
     createExtractionStore.reset()
+    createExtractionStore.setExtentLayerFromRequestBody(request.value)
   }
 })
 
