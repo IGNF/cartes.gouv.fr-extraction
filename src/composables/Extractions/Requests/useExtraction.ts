@@ -1,11 +1,18 @@
-import { useCreateExtractionRequest, useDeleteExtractionRequest } from "@/composables/Extractions/gpfRequests";
+import { useCreateExtractionRequest, useDeleteExtractionRequest } from "@/composables/Extractions/Requests/gpfRequests";
 import type { DeleteExtractionResponse } from "@/types/my-extractions.types";
 import type { ExtractionRequestBody, createExtractionResponse } from "@/types/extractibles.types";
 import type { HistoricFileContent } from "@/types/historique.types";
-import { isExtractionErrorResponse } from '@/composables/Extractions/gpfRequests'
+import { isExtractionErrorResponse } from '@/composables/Extractions/Requests/gpfRequests'
 import { useCreateHistoricDocument, useDeleteExtractionHistoricDocument } from "./historicRequests";
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 
+
+/**
+ *  Ce fichier contient les fonctions de manipulation d'extraction au sens Interface
+ *  Par exemple 1 appel de création d'extraction appel plusieurs gpfRequests 
+ *  pour créer les jobs d'extraction et les documents historiques associés.
+ *  
+ */
 
 export async function useCreateExtraction(
   requestBody: ExtractionRequestBody | undefined,
@@ -23,6 +30,14 @@ export async function useCreateExtraction(
     if (isExtractionErrorResponse(createResult)) {
       return new Error(createResult.detail || createResult.title || 'Erreur lors de la création du job d\'extraction.')
     }
+
+    if (!('jobID' in createResult)) {
+      const unauthorizedMessage = Array.isArray(createResult.errorDescription)
+        ? createResult.errorDescription.join(', ')
+        : createResult.errorDescription
+      return new Error(unauthorizedMessage || createResult.error || 'Erreur d\'authentification lors de la création du job d\'extraction.')
+    }
+
     response = createResult
   } catch (error) {
     return error instanceof Error ? error : new Error('Erreur inconnue lors de la création du job d\'extraction.')
@@ -49,7 +64,7 @@ export async function useDeleteExtraction(
   documentID: string,
   jobStatus?: string
 ): Promise<DeleteExtractionResponse | Error | null> {
-  let deleteExtractionResponse: DeleteExtractionResponse | null
+  let deleteExtractionResponse: DeleteExtractionResponse | null = null
 
   if (jobStatus !== 'dismissed') {
     try {
@@ -108,4 +123,7 @@ export function useRelaunchExtractionWithNewParams(
   const store = useCreateExtractionStore()
   store.selectedExtractibleID = processID ?? null
   store.requestBody = requestBody
+  // Recrée la couche d'emprise à partir des filtres SQL du requestBody
+  // pour réafficher la géométrie dans le parcours de relance.
+  store.setExtentLayerFromRequestBody(requestBody)
 }

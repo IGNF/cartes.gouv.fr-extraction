@@ -2,10 +2,12 @@
 <script setup lang="ts">
 import { drawingOptions, layerImportOptions, zoomOptions, searchEngineOptions } from "@/composables/getDefaultControlOptions.js";
 import { mainMap } from "@/composables/mapkeys.js";
+import { useCreateExtractionStore } from "@/stores/createExtractionStore";
 import { useMapStore } from "@/stores/mapStore";
 import { useLogger } from "vue-logger-plugin";
 
 const mapStore = useMapStore()
+const createExtractionStore = useCreateExtractionStore()
 const log = useLogger();
 const DEFAULT_LAYER2 = {
   name: "PLAN.IGN",
@@ -45,14 +47,20 @@ onMounted(() => {
             :layerOptions="DEFAULT_LAYER"
             :map-id="mainMap"
         />
+        <VectorLayer
+          v-if="createExtractionStore.extentSourceOptions"
+          :map-id="mainMap"
+          :source-options="createExtractionStore.extentSourceOptions"
+          :layer-options="createExtractionStore.extentLayerOptions"
+        />
         <Controls
           :map-id="mainMap" 
         >
-            <Drawing
+            <!-- <Drawing
               visibility
               :drawing-options="drawingOptions"
               :map-id="mainMap"
-            />
+            /> -->
 
             <LayerImport
               visibility

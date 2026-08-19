@@ -2,10 +2,12 @@
 import Zoom from "@/components/map/Controls/Zoom.vue";
 import { zoomOptions } from "@/composables/getDefaultControlOptions.js";
 import { sqlMap } from "@/composables/mapkeys.js";
+import { useCreateExtractionStore } from "@/stores/createExtractionStore";
 import { useMapStore } from "@/stores/mapStore";
 import { useLogger } from "vue-logger-plugin";
 
 const mapStore = useMapStore()
+const createExtractionStore = useCreateExtractionStore()
 const log = useLogger();
 const DEFAULT_LAYER2 = {
   name: "PLAN.IGN",
@@ -26,7 +28,6 @@ const DEFAULT_LAYER = {
   grayscale: false
 };
 
-
 onMounted(() => {
   log.debug("CreateExtraction - ChooseArea mounted")
 });
@@ -43,6 +44,12 @@ onMounted(() => {
         <Layer  
             :map-id="sqlMap" 
             :layerOptions="DEFAULT_LAYER"
+        />
+        <VectorLayer
+          v-if="createExtractionStore.extentSourceOptions"
+          :map-id="sqlMap"
+          :source-options="createExtractionStore.extentSourceOptions"
+          :layer-options="createExtractionStore.extentLayerOptions"
         />
         <Controls
             :map-id="sqlMap" 

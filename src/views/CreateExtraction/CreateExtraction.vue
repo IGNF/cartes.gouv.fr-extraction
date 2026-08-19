@@ -9,10 +9,18 @@ import NameExtractionModal from '@/components/Modals/NameExtractionModal.vue';
 import SuccessModal from '@/components/Modals/SuccessModal.vue';
 import { onMounted } from 'vue'
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
+import { filterExtractiblesByLayerIntersection } from '@/composables/layerUtils'
 
 const dataStore = useDataStore()
 const { getExtractible } = dataStore;
-const extractibles = computed(() => getExtractible())
+const createExtractionStore = useCreateExtractionStore()
+
+const extractibles = computed(() => {
+  return filterExtractiblesByLayerIntersection(
+    getExtractible(),
+    createExtractionStore.extentLayer,
+  )
+})
 
 const currentStep = ref(1)
 watch(currentStep, (newStep) => {
@@ -26,7 +34,6 @@ const selectedExtractible = ref<Extractible | null>(null)
 const request = ref<ExtractionRequestBody | undefined>(undefined)
 const nameExtractionModalRef = ref<InstanceType<typeof NameExtractionModal> | null>(null)
 const successModalRef = ref<InstanceType<typeof SuccessModal> | null>(null)
-const createExtractionStore = useCreateExtractionStore()
 
 onBeforeMount(() => {
   if (createExtractionStore.selectedExtractibleID !== null || createExtractionStore.requestBody !== undefined) {
@@ -43,6 +50,7 @@ onBeforeMount(() => {
     } )
     currentStep.value = 3
     createExtractionStore.reset()
+    createExtractionStore.setExtentLayerFromRequestBody(request.value)
   }
 })
 

@@ -1,11 +1,37 @@
 import IconGeolocationSVG from "@/assets/geolocation.svg";
+import Style from "ol/style/Style";
+import Icon from "ol/style/Icon";
+import Stroke from "ol/style/Stroke";
+import Fill from "ol/style/Fill";
+import mapPinIcon from "@/assets/map-pin-2-fill.svg";
 
 export const layerImportOptions = {
   id: "20",
   position: "top-right",
   gutter: true,
   listable: true,
-  layerTypes: ["KML", "GeoJSON"]
+  layerTypes: ["GeoJSON", "KML"],
+  vectorStyleOptions : {
+    "GeoJSON" : {
+        extractStyles : true,
+        defaultStyle : new Style({
+        image : new Icon({
+            src : mapPinIcon,
+            color : "#000091",
+            anchor : [0.5, 1],
+        }),
+        stroke : new Stroke({
+            color : "#000091",
+            lineDash : [5,  5],
+            width : 2,
+            lineDashOffset : 0
+        }),
+        fill : new Fill({
+            color : "rgba(1, 1, 1, 0.3)",
+        }),
+    })
+    }
+  }
 };
 export const drawingOptions = {
   id: "3",

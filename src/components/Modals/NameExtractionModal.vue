@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { DsfrAlert, DsfrInput, DsfrModal } from '@gouvminint/vue-dsfr'
-import { isExtractionErrorResponse } from '@/composables/Extractions/gpfRequests'
-import { useCreateExtraction } from '@/composables/Extractions/useExtraction'
+import { isExtractionErrorResponse } from '@/composables/Extractions/Requests/gpfRequests'
+import { useCreateExtraction } from '@/composables/Extractions/Requests/useExtraction'
 import type {
   ExtractionRequestBody,
   createExtractionResponse,

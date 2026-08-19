@@ -39,6 +39,7 @@ declare module 'vue' {
     SuccessModal: typeof import('./components/Modals/SuccessModal.vue')['default']
     TableAttributeSelector: typeof import('./components/requestBuilder/TableAttributeSelector.vue')['default']
     'TableAttributeSelector copy': typeof import('./components/requestBuilder/TableAttributeSelector copy.vue')['default']
+    VectorLayer: typeof import('./components/map/VectorLayer.vue')['default']
     View: typeof import('./components/map/View.vue')['default']
     Zoom: typeof import('./components/map/Controls/Zoom.vue')['default']
   }
