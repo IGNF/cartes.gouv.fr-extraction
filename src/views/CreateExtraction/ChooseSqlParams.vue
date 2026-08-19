@@ -127,11 +127,11 @@ watch(requestBody, (newValue) => {
                             </CgfrSqlEditor>  -->
                             <RequestBuilder 
                                 :relations="extractible?.type_infos.relations || []"
+                                :ExtractibleSrs="extractible?.srs"
                                 v-model="relations"
                                 />
                         </div>
                     </div>
-                    {{ requestBody }}
                 </div>
                 <div class="fr-col">
                     <ChooseSqlParamsMap />

@@ -1,3 +1,16 @@
+/**
+ * Ce fichier contient les fonctions de manipulation des fichiers d'historicisation des extractions
+ * 
+ * Chaque fonction fait des appels à l'API des document au sens GPF
+ * Pour créer, supprimer, lister et récupérer le contenu des documents d'historique
+ * 
+ * Les documents sont stockés dans l'API GPF avec un label spécifique pour les extractions : "cartes.gouv.fr-extraction"
+ * Le nom des fichiers est généré à partir du jobID de l'extraction : "EXTRACTION_{jobID}.json"
+ * 
+ * Le contenu des fichiers est de type HistoricFileContent, qui contient les informations nécessaires pour reconstituer l'extraction.
+ */
+
+
 import type { DocumentCreateRequestBody, HistoricFileContent, DocumentListItem, HistoricContentWithDocumentID } from '@/types/historique.types'
 import { useAppStore } from '@/stores/appStore'
 
@@ -8,6 +21,7 @@ export function useGetHistoricFilename(jobID: string): string {
 export async function useCreateHistoricDocument(historicContent: HistoricFileContent): Promise<void> {
     const appStore = useAppStore()
     const service = appStore.service
+    const documentsApiBase = service?.api ?? 'https://data.geopf.fr/api'
 
     if (!service) {
         throw new Error('Service API non initialisé')
@@ -34,7 +48,7 @@ export async function useCreateHistoricDocument(historicContent: HistoricFileCon
         let labels = ['cartes.gouv.fr-extraction']
         formData.append('labels', labels.join(','))
 
-        const response = await service.getFetch()('https://data.geopf.fr/api/users/me/documents', {
+        const response = await service.getFetch()(`${documentsApiBase}/users/me/documents`, {
             method: 'POST',
             body: formData,
         })
@@ -53,6 +67,7 @@ export async function useCreateHistoricDocument(historicContent: HistoricFileCon
 export async function useGetHistoricDocumentContent(jobID: string): Promise<HistoricFileContent | null> {
     const appStore = useAppStore()
     const service = appStore.service
+    const documentsApiBase = service?.api ?? 'https://data.geopf.fr/api'
 
     if (!service) {
         throw new Error('Service API non initialisé')
@@ -64,7 +79,7 @@ export async function useGetHistoricDocumentContent(jobID: string): Promise<Hist
             labels: 'cartes.gouv.fr-extraction',
         })
 
-        const listResponse = await service.getFetch()(`https://data.geopf.fr/api/users/me/documents?${query.toString()}`, {
+        const listResponse = await service.getFetch()(`${documentsApiBase}/users/me/documents?${query.toString()}`, {
             method: 'GET',
         })
 
@@ -83,8 +98,15 @@ export async function useGetHistoricDocumentContent(jobID: string): Promise<Hist
         }
 
         const contentResponse = await service.getFetch()(
-            `https://data.geopf.fr/api/users/me/documents/${firstDocument._id}/file`,
-            { method: 'GET' }
+            `${documentsApiBase}/users/me/documents/${firstDocument._id}/file`,
+            {
+                method: 'GET',
+                cache: 'no-cache',
+                headers: {
+                    Accept: '*/*',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            }
         )
 
         if (!contentResponse.ok) {
@@ -92,7 +114,11 @@ export async function useGetHistoricDocumentContent(jobID: string): Promise<Hist
                 console.warn(`Contenu du document historique ${firstDocument.name} non trouvé.`)
                 return null
             }
-            throw new Error(`Erreur lors de la récupération du contenu du document: ${contentResponse.status}`)
+            const errorBody = await contentResponse.text()
+            const contentType = contentResponse.headers.get('content-type')
+            throw new Error(
+                `Erreur lors de la récupération du contenu du document: ${contentResponse.status} (content-type: ${contentType ?? 'inconnu'}) - ${errorBody}`
+            )
         }
 
         const historicContent: HistoricFileContent = await contentResponse.json()
@@ -106,6 +132,7 @@ export async function useGetHistoricDocumentContent(jobID: string): Promise<Hist
 export async function useGetHistoricDocumentList(): Promise<HistoricContentWithDocumentID[]> {
     const appStore = useAppStore()
     const service = appStore.service
+    const documentsApiBase = service?.api ?? 'https://data.geopf.fr/api'
 
     if (!service) {
         throw new Error('Service API non initialisé')
@@ -116,7 +143,7 @@ export async function useGetHistoricDocumentList(): Promise<HistoricContentWithD
             labels: 'cartes.gouv.fr-extraction',
         })
 
-        const listResponse = await service.getFetch()(`https://data.geopf.fr/api/users/me/documents?${query.toString()}`, {
+        const listResponse = await service.getFetch()(`${documentsApiBase}/users/me/documents?${query.toString()}`, {
             method: 'GET',
         })
 
@@ -133,12 +160,23 @@ export async function useGetHistoricDocumentList(): Promise<HistoricContentWithD
         return await Promise.all(
             documents.map(async (document) => {
                 const contentResponse = await service.getFetch()(
-                    `https://data.geopf.fr/api/users/me/documents/${document._id}/file`,
-                    { method: 'GET' }
+                    `${documentsApiBase}/users/me/documents/${document._id}/file`,
+                    {
+                        method: 'GET',
+                        cache: 'no-cache',
+                        headers: {
+                            Accept: '*/*',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    }
                 )
 
                 if (!contentResponse.ok) {
-                    throw new Error(`Erreur lors de la récupération du contenu du document d'historique ${document.name}: ${contentResponse.status}`)
+                    const errorBody = await contentResponse.text()
+                    const contentType = contentResponse.headers.get('content-type')
+                    throw new Error(
+                        `Erreur lors de la récupération du contenu du document d'historique ${document.name}: ${contentResponse.status} (content-type: ${contentType ?? 'inconnu'}) - ${errorBody}`
+                    )
                 }
                 let content: HistoricFileContent = await contentResponse.json()
                 return { ...content, documentID: document._id } as HistoricContentWithDocumentID
@@ -153,13 +191,14 @@ export async function useGetHistoricDocumentList(): Promise<HistoricContentWithD
 export async function useDeleteExtractionHistoricDocument(documentID: string): Promise<void> {
     const appStore = useAppStore()
     const service = appStore.service
+    const documentsApiBase = service?.api ?? 'https://data.geopf.fr/api'
 
     if (!service) {
         throw new Error('Service API non initialisé')
     }
 
     try {
-        const response = await service.getFetch()(`https://data.geopf.fr/api/users/me/documents/${documentID}`, {
+        const response = await service.getFetch()(`${documentsApiBase}/users/me/documents/${documentID}`, {
             method: 'DELETE',
         })
 
