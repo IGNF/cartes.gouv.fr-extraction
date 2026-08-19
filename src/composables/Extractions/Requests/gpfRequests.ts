@@ -1,3 +1,13 @@
+/**
+ * Ce fichier contient les fonctions de manipulation de l'API d'extraction
+ * 
+ * Chaque fonction est un wrapper Typescript des routes API utilisées
+ * Elles gèrent :
+ *  - l'authentification
+ *  - validation des types d'entrée et sortie
+ *  - gestion des erreurs
+ */
+
 import type {
     ExtractionRequestBody,
     createExtractionErrorResponse,

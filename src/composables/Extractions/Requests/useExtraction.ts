@@ -1,11 +1,18 @@
-import { useCreateExtractionRequest, useDeleteExtractionRequest } from "@/composables/Extractions/gpfRequests";
+import { useCreateExtractionRequest, useDeleteExtractionRequest } from "@/composables/Extractions/Requests/gpfRequests";
 import type { DeleteExtractionResponse } from "@/types/my-extractions.types";
 import type { ExtractionRequestBody, createExtractionResponse } from "@/types/extractibles.types";
 import type { HistoricFileContent } from "@/types/historique.types";
-import { isExtractionErrorResponse } from '@/composables/Extractions/gpfRequests'
+import { isExtractionErrorResponse } from '@/composables/Extractions/Requests/gpfRequests'
 import { useCreateHistoricDocument, useDeleteExtractionHistoricDocument } from "./historicRequests";
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 
+
+/**
+ *  Ce fichier contient les fonctions de manipulation d'extraction au sens Interface
+ *  Par exemple 1 appel de création d'extraction appel plusieurs gpfRequests 
+ *  pour créer les jobs d'extraction et les documents historiques associés.
+ *  
+ */
 
 export async function useCreateExtraction(
   requestBody: ExtractionRequestBody | undefined,

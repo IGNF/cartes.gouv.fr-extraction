@@ -7,49 +7,21 @@ import VectorLayerImpl from 'ol/layer/Vector'
 import Feature from 'ol/Feature'
 import GeoJSON from 'ol/format/GeoJSON'
 import type Geometry from 'ol/geom/Geometry'
+import { extractGeoJsonFromFilter } from '@/composables/Extractions/useExtractionExtent'
 
 const geoJsonFormat = new GeoJSON()
-
-// Extrait toutes les géométries GeoJSON présentes dans les filtres SQL,
-// en ciblant les appels ST_GeomFromGeoJSON('...') et leur SRID éventuel.
-function extractGeoJsonFromFilter(filter: string): Array<{ geojson: Record<string, unknown>, srid: number }> {
-  const results: Array<{ geojson: Record<string, unknown>, srid: number }> = []
-  const geomRegex = /ST_GeomFromGeoJSON\(\s*'((?:''|[^'])*)'\s*\)/gi
-
-  let match: RegExpExecArray | null
-  while ((match = geomRegex.exec(filter)) !== null) {
-    const escapedGeoJson = match[1]
-    const rawGeoJson = escapedGeoJson.replace(/''/g, "'")
-
-    try {
-      const parsed = JSON.parse(rawGeoJson) as Record<string, unknown>
-
-      const beforeGeomCall = filter.slice(0, match.index)
-      const setSridMatch = /ST_SetSRID\(\s*$/i.exec(beforeGeomCall)
-      // SRID par défaut attendu dans le projet pour l'affichage carto.
-      let srid = 3857
-
-      if (setSridMatch) {
-        const afterGeomCall = filter.slice(match.index + match[0].length)
-        const sridMatch = /^\s*,\s*(\d+)\s*\)/.exec(afterGeomCall)
-        if (sridMatch) {
-          srid = Number.parseInt(sridMatch[1], 10)
-        }
-      }
-
-      results.push({ geojson: parsed, srid })
-    } catch {
-      continue
-    }
-  }
-
-  return results
-}
 
 export const useCreateExtractionStore = defineStore('createExtraction', () => {
   const selectedExtractibleID = ref<string | null>(null)
   const requestBody = ref<ExtractionRequestBody | undefined>(undefined)
+
+  // Layer openlayers
   const extentLayer = shallowRef<VectorLayer | null>(null)
+
+  /**
+   *  DEBUT 
+   *  Dérivés du ExtentLayer
+   */
   const extent = computed(() => {
     if (!extentLayer.value) return null
     const source = extentLayer.value.getSource()
@@ -58,6 +30,8 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
     if (!sourceExtent) return null
     return sourceExtent
   })
+
+  // Options de la couche pour reconstruire la couche d'emprise à partir de l'état du store.
   const extentLayerOptions = computed(() => {
     if (!extentLayer.value) return {}
 
@@ -68,6 +42,8 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
       zIndex: extentLayer.value.getZIndex()
     }
   })
+
+  // Options de la source pour reconstruire la couche d'emprise à partir de l'état du store.
   const extentSourceOptions = computed(() => {
     if (!extentLayer.value) return null
 
@@ -82,6 +58,7 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
     }
   })
 
+  // Liste des géométries GeoJSON de l'emprise, transformées en EPSG:4326 pour l'export.
   const extentGeometries = computed<Record<string, unknown>[]>(() => {
     if (!extentLayer.value) return []
 
@@ -97,16 +74,19 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
       .map((geometry) => {
         const geometryClone = geometry.clone()
 
-        if (sourceProjection !== 'EPSG:3857') {
-          geometryClone.transform(sourceProjection, 'EPSG:3857')
+        if (sourceProjection !== 'EPSG:4326') {
+          geometryClone.transform(sourceProjection, 'EPSG:4326')
         }
 
         return geoJsonFormat.writeGeometryObject(geometryClone, {
-          dataProjection: 'EPSG:3857',
+          dataProjection: 'EPSG:4326',
           featureProjection: 'EPSG:3857',
         })
       })
   })
+  /**
+   *  FIN 
+   */
 
   function setExtentLayer(layer: VectorLayer) {
     extentLayer.value = layer

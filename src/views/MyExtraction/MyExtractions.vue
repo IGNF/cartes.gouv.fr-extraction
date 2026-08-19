@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { downloadAllItemsAsZip, getResultDownloadList, useGetExtractionResults, useGetJobByID } from '@/composables/Extractions/gpfRequests'
-import { useGetHistoricDocumentList } from '@/composables/Extractions/historicRequests'
-import { useDeleteExtraction, useRelaunchExtraction, useRelaunchExtractionWithNewParams } from '@/composables/Extractions/useExtraction'
+import { downloadAllItemsAsZip, getResultDownloadList, useGetExtractionResults, useGetJobByID } from '@/composables/Extractions/Requests/gpfRequests'
+import { useGetHistoricDocumentList } from '@/composables/Extractions/Requests/historicRequests'
+import { useDeleteExtraction, useRelaunchExtraction, useRelaunchExtractionWithNewParams } from '@/composables/Extractions/Requests/useExtraction'
 import type { ExtractionJob, Extraction } from '@/types/my-extractions.types'
 import type { HistoricContentWithDocumentID } from '@/types/historique.types'
 import type { RelaunchAction } from '@/types/UITypes'
