@@ -13,6 +13,7 @@
 
 import type { DocumentCreateRequestBody, HistoricFileContent, DocumentListItem, HistoricContentWithDocumentID } from '@/types/historique.types'
 import { useAppStore } from '@/stores/appStore'
+import { getRuntimeConfig } from '@/config/configService'
 
 export function useGetHistoricFilename(jobID: string): string {
     return `EXTRACTION_${jobID}.json`
@@ -21,9 +22,9 @@ export function useGetHistoricFilename(jobID: string): string {
 export async function useCreateHistoricDocument(historicContent: HistoricFileContent): Promise<void> {
     const appStore = useAppStore()
     const service = appStore.service
-    const documentsApiBase = service?.api ?? 'https://data.geopf.fr/api'
+    const documentsApiBase = getRuntimeConfig().IAM_ENTREPOT_API_URL
 
-    if (!service) {
+    if (!service || !documentsApiBase) {
         throw new Error('Service API non initialisé')
     }
 
@@ -67,9 +68,9 @@ export async function useCreateHistoricDocument(historicContent: HistoricFileCon
 export async function useGetHistoricDocumentContent(jobID: string): Promise<HistoricFileContent | null> {
     const appStore = useAppStore()
     const service = appStore.service
-    const documentsApiBase = service?.api ?? 'https://data.geopf.fr/api'
+    const documentsApiBase = getRuntimeConfig().IAM_ENTREPOT_API_URL
 
-    if (!service) {
+    if (!service || !documentsApiBase) {
         throw new Error('Service API non initialisé')
     }
 
@@ -132,9 +133,9 @@ export async function useGetHistoricDocumentContent(jobID: string): Promise<Hist
 export async function useGetHistoricDocumentList(): Promise<HistoricContentWithDocumentID[]> {
     const appStore = useAppStore()
     const service = appStore.service
-    const documentsApiBase = service?.api ?? 'https://data.geopf.fr/api'
+    const documentsApiBase = getRuntimeConfig().IAM_ENTREPOT_API_URL
 
-    if (!service) {
+    if (!service || !documentsApiBase) {
         throw new Error('Service API non initialisé')
     }
 
@@ -191,9 +192,9 @@ export async function useGetHistoricDocumentList(): Promise<HistoricContentWithD
 export async function useDeleteExtractionHistoricDocument(documentID: string): Promise<void> {
     const appStore = useAppStore()
     const service = appStore.service
-    const documentsApiBase = service?.api ?? 'https://data.geopf.fr/api'
+    const documentsApiBase = getRuntimeConfig().IAM_ENTREPOT_API_URL
 
-    if (!service) {
+    if (!service || !documentsApiBase) {
         throw new Error('Service API non initialisé')
     }
 

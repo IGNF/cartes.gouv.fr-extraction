@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import type { Extractible, ProcessLink } from '@/types/extractibles.types'
+import { getRuntimeConfig } from '@/config/configService'
 
 import { useLogger } from 'vue-logger-plugin'
 
@@ -19,9 +20,14 @@ export const useDataStore = defineStore('data', () => {
     async function fetchData(service: any) {
           log.debug("Fetching data... extraction")
           log.debug("API URL:", service)
+        const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL
+
+        if (!service || !extractionApiBaseUrl) {
+          throw new Error('Service API non initialisé')
+        }
         try {
         const response = await service.getFetch()(
-          'https://data.geopf.fr/extraction/processes?page=1&limit=10',
+          `${extractionApiBaseUrl}/processes?page=1&limit=10`,
           {
             headers: {
               'Content-Type': 'application/json'
