@@ -23,6 +23,7 @@ import type {
     ExtractionErrorResponse,
 } from '@/types/my-extractions.types';
 import { useAppStore } from '@/stores/appStore';
+import { getRuntimeConfig } from '@/config/configService';
 import JSZip from 'jszip';
 
 export function isExtractionErrorResponse(value: unknown): value is ExtractionErrorResponse {
@@ -38,8 +39,9 @@ export function isExtractionErrorResponse(value: unknown): value is ExtractionEr
 export async function useCreateExtractionRequest(requestBody: ExtractionRequestBody, processID: string | undefined): Promise<createExtractionResponse | createExtractionErrorResponse | createExtractionUnauthorizedErrorResponse> {
     const appStore = useAppStore();
     const service = appStore.service;
+    const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service) {
+    if (!service || !extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
         if (!processID) {
@@ -49,7 +51,7 @@ export async function useCreateExtractionRequest(requestBody: ExtractionRequestB
     console.log('Lancement de l\'extraction avec les données suivantes :', requestBody);
     console.log('Service API utilisé :', service);
     try {
-        const response = await service.getFetch()(`https://data.geopf.fr/extraction/processes/${processID}/execution`, {
+        const response = await service.getFetch()(`${extractionApiBaseUrl}/processes/${processID}/execution`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -103,8 +105,9 @@ export async function useGetJobs(options?: {
 }) {
     const appStore = useAppStore();
     const service = appStore.service;
+    const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service) {
+    if (!service || !extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
 
@@ -124,7 +127,7 @@ export async function useGetJobs(options?: {
     if (options?.limit !== undefined) searchParams.append('limit', options.limit.toString());
 
     try {
-        const url = `https://data.geopf.fr/extraction/jobs${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+        const url = `${extractionApiBaseUrl}/jobs${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
         const response = await service.getFetch()(url, {
             method: 'GET',
             headers: {
@@ -152,13 +155,14 @@ export async function useGetJobs(options?: {
 export async function useGetJobByID(jobID: string) {
     const appStore = useAppStore();
     const service = appStore.service;
+    const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service) {
+    if (!service || !extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
 
     try {
-        const url = `https://data.geopf.fr/extraction/jobs/${jobID}`;
+        const url = `${extractionApiBaseUrl}/jobs/${jobID}`;
         const response = await service.getFetch()(url, {
             method: 'GET',
             headers: {
@@ -183,13 +187,14 @@ export async function useGetJobByID(jobID: string) {
 export async function useGetExtractionResults(jobID: string) {
     const appStore = useAppStore();
     const service = appStore.service;
+    const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service) {
+    if (!service || !extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
 
     try {
-        const url = `https://data.geopf.fr/extraction/jobs/${jobID}/results`;
+        const url = `${extractionApiBaseUrl}/jobs/${jobID}/results`;
         const response = await service.getFetch()(url, {
             method: 'GET',
             headers: {
@@ -214,13 +219,14 @@ export async function useGetExtractionResults(jobID: string) {
 export async function useDeleteExtractionRequest(jobID: string): Promise<DeleteExtractionResponse | null> {
     const appStore = useAppStore();
     const service = appStore.service;
+    const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service) {
+    if (!service || !extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
 
     try {
-        const url = `https://data.geopf.fr/extraction/jobs/${jobID}`;
+        const url = `${extractionApiBaseUrl}/jobs/${jobID}`;
         const response = await service.getFetch()(url, {
             method: 'DELETE',
             headers: {
