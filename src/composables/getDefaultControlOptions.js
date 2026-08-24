@@ -30,6 +30,25 @@ export const layerImportOptions = {
             color : "rgba(1, 1, 1, 0.3)",
         }),
     })
+    },
+    "KML" : {
+        extractStyles : false,
+        defaultStyle : new Style({
+        image : new Icon({
+            src : mapPinIcon,
+            color : "#000091",
+            anchor : [0.5, 1],
+        }),
+        stroke : new Stroke({
+            color : "#000091",
+            lineDash : [5,  5],
+            width : 2,
+            lineDashOffset : 0
+        }),
+        fill : new Fill({
+            color : "rgba(1, 1, 1, 0.3)",
+        }),
+    })
     }
   }
 };
