@@ -39,29 +39,8 @@ const createExtractionStore = useCreateExtractionStore();
 const log = useLogger();
 
 const map = computed(() => mapStore.getMapRef(props.mapId))
+const handleAddVectorLayer = (event) => createExtractionStore.handleAddVectorLayer(() => map.value?.value, event.layer)
 const layerImport = ref(new LayerImport(props.layerImportOptions));
-
-// Event listeners for LayerImport
-const handleVectorAdded = (event) => {
-  const currentMap = map.value?.value;
-  const previousExtentLayer = createExtractionStore.extentLayer;
-
-  if (previousExtentLayer && currentMap) {
-    const previousLayerId = previousExtentLayer.ol_uid;
-    const mapLayers = currentMap.getLayers().getArray();
-    const layerToRemove = mapLayers.find((layer) => {
-      const layerId = layer.ol_uid;
-      return previousLayerId !== undefined && layerId === previousLayerId;
-    });
-
-    if (layerToRemove) {
-      currentMap.getLayers().remove(layerToRemove);
-      createExtractionStore.removeExtentLayer();
-    }
-  }
-
-  createExtractionStore.setExtentLayer(event.layer);
-};
 
 const handleMapboxAdded = (event) => {
   log.debug('MapBox layer added:', event);
@@ -85,7 +64,7 @@ const handleRenderFailure = (event) => {
 
 onMounted(() => {
   // Add event listeners
-  layerImport.value.addEventListener('layerimport:vector:added', handleVectorAdded);
+  layerImport.value.addEventListener('layerimport:vector:added', handleAddVectorLayer);
   layerImport.value.addEventListener('layerimport:mapbox:added', handleMapboxAdded);
   layerImport.value.addEventListener('layerimport:service:added', handleServiceAdded);
   layerImport.value.addEventListener('editor:loaded', handleEditorLoaded);
@@ -106,7 +85,7 @@ onMounted(() => {
 onUnmounted(() => {
   // Remove event listeners on component unmount
   const element = layerImport.value;
-  element.removeEventListener('layerimport:vector:added', handleVectorAdded);
+  element.removeEventListener('layerimport:vector:added', handleAddVectorLayer);
   element.removeEventListener('layerimport:mapbox:added', handleMapboxAdded);
   element.removeEventListener('layerimport:service:added', handleServiceAdded);
   element.removeEventListener('editor:loaded', handleEditorLoaded);
@@ -122,23 +101,17 @@ onUnmounted(() => {
 <style lang="scss">
 // le widget est intégré dans le container gauche
 // mais le bouton est caché (car intégré dans menus gauche et droite)
-.position-container-top-left .gpf-btn-icon[id^=GPshowImportPicto-] {
-  display: none;
-}
-div[id^='GPimportStaticParams-'] > .GPimportInputLine:first-child {
-  display: none;
-}
-div[id^='GPimportStaticParams-'] {
-  margin-bottom: 0;
-}
-dialog[id^='GPimportPanel-'] {
-  max-height: calc(45vh - 20px) !important;
-}
+
 form[id^='GPimportForm-'] {
   margin-bottom: 0;
   overflow: hidden;
 }
-input[id^='GPimportSubmit-'] {
-  margin-top: 0
+
+button.GPButton.fr-icon-delete-line::after {
+  content: none;
+}
+
+button.GPButton.fr-icon-close-line::after {
+  content: none;
 }
 </style>
