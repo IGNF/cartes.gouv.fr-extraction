@@ -5,6 +5,7 @@ WORKDIR /app
 # Installation des dépendances
 COPY package.json .
 COPY package-lock.json .
+COPY geopf-extensions-openlayers-1.0.0-beta*.tgz .
 RUN npm ci
 
 # Vérifier que les dépendances sont installées
