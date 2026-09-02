@@ -4,6 +4,7 @@ import { useMapStore } from "@/stores/mapStore";
 import { layerImportOptions } from "@/composables/getDefaultControlOptions.js";
 import VectorSource from "ol/source/Vector";
 import OpenLayersVectorLayer from "ol/layer/Vector";
+import { isEmpty } from "ol/extent";
 
 const props = defineProps({
   sourceOptions: {
@@ -28,6 +29,16 @@ const map = computed(() => mapStore.getMapRef(props.mapId));
 
 const vectorLayer = shallowRef(null);
 
+function fitToLayerExtent() {
+  const currentMap = map.value?.value;
+  const extent = vectorLayer.value?.getSource()?.getExtent();
+
+  if (!currentMap || !extent || isEmpty(extent)) return false;
+
+  currentMap.getView().fit(extent);
+  return true;
+}
+
 function removeLayer() {
   const currentMap = map.value?.value;
   if (currentMap && vectorLayer.value) {
@@ -51,6 +62,12 @@ function mountLayer() {
 
   if (!currentMap.getLayers().getArray().includes(vectorLayer.value)) {
     currentMap.addLayer(vectorLayer.value);
+  }
+
+  if (!fitToLayerExtent()) {
+    source.once("featuresloadend", () => {
+      fitToLayerExtent();
+    });
   }
   log.debug("Add VectorLayer to map : ", props.mapId);
   emit("mounted", vectorLayer.value);
