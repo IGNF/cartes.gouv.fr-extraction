@@ -94,7 +94,14 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
     extentLayer.value = layer
   }
 
-  function removeExtentLayer() {
+  function removeExtentLayer(getMap?: () => Map | null | undefined) {
+    const layer = extentLayer.value
+    const currentMap = getMap?.()
+
+    if (layer && currentMap) {
+      currentMap.removeLayer(layer)
+    }
+
     extentLayer.value = null
   }
 

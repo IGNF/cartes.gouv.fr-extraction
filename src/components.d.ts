@@ -17,6 +17,7 @@ declare module 'vue' {
     DsfrSearchBar: typeof import('@gouvminint/vue-dsfr')['DsfrSearchBar']
     DsfrSelect: typeof import('@gouvminint/vue-dsfr')['DsfrSelect']
     ExpertRequestBuilder: typeof import('./components/requestBuilder/ExpertRequestBuilder.vue')['default']
+    ExtentInteraction: typeof import('./components/map/Interactions/extentInteraction.vue')['default']
     ExtractibleGrid: typeof import('./components/template-grid/ExtractibleGrid.vue')['default']
     ExtractionList: typeof import('./components/ExtractionList.vue')['default']
     ExtractionListElement: typeof import('./components/ExtractionListElement.vue')['default']
