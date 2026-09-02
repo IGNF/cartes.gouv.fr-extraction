@@ -56,6 +56,7 @@ const requestBody = computed((): ExtractionRequestBody => {
             format: format.value, 
             srs: projection.value,
             relations: relations.value,
+            append: true
         },
         outputs: {
             logs : {},
