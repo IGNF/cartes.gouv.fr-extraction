@@ -320,6 +320,26 @@ export async function downloadAllItemsAsZip(downloadItems: DownloadItem[], archi
         throw new Error('La liste des fichiers à télécharger est vide');
     }
 
+    // Si le fichier contenant les données est unique, télécharger directement sans créer d'archive ZIP
+    if (downloadItems.length <= 2) {
+        const item = downloadItems.length === 2
+            ? downloadItems.find(({ href }) => !href.includes('data/extraction.json'))
+            : downloadItems[0];
+
+        if (!item) {
+            throw new Error('Aucun fichier de données à télécharger');
+        }
+
+        const link = document.createElement('a');
+        link.href = item.href;
+        link.download = item.name || item.href.split('/').pop() || 'fichier';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        return;
+    }
+
+    // Créer une archive ZIP quand il y a plusieurs fichiers à télécharger
     const zip = new JSZip();
 
     for (const item of downloadItems) {
