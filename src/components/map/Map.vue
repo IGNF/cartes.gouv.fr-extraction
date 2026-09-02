@@ -13,12 +13,18 @@ export default {
 import { CRS } from 'geopf-extensions-openlayers'
 
 import Map from 'ol/Map'
+import View from 'ol/View'
 import {
     MouseWheelZoom,
     defaults as defaultInteractions
 } from "ol/interaction";
 import TileLayer from 'ol/layer/Tile'
 import OSM from 'ol/source/OSM'
+import {
+  fromLonLat,
+  toLonLat
+} from 'ol/proj'
+import { nextTick } from 'vue'
 import {
     shiftKeyOnly as eventShiftKeyOnly
 } from "ol/events/condition";
@@ -42,12 +48,36 @@ const props = defineProps({
 */
 const mapRef = ref(null)
 
+const view = new View({
+  zoom: mapStore.zoom,
+  center: fromLonLat([mapStore.lon, mapStore.lat]),
+  minZoom: 0,
+  maxZoom: 21,
+  projection: 'EPSG:3857'
+})
+
+let skipStoreViewUpdate = false
+
+watch(
+  () => [mapStore.zoom, mapStore.lon, mapStore.lat],
+  () => {
+    if (skipStoreViewUpdate) {
+      skipStoreViewUpdate = false
+      return
+    }
+
+    view.setZoom(mapStore.zoom)
+    view.setCenter(fromLonLat([mapStore.lon, mapStore.lat]))
+  }
+)
+
 /**
 * Map
 * default controls are removed (rotate, zoom and attributions)
 */
 const map = new Map({
   target: props.mapId,
+  view,
   controls: [], // on supprime les contrôles par defaut !
   interactions : defaultInteractions().extend([
     new MouseWheelZoom({
@@ -68,6 +98,23 @@ onMounted(() => {
     canvas[0].tabIndex = 0
   }
   mapStore.setMap(props.mapId, map)
+  map.on('moveend', () => {
+    const view = map.getView()
+    const center = view?.getCenter()
+
+    if (!center) {
+      return
+    }
+
+    const [longitude, latitude] = toLonLat(center)
+    skipStoreViewUpdate = true
+    mapStore.zoom = view.getZoom()
+    mapStore.lon = longitude
+    mapStore.lat = latitude
+    nextTick(() => {
+      skipStoreViewUpdate = false
+    })
+  })
   log.debug('Map mounted : ', props.mapId)
     const osmLayer = new TileLayer({
     source: new OSM(),

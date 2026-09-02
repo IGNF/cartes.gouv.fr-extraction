@@ -36,11 +36,11 @@ onMounted(() => {
     <Map 
         class="map" 
         :map-id="sqlMap">
-        <View
+        <!-- <View
           :map-id="sqlMap"
           :center="mapStore.center"
           :zoom="mapStore.zoom"
-        />
+        /> -->
         <Layer  
             :map-id="sqlMap" 
             :layerOptions="DEFAULT_LAYER"
