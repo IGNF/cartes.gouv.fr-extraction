@@ -10,6 +10,8 @@ export const layerImportOptions = {
   position: "top-right",
   gutter: true,
   listable: true,
+  dragAndDropUI: true,
+  title : "Importer une emprise",
   layerTypes: ["GeoJSON", "KML"],
   vectorStyleOptions : {
     "GeoJSON" : {
@@ -64,7 +66,8 @@ export const searchEngineOptions = {
   id: "1",
   collapsed: false,
   collapsible: false,
-  returnTrueGeometry: true,
+  returnTrueGeometry : true,
+  selectGeometry : 'extent',
   autocompleteOptions : {
     serviceOptions : {
         maximumResponses : 10
@@ -74,7 +77,6 @@ export const searchEngineOptions = {
   },
   markerUrl : IconGeolocationSVG,
   placeholder: "Rechercher un lieu...",
-
 };
 export const zoomOptions = {
   position: "bottom-right",

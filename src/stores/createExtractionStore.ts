@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { ExtractionRequestBody } from '@/types/extractibles.types'
+import type Map from 'ol/Map'
 import type VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 import VectorLayerImpl from 'ol/layer/Vector'
 import Feature from 'ol/Feature'
 import GeoJSON from 'ol/format/GeoJSON'
 import type Geometry from 'ol/geom/Geometry'
+import { getUid } from 'ol/util'
 import { extractGeoJsonFromFilter } from '@/composables/Extractions/useExtractionExtent'
 
 const geoJsonFormat = new GeoJSON()
@@ -92,8 +94,35 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
     extentLayer.value = layer
   }
 
-  function removeExtentLayer() {
+  function removeExtentLayer(getMap?: () => Map | null | undefined) {
+    const layer = extentLayer.value
+    const currentMap = getMap?.()
+
+    if (layer && currentMap) {
+      currentMap.removeLayer(layer)
+    }
+
     extentLayer.value = null
+  }
+
+  function handleAddVectorLayer(getMap: () => Map | null | undefined, layer: VectorLayer) {
+    const currentMap = getMap()
+    const previousExtentLayer = extentLayer.value
+
+    if (previousExtentLayer && currentMap) {
+      const previousLayerId = getUid(previousExtentLayer)
+      const mapLayers = currentMap.getLayers().getArray()
+      const layerToRemove = mapLayers.find((layer) => {
+        return getUid(layer) === previousLayerId
+      })
+
+      if (layerToRemove) {
+        currentMap.getLayers().remove(layerToRemove)
+        removeExtentLayer()
+      }
+    }
+
+    setExtentLayer(layer)
   }
 
   function setExtentLayerFromRequestBody(body?: ExtractionRequestBody) {
@@ -161,6 +190,7 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
     extentSourceOptions,
     extentGeometries,
     setExtentLayer,
+    handleAddVectorLayer,
     setExtentLayerFromRequestBody,
     removeExtentLayer,
     reset

@@ -26,15 +26,15 @@ const emit = defineEmits(["mounted", "unmounted"]);
 
 const map = computed(() => mapStore.getMapRef(props.mapId));
 
-let vectorLayer = null;
+const vectorLayer = shallowRef(null);
 
 function removeLayer() {
   const currentMap = map.value?.value;
-  if (currentMap && vectorLayer) {
-    currentMap.removeLayer(vectorLayer);
+  if (currentMap && vectorLayer.value) {
+    currentMap.removeLayer(vectorLayer.value);
     emit("unmounted");
   }
-  vectorLayer = null;
+  vectorLayer.value = null;
 }
 
 function mountLayer() {
@@ -43,15 +43,17 @@ function mountLayer() {
 
   const source = new VectorSource(props.sourceOptions || {});
   const defaultGeoJsonStyle = layerImportOptions.vectorStyleOptions?.GeoJSON?.defaultStyle;
-  vectorLayer = new OpenLayersVectorLayer({
+  vectorLayer.value = new OpenLayersVectorLayer({
     source,
     ...(props.layerOptions || {}),
     style: defaultGeoJsonStyle,
   });
 
-  currentMap.addLayer(vectorLayer);
+  if (!currentMap.getLayers().getArray().includes(vectorLayer.value)) {
+    currentMap.addLayer(vectorLayer.value);
+  }
   log.debug("Add VectorLayer to map : ", props.mapId);
-  emit("mounted");
+  emit("mounted", vectorLayer.value);
 }
 
 watch(
@@ -70,6 +72,6 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <slot />
+    <slot :vector-layer="vectorLayer" />
   </div>
 </template>

@@ -2,8 +2,11 @@
 
 import { useLogger } from 'vue-logger-plugin';
 import { useMapStore } from '@/stores/mapStore';
+import { useCreateExtractionStore } from '@/stores/createExtractionStore';
 
-import { shallowRef, markRaw } from 'vue';
+import { shallowRef } from 'vue';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
 
 import {
   toLonLat as toLonLatProj,
@@ -36,6 +39,7 @@ const props = defineProps({
 
 const log = useLogger();
 const mapStore = useMapStore();
+const createExtractionStore = useCreateExtractionStore();
 
 const map = computed(() => mapStore.getMapRef(props.mapId))
 
@@ -44,8 +48,67 @@ const location = ref(new LocationAdvancedSearch());
 const coordinates = ref(new CoordinateAdvancedSearch());
 const parcels = ref(new ParcelAdvancedSearch());
 
+const addExtentLayer = (feature) => {
+  log.debug("SearchEngineAdvanced - addExtentLayer", feature);
+
+  const geometry = feature?.getGeometry?.();
+  if (!geometry) {
+    log.warn('SearchEngineAdvanced - addExtentLayer called without valid feature geometry');
+    return;
+  }
+
+  // Clone le feature pour éviter toute mutation partagée avec le widget.
+  const extentFeature = feature.clone();
+  const layer = new VectorLayer({
+    source: new VectorSource({ features: [extentFeature] }),
+    visible: true,
+    opacity: 1,
+    zIndex: 1000,
+  });
+
+  createExtractionStore.handleAddVectorLayer(() => map.value?.value, layer);
+
+  const currentMap = map.value?.value;
+  if (!currentMap) {
+    return;
+  }
+
+  // Supprime la feature d'origine du widget de recherche après duplication.
+  currentMap.getLayers().forEach((mapLayer) => {
+    const source = mapLayer?.getSource?.();
+    if (!source?.hasFeature?.(feature)) {
+      return;
+    }
+
+    source.removeFeature(feature);
+  });
+  
+}
+
 const advancedSearchEngineOptions = computed(() => {
-    return Object.assign({}, props.searchEngineOptions, {advancedSearch : [insee.value, location.value, coordinates.value, parcels.value]})
+    return Object.assign(
+      {}, 
+      props.searchEngineOptions, 
+      {
+        advancedSearch : [
+          insee.value,
+          location.value,
+          coordinates.value,
+          parcels.value
+        ]
+      },
+      {
+        popupButtons : [{
+                            label : "Choisir comme emprise",
+                            className : "custom-button",
+                            icon : "fr-icon-map-pin-add-line",
+                            attributes : {
+                                "data-action" : "add-feature",
+                            },
+                            onClick : addExtentLayer
+                        }]
+      }
+    )
 });
 
 // const searchEngineAdvanced = ref(markRaw(new SearchEngineAdvanced(advancedSearchEngineOptions.value)));
