@@ -1,6 +1,7 @@
 
 <script setup lang="ts">
 import { drawingOptions, layerImportOptions, zoomOptions, searchEngineOptions } from "@/composables/getDefaultControlOptions.js";
+import ExtentInteraction from "@/components/map/Interactions/extentInteraction.vue";
 import { mainMap } from "@/composables/mapkeys.js";
 import { useCreateExtractionStore } from "@/stores/createExtractionStore";
 import { useMapStore } from "@/stores/mapStore";
@@ -52,7 +53,14 @@ onMounted(() => {
           :map-id="mainMap"
           :source-options="createExtractionStore.extentSourceOptions"
           :layer-options="createExtractionStore.extentLayerOptions"
-        />
+        >
+          <template #default="{ vectorLayer }">
+            <ExtentInteraction
+              :map-id="mainMap"
+              :vector-layer="vectorLayer"
+            />
+          </template>
+        </VectorLayer>
         <Controls
           :map-id="mainMap" 
         >
