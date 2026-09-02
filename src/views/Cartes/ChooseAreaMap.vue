@@ -38,11 +38,11 @@ onMounted(() => {
     <Map 
         class="map map-container" 
         :map-id="mainMap">
-        <View
+        <!-- <View
           :map-id="mainMap"
           :center="mapStore.center"
           :zoom="mapStore.zoom"
-        />
+        /> -->
         <Layer  
             key="mainMap" 
             :layerOptions="DEFAULT_LAYER"
