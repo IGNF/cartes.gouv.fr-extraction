@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useGetJobInputs } from '@/composables/Extractions/Requests/gpfRequests'
+import type { ExtractionRequestBody } from '@/types/extractibles.types'
 import type { Extraction } from '@/types/my-extractions.types';
+import { DsfrAccordion, DsfrAccordionsGroup } from '@gouvminint/vue-dsfr'
 
 const props = defineProps<{
     extraction: Extraction
@@ -10,6 +13,11 @@ const emit = defineEmits<{
     (e: 'delete', extraction: Extraction): void
     (e: 'relaunch', extraction: Extraction): void
 }>()
+
+const activeDebugAccordion = ref(-1)
+const jobInputs = ref<ExtractionRequestBody | null>(null)
+const isLoadingJobInputs = ref(false)
+const jobInputsError = ref<string | null>(null)
 
 const formattedDate = computed(() =>
     new Date(props.extraction.updated).toLocaleDateString('fr-FR', {
@@ -42,6 +50,23 @@ function statusLinter(status: string) {
             break;
     }
     return ret.toUpperCase()
+}
+
+async function loadJobInputs(accordionIndex: number) {
+    if (accordionIndex !== 0 || jobInputs.value || isLoadingJobInputs.value) return
+
+    isLoadingJobInputs.value = true
+    jobInputsError.value = null
+
+    try {
+        jobInputs.value = await useGetJobInputs(props.extraction.jobID)
+    } catch (error: unknown) {
+        jobInputsError.value = error instanceof Error
+            ? error.message
+            : 'Impossible de récupérer les paramètres du job.'
+    } finally {
+        isLoadingJobInputs.value = false
+    }
 }
 
 </script>
@@ -78,6 +103,18 @@ function statusLinter(status: string) {
                 </DsfrButton>
             </div>
         </div>
+        <DsfrAccordionsGroup
+            v-model="activeDebugAccordion"
+            @update:model-value="loadJobInputs"
+        >
+            <DsfrAccordion title="Debug : paramètres de l'extraction">
+                <p v-if="isLoadingJobInputs">Chargement des paramètres...</p>
+                <p v-else-if="jobInputsError" class="fr-message fr-message--error">
+                    {{ jobInputsError }}
+                </p>
+                <pre v-else-if="jobInputs">{{ JSON.stringify(jobInputs, null, 2) }}</pre>
+            </DsfrAccordion>
+        </DsfrAccordionsGroup>
     </div>
 </template>
 
@@ -123,5 +160,12 @@ h4 {
 
 .row p {
     margin: 0;
+}
+
+pre {
+    max-height: 30rem;
+    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 </style>

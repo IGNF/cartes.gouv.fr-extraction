@@ -184,6 +184,38 @@ export async function useGetJobByID(jobID: string) {
     }
 }
 
+export async function useGetJobInputs(jobID: string): Promise<ExtractionRequestBody> {
+    const appStore = useAppStore();
+    const service = appStore.service;
+    const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
+
+    if (!service || !extractionApiBaseUrl) {
+        throw new Error('Service API non initialisé');
+    }
+
+    try {
+        const url = `${extractionApiBaseUrl}/jobs/${jobID}/inputs`;
+        const response = await service.getFetch()(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json() as ExtractionRequestBody;
+
+        if (!response.ok) {
+            throw data;
+        }
+
+        console.log('Inputs du job récupérés avec succès :', data);
+        return data;
+    } catch (error: unknown) {
+        console.error('Erreur lors de la récupération des inputs du job :', error);
+        throw error;
+    }
+}
+
 export async function useGetExtractionResults(jobID: string) {
     const appStore = useAppStore();
     const service = appStore.service;

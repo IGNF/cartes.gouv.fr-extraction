@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     CardList: typeof import('./components/CardList.vue')['default']
     Controls: typeof import('./components/map/Controls/Controls.vue')['default']
+    copy: typeof import('./components/requestBuilder/TableAttributeSelector copy.vue')['default']
     DeleteModal: typeof import('./components/Modals/DeleteModal.vue')['default']
     Drawing: typeof import('./components/map/Controls/Drawing.vue')['default']
     DsfrButton: typeof import('@gouvminint/vue-dsfr')['DsfrButton']
