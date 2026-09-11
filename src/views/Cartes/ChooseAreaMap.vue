@@ -93,7 +93,7 @@ onMounted(() => {
   margin-top: 2rem;
   border: 1px solid var(--light-decisions-border-border-default-grey, #DDD);
   width: 100%;
-  height: 50vh;
+  height: 60vh;
   position: relative;
 }
 </style>
