@@ -1,7 +1,8 @@
 # Service d’extraction de données cartes.gouv.fr
 
-Cette application Vue 3 / Vue DSFR permet de lancer des extractions de données géographiques de la Géoplateforme sur une étendue.
-Elle propose un paramètrage puis un suivi des extractions lancées.
+Cette application est une des briques fonctionnelles du portail cartes.gouv.fr. Elle offre une interface graphique permettant de lancer des extractions de données géographiques avec le [service d'extraction de la Géoplateforme](https://cartes.gouv.fr/aide/fr/guides-utilisateur/utiliser-les-services-de-la-geoplateforme/extraction/).
+
+Elle propose un paramètrage de l'emprise géographique, du contenu et des critères de filtrage des extractions puis un suivi des extractions demandées.
 
 ---
 
@@ -9,14 +10,13 @@ Elle propose un paramètrage puis un suivi des extractions lancées.
 
 - [Vue 3](https://vuejs.org/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/)
 - [Vue Router](https://router.vuejs.org/) et [Pinia](https://pinia.vuejs.org/)
-- [Vue DSFR](https://vue-ds.fr/) (`@gouvminint/vue-dsfr`) + DSFR (`@gouvfr/dsfr`)
-- [OpenLayers](https://openlayers.org/) pour la cartographie
+- [Vue DSFR](https://vue-ds.fr/) (`@gouvminint/vue-dsfr`) + DSFR (`@gouvfr/dsfr`) s'agissant d'un site utilisant le système de design de l'Etat.
+- [OpenLayers](https://openlayers.org/) et [IGNF/geopf-extensions-openlayers](https://github.com/IGNF/geopf-extensions-openlayers) pour la cartographie
 - [Vitest](https://vitest.dev/) et [Playwright](https://playwright.dev/) pour les tests
 
 ## Prérequis
 
-- Node.js 20+ recommandé
-- npm
+`Node.js` (>20) et `npm` installés
 
 ## Installation
 
@@ -86,7 +86,7 @@ Les variables concernent notamment le `BASE_URL`, le mode (`MODE`) et la configu
 
 ## Docker
 
-Les commandes utiles sont détaillées dans [Docker.md](Docker.md).
+Les commandes utiles sont détaillées dans [Docker.md](docs/developper/Docker.md).
 
 Exemple rapide :
 
