@@ -30,6 +30,7 @@ import {
 } from "ol/events/condition";
 
 import { mainMap } from "@/composables/mapkeys"
+import { DEFAULT_MAP_SRS } from '@/composables/useMapConstants'
 import { useMapStore } from '@/stores/mapStore'
 import { useLogger } from "vue-logger-plugin";
 
@@ -53,7 +54,7 @@ const view = new View({
   center: fromLonLat([mapStore.lon, mapStore.lat]),
   minZoom: 0,
   maxZoom: 21,
-  projection: 'EPSG:3857'
+  projection: DEFAULT_MAP_SRS
 })
 
 let skipStoreViewUpdate = false
