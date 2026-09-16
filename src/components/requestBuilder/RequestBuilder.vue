@@ -2,7 +2,8 @@
 import { CgfrSelectList } from 'cartes.gouv.fr-vue-components'
 import { storeToRefs } from 'pinia'
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
-import { createIntersectSQL } from '@/composables/Extractions/useExtractionExtent'
+import { createIntersectSQL } from '@/composables/Extractions/useExtractionExtentUtils'
+import { DEFAULT_MAP_SRS, DEFAULT_MAP_SRID } from '@/composables/useMapConstants'
 import type { ExtractibleRelation, RelationInput } from '@/types/extractibles.types'
 
 const props = withDefaults(defineProps<{
@@ -10,7 +11,7 @@ const props = withDefaults(defineProps<{
 	ExtractibleSrs?: string
 }>(), {
 	relations: () => [],
-	ExtractibleSrs: 'EPSG:3857',
+	ExtractibleSrs: DEFAULT_MAP_SRS,
 })
 
 const model = defineModel<RelationInput>({ required: true })
@@ -23,12 +24,17 @@ const selectedTableNames = ref<string[]>([])
 
 const tableOptions = computed(() => props.relations.map((relation) => relation.name))
 
+/**
+ * Extrait le code EPSG/SRID cible du système de coordonnées de l'extractible
+ * pour appliquer le filtre spatial. Utilise Web Mercator (3857) par défaut
+ * si le système de coordonnées est absent ou invalide.
+ */
 const destinationSrid = computed(() => {
 	const match = props.ExtractibleSrs?.match(/(\d+)/)
-	if (!match) return 3857
+	if (!match) return DEFAULT_MAP_SRID
 
 	const srid = Number.parseInt(match[1], 10)
-	return Number.isNaN(srid) ? 3857 : srid
+	return Number.isNaN(srid) ? DEFAULT_MAP_SRID : srid
 })
 
 const extentFilter = computed(() => {

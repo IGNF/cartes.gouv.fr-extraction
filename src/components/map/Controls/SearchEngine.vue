@@ -65,7 +65,7 @@ const addExtentLayer = (feature) => {
     opacity: 1,
     zIndex: 1000,
   });
-
+  console.log("Adding extent layer:", layer);
   createExtractionStore.handleAddVectorLayer(() => map.value?.value, layer);
 
   const currentMap = map.value?.value;
@@ -82,7 +82,9 @@ const addExtentLayer = (feature) => {
 
     source.removeFeature(feature);
   });
-  
+
+  // Ferme la popup et supprime le marqueur de recherche.
+  document.getElementById("delete-search-geometry")?.click();
 }
 
 const advancedSearchEngineOptions = computed(() => {
@@ -98,7 +100,19 @@ const advancedSearchEngineOptions = computed(() => {
         ]
       },
       {
-        popupButtons : [{
+        popupButtons : [
+                        {
+                            label: "Fermer la popup",
+                            icon: "fr-icon-close-line",
+                            attributes: {
+                                id: "delete-search-geometry",
+                            },
+                            onClick: function (feature) {
+                                // true => suppression de la feature + fermeture de la popup
+                                return true;
+                            }
+                        },
+                        {
                             label : "Choisir comme emprise",
                             className : "custom-button",
                             icon : "fr-icon-map-pin-add-line",
@@ -106,7 +120,8 @@ const advancedSearchEngineOptions = computed(() => {
                                 "data-action" : "add-feature",
                             },
                             onClick : addExtentLayer
-                        }]
+                        }
+                      ]
       }
     )
 });
@@ -204,5 +219,9 @@ const onClickSearchGeolocationRemove = (e) => {
 // centre l'icone
 .GPsearchInputSubmit::before {
   margin: 0 auto !important;
+}
+
+button[aria-label="Fermer la pop-up"], button[aria-label="Supprimer le marqueur"] {
+  display: none;
 }
 </style>

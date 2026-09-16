@@ -2,8 +2,8 @@ import type { Extractible } from '@/types/extractibles.types'
 import type VectorLayer from 'ol/layer/Vector'
 import type { Extent } from 'ol/extent'
 import { createEmpty, extend, intersects } from 'ol/extent'
-import { transformExtent } from 'ol/proj'
-import GeoJSON from 'ol/format/GeoJSON'
+import GeoJSON, { type GeoJSONFeatureCollection } from 'ol/format/GeoJSON'
+import { DEFAULT_GEOJSON_SRS, DEFAULT_MAP_SRS } from '@/composables/useMapConstants'
 
 const geoJsonFormat = new GeoJSON()
 
@@ -24,8 +24,8 @@ export function getExtractibleExtent(extent: unknown, srs?: string): Extent | nu
       : extent as object
 
     const geometry = geoJsonFormat.readGeometry(geometryObject, {
-      dataProjection: 'EPSG:4326',
-      featureProjection: 'EPSG:3857',
+      dataProjection: DEFAULT_GEOJSON_SRS,
+      featureProjection: DEFAULT_MAP_SRS,
     })
     return geometry.getExtent()
   } catch {
@@ -33,75 +33,56 @@ export function getExtractibleExtent(extent: unknown, srs?: string): Extent | nu
   }
 }
 
-export function getVectorLayerExtent(vectorLayer: VectorLayer | null): Extent | null {
+// Collection GeoJSON (EPSG:4326) de toutes les features du extentLayer.
+export function getVectorLayerExtent(vectorLayer: VectorLayer | null): GeoJSONFeatureCollection | null {
   if (!vectorLayer) return null
 
   const source = vectorLayer.getSource()
   if (!source) return null
 
-  const sourceProjection = source.getProjection?.()?.getCode() ?? 'EPSG:3857'
-  console.log('getVectorLayerExtent - Source Projection:', sourceProjection)
-
   const features = source.getFeatures?.() ?? []
-  console.log('getVectorLayerExtent - Features count:', features.length)
+  if (!features.length) return null
 
-  if (features.length === 0) {
-    const sourceExtent = source.getExtent?.()
-    console.log('getVectorLayerExtent - Source extent (no features):', sourceExtent)
-    if (!isValidExtent(sourceExtent)) return null
-    const result = sourceProjection !== 'EPSG:3857'
-      ? transformExtent(sourceExtent, sourceProjection, 'EPSG:3857')
-      : sourceExtent
-    console.log('getVectorLayerExtent - Transformed extent:', result)
-    return result
-  }
+  const sourceProjection = source.getProjection?.()?.getCode() ?? DEFAULT_MAP_SRS
 
-  const computedExtent = createEmpty()
-  let hasGeometry = false
-
-  for (const feature of features) {
-    const geometry = feature.getGeometry?.()
-    if (!geometry) continue
-
-    const featureExtent = geometry.getExtent()
-    if (!isValidExtent(featureExtent)) continue
-
-    console.log('getVectorLayerExtent - Feature extent:', featureExtent)
-    extend(computedExtent, featureExtent)
-    hasGeometry = true
-  }
-
-  if (!hasGeometry) {
-    console.log('getVectorLayerExtent - No geometries found')
-    return null
-  }
-
-  console.log('getVectorLayerExtent - Computed extent:', computedExtent)
-  const result = sourceProjection !== 'EPSG:3857'
-    ? transformExtent(computedExtent, sourceProjection, 'EPSG:3857')
-    : computedExtent
-  console.log('getVectorLayerExtent - Final extent (EPSG:3857):', result)
-  return result
+  return geoJsonFormat.writeFeaturesObject(features, {
+    dataProjection: DEFAULT_GEOJSON_SRS,
+    featureProjection: sourceProjection,
+  })
 }
 
 export function filterExtractiblesByLayerIntersection(
   extractibles: Extractible[],
   extentLayer: VectorLayer | null,
 ): Extractible[] {
-  const layerExtent = getVectorLayerExtent(extentLayer)
+  const layerFeatureCollection = getVectorLayerExtent(extentLayer)
 
-  if (!layerExtent) {
+  if (!layerFeatureCollection) {
     return extractibles
   }
 
-  console.log('Extractibles', extractibles);
-  
+  // Reconstruit un extent global (EPSG:3857) à partir de la collection GeoJSON pour le test d'intersection.
+  const layerExtent = createEmpty()
+  let hasGeometry = false
+
+  for (const feature of geoJsonFormat.readFeatures(layerFeatureCollection, {
+    dataProjection: DEFAULT_GEOJSON_SRS,
+    featureProjection: DEFAULT_MAP_SRS,
+  })) {
+    const featureExtent = feature.getGeometry?.()?.getExtent()
+    if (!isValidExtent(featureExtent)) continue
+
+    extend(layerExtent, featureExtent)
+    hasGeometry = true
+  }
+
+  if (!hasGeometry) {
+    return extractibles
+  }
+
   return extractibles.filter((extractible) => {
     const extractibleExtent = getExtractibleExtent(extractible.extent, extractible.srs)
-    if (extractible.name == "appariement_dep52_gpkg_15-11-2024") {
-            console.log('Extractible:', extractible.name, 'Extent:', extractibleExtent, 'Layer Extent:', layerExtent);
-            console.log('Intersects:', !!extractibleExtent && intersects(extractibleExtent, layerExtent));
-    }
     return !!extractibleExtent && intersects(extractibleExtent, layerExtent)
   })
 }
+

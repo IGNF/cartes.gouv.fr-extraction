@@ -29,9 +29,11 @@ function closePopup() {
 	selectInteraction.value?.getFeatures().clear()
 }
 
-function removeExtentLayer() {
+function removeFeatures() {
+	// getArray() renvoie le tableau interne : on le clone avant que closePopup() ne le vide.
+	const features = [...(selectInteraction.value?.getFeatures().getArray() ?? [])]
 	closePopup()
-	createExtractionStore.removeExtentLayer(() => map.value?.value)
+	createExtractionStore.removeFeatures(() => map.value?.value, features, props.vectorLayer ?? undefined)
 }
 
 function handleSelect(event: SelectEvent) {
@@ -118,7 +120,7 @@ onUnmounted(() => {
 					tertiary
 					no-outline
 					label="Supprimer l'emprise"
-					@click="removeExtentLayer"
+					@click="removeFeatures"
 				/>
 			</div>
 		</div>

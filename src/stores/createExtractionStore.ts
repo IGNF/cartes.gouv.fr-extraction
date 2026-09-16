@@ -9,7 +9,8 @@ import Feature from 'ol/Feature'
 import GeoJSON from 'ol/format/GeoJSON'
 import type Geometry from 'ol/geom/Geometry'
 import { getUid } from 'ol/util'
-import { extractGeoJsonFromFilter } from '@/composables/Extractions/useExtractionExtent'
+import { extractGeoJsonFromFilter } from '@/composables/Extractions/useExtractionExtentUtils'
+import { DEFAULT_GEOJSON_SRS, DEFAULT_MAP_SRS } from '@/composables/useMapConstants'
 
 const geoJsonFormat = new GeoJSON()
 
@@ -67,7 +68,7 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
     const source = extentLayer.value.getSource()
     if (!source) return []
 
-    const sourceProjection = source.getProjection?.()?.getCode() ?? 'EPSG:3857'
+    const sourceProjection = source.getProjection?.()?.getCode() ?? DEFAULT_MAP_SRS
     const features = source.getFeatures?.() ?? []
 
     return features
@@ -76,13 +77,13 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
       .map((geometry) => {
         const geometryClone = geometry.clone()
 
-        if (sourceProjection !== 'EPSG:4326') {
-          geometryClone.transform(sourceProjection, 'EPSG:4326')
+        if (sourceProjection !== DEFAULT_GEOJSON_SRS) {
+          geometryClone.transform(sourceProjection, DEFAULT_GEOJSON_SRS)
         }
 
         return geoJsonFormat.writeGeometryObject(geometryClone, {
-          dataProjection: 'EPSG:4326',
-          featureProjection: 'EPSG:3857',
+          dataProjection: DEFAULT_GEOJSON_SRS,
+          featureProjection: DEFAULT_MAP_SRS,
         })
       })
   })
@@ -105,21 +106,44 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
     extentLayer.value = null
   }
 
+  function removeFeatures(getMap: () => Map | null | undefined, features: Feature[], layer?: VectorLayer) {
+    // Le layer rendu sur la carte peut être une reconstruction (features clonées) distincte
+    // de extentLayer.value : on opère donc sur le layer réellement fourni par l'appelant.
+    const targetLayer = layer ?? extentLayer.value
+    const source = targetLayer?.getSource()
+
+    if (!source || !features.length) {
+      return
+    }
+
+    // Les features sélectionnées peuvent être des instances différentes de celles de la source :
+    // on les fait correspondre par ol_uid.
+    const idsToRemove = new Set(features.map((feature) => getUid(feature)))
+
+    const matchingFeatures = source.getFeatures()
+      .filter((sourceFeature) => idsToRemove.has(getUid(sourceFeature)))
+
+    matchingFeatures.forEach((sourceFeature) => source.removeFeature(sourceFeature))
+
+    // Supprime la couche si elle ne contient plus aucune feature, sinon synchronise le store sur le layer utilisé.
+    if (source.getFeatures().length === 0) {
+      removeExtentLayer(getMap)
+    } else if (targetLayer && targetLayer !== extentLayer.value) {
+      setExtentLayer(targetLayer)
+    }
+  }
+
   function handleAddVectorLayer(getMap: () => Map | null | undefined, layer: VectorLayer) {
     const currentMap = getMap()
     const previousExtentLayer = extentLayer.value
 
-    if (previousExtentLayer && currentMap) {
-      const previousLayerId = getUid(previousExtentLayer)
-      const mapLayers = currentMap.getLayers().getArray()
-      const layerToRemove = mapLayers.find((layer) => {
-        return getUid(layer) === previousLayerId
-      })
+    if (previousExtentLayer) {
+      // Récupère les features de l'ancienne couche avant sa suppression pour les reporter sur la nouvelle.
+      const previousFeatures = previousExtentLayer.getSource?.()?.getFeatures?.() ?? []
+      layer.getSource()?.addFeatures(previousFeatures)
 
-      if (layerToRemove) {
-        currentMap.getLayers().remove(layerToRemove)
-        removeExtentLayer()
-      }
+      currentMap?.removeLayer(previousExtentLayer)
+      removeExtentLayer()
     }
 
     setExtentLayer(layer)
@@ -148,7 +172,7 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
           // pour rester cohérent avec les cartes OpenLayers du parcours.
           const geometry = geoJsonFormat.readGeometry(geojson, {
             dataProjection: `EPSG:${srid}`,
-            featureProjection: 'EPSG:3857',
+            featureProjection: DEFAULT_MAP_SRS,
           })
 
           return new Feature({ geometry })
@@ -193,6 +217,7 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
     handleAddVectorLayer,
     setExtentLayerFromRequestBody,
     removeExtentLayer,
+    removeFeatures,
     reset
   }
 })

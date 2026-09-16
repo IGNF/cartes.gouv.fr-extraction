@@ -26,6 +26,7 @@ import {
 
 import { DEFAULT_STYLE } from './style';
 import t from './translation';
+import { DEFAULT_MAP_SRS } from '@/composables/useMapConstants';
 
 /**
  * INFO
@@ -281,7 +282,7 @@ const createComputeLayer = async (options) => {
       });
       var geojson = format.writeFeatures(e.features, {
           dataProjection : "EPSG:4326",
-          featureProjection : "EPSG:3857"
+          featureProjection : DEFAULT_MAP_SRS
       });
       vectorLayer.set("geojson", geojson);
     };
@@ -335,7 +336,7 @@ const createServiceLayer = async (options) => {
         layer: options.data.layer,
         matrixSet: options.data.tileMatrixSet,
         format: options.data.outputFormat,
-        projection: 'EPSG:3857',
+        projection: DEFAULT_MAP_SRS,
         tileGrid: tileGrid,
         style: options.data.styleName,
         attributions: '',
@@ -368,7 +369,7 @@ const createServiceLayer = async (options) => {
             "VERSION": options.data.version,
             "STYLES": options.data.stylesName // array ?
           },
-          projection : options.data.projection || 'EPSG:3857',
+          projection : options.data.projection || DEFAULT_MAP_SRS,
           attributions: ''
       });
     
@@ -402,7 +403,7 @@ const createServiceLayer = async (options) => {
     
     // extent par defaut
     if (tileLayer && !tileLayer.getExtent()) {
-      const projection = getProjection('EPSG:3857');
+      const projection = getProjection(DEFAULT_MAP_SRS);
       tileLayer.setExtent(projection.getExtent());
     }
       

@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@codemirror/lang-sql": "^6.10.0",
-    "@gouvfr/dsfr": "^1.14.4",
+    "@gouvfr/dsfr": "1.14.4",
     "@gouvminint/vue-dsfr": "^8.16.1",
     "@vueuse/core": "^13.0.0",
     "cartes.gouv.fr-service": "git+https://github.com/IGNF/cartes.gouv.fr-service#v0.0.8",
@@ -29,7 +29,7 @@
     "codemirror": "^6.0.2",
     "focus-trap": "^7.5.4",
     "focus-trap-vue": "^4.0.3",
-    "geopf-extensions-openlayers": "file:geopf-extensions-openlayers-1.0.0-beta.13-580.tgz",
+    "geopf-extensions-openlayers": "^1.0.0-beta.14",
     "jszip": "^3.10.1",
     "notivue": "^2.4.5",
     "ol": "^10.8.0",

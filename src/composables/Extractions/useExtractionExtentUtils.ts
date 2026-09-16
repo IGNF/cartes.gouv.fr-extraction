@@ -1,11 +1,21 @@
 import GeoJSON from 'ol/format/GeoJSON'
 import type Geometry from 'ol/geom/Geometry'
 import type VectorLayer from 'ol/layer/Vector'
+import { DEFAULT_MAP_SRS } from '@/composables/useMapConstants'
 
 const geoJsonFormat = new GeoJSON()
 
-// Extrait toutes les géométries GeoJSON présentes dans les filtres SQL,
-// en ciblant les appels ST_GeomFromGeoJSON('...') et leur SRID éventuel.
+/**
+ * Extrait les géométries GeoJSON présentes dans un filtre SQL.
+ *
+ * La fonction recherche les appels `ST_GeomFromGeoJSON('...')`, décode
+ * les apostrophes échappées et associe à chaque géométrie son SRID. Si
+ * aucun `ST_SetSRID` ne précise de SRID, celui de la carte est utilisé.
+ * Les géométries dont le JSON est invalide sont ignorées.
+ *
+ * @param filter Filtre SQL pouvant contenir des appels PostGIS de création de géométrie.
+ * @returns Les géométries extraites et leur SRID associé.
+ */
 export function extractGeoJsonFromFilter(filter: string): Array<{ geojson: Record<string, unknown>, srid: number }> {
 	const results: Array<{ geojson: Record<string, unknown>, srid: number }> = []
 	const geomRegex = /ST_GeomFromGeoJSON\(\s*'((?:''|[^'])*)'\s*\)/gi
@@ -21,7 +31,7 @@ export function extractGeoJsonFromFilter(filter: string): Array<{ geojson: Recor
 			const beforeGeomCall = filter.slice(0, match.index)
 			const setSridMatch = /ST_SetSRID\(\s*$/i.exec(beforeGeomCall)
 			// SRID par défaut attendu dans le projet pour l'affichage carto.
-			let srid = 3857
+			let srid = Number.parseInt(DEFAULT_MAP_SRS.replace('EPSG:', ''), 10)
 
 			if (setSridMatch) {
 				const afterGeomCall = filter.slice(match.index + match[0].length)
@@ -40,11 +50,24 @@ export function extractGeoJsonFromFilter(filter: string): Array<{ geojson: Recor
 	return results
 }
 
+/**
+ * Construit une condition SQL PostGIS d'intersection à partir des géométries
+ * d'une couche vectorielle.
+ *
+ * Les géométries sont clonées puis reprojetées vers le SRID de destination
+ * avant d'être sérialisées en GeoJSON. Une seule géométrie est utilisée
+ * directement ; plusieurs géométries sont regroupées avec `ST_Collect`.
+ *
+ * @param layer Couche vectorielle contenant les géométries à intersecter.
+ * @param destinationSrid SRID de la projection cible utilisée dans la requête.
+ * @returns Une condition `ST_Intersects`, ou une chaîne vide si la couche
+ * ne possède pas de source ou de géométrie exploitable.
+ */
 export function createIntersectSQL(layer: VectorLayer, destinationSrid: number): string {
 	const source = layer.getSource()
 	if (!source) return ''
 
-	const sourceProjection = source.getProjection?.()?.getCode() ?? 'EPSG:3857'
+	const sourceProjection = source.getProjection?.()?.getCode() ?? DEFAULT_MAP_SRS
 	const destinationProjection = `EPSG:${destinationSrid}`
 	const features = source.getFeatures?.() ?? []
 

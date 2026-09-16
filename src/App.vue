@@ -51,7 +51,7 @@ const { isAuthenticated, user } = useAuth({ service, options: { routing : false}
 // et on veut s'assurer que le store est mis à jour dès que l'une ou l'autre change.
 watch([isAuthenticated, user], ([authenticated, currentUser]) => {
   appStore.isAuthenticated = authenticated;
-  appStore.user = currentUser;
+  appStore.user = authenticated ? service.user : currentUser;
 }, { immediate: true });
 
 </script>

@@ -20,6 +20,7 @@ import {
 
 import { useMapStore } from "@/stores/mapStore";
 import { mainMap } from "@/composables/mapkeys";
+import { DEFAULT_MAP_SRS } from '@/composables/useMapConstants';
 import { useLogger } from "vue-logger-plugin";
 
 const log = useLogger();
@@ -48,7 +49,7 @@ const view = new View({
   center: fromLonLatProj(props.center),
   minZoom : 0,
   maxZoom : 21,
-  projection : "EPSG:3857"
+  projection : DEFAULT_MAP_SRS
 });
 
 /**
