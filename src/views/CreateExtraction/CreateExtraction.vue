@@ -10,6 +10,7 @@ import SuccessModal from '@/components/Modals/SuccessModal.vue';
 import { onMounted } from 'vue'
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 import { filterExtractiblesByLayerIntersection } from '@/composables/layerUtils'
+import ChooseSqlParams_v1 from './ChooseSqlParams_v1.vue';
 
 const dataStore = useDataStore()
 const { getExtractible } = dataStore;
@@ -75,12 +76,12 @@ function handleExtractionSuccess() {
         v-show="currentStep === 2"  
         :extractibles="extractibles" 
         v-model:selectedExtractible="selectedExtractible"/>
-      <ChooseSqlParams 
+      <ChooseSqlParams_v1 
       v-show="currentStep === 3" 
       :extractible="selectedExtractible" 
       v-model="request"/>
     </div>
-        <!-- {{ request }} -->
+        {{ request }}
     <div class="fr-grid-row nav-row">
         <!-- Bouton Précédent -->
         <DsfrButton 

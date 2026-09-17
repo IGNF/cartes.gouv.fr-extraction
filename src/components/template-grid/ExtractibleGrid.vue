@@ -10,7 +10,7 @@ const props = defineProps<{
             <span v-if="iconClass":class="iconClass" aria-hidden="true"></span>
             <h3>{{ props.title }}</h3>
         </div>
-        <div class="fr-container fr-mb-6v">
+        <div class="fr-container fr-mb-6v gap-24">
             <slot></slot>
         </div>
     </div> 
@@ -29,5 +29,8 @@ const props = defineProps<{
   border: 1px solid var(--light-decisions-border-border-default-grey, #DDD);
   width: 100%;
   height: fit-content;
+}
+.gap-24 {
+  gap: 24px;
 }
 </style>
