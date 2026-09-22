@@ -45,14 +45,14 @@ watch([selectedTable, selectedAttributes], () => {
 	<div class="fr-grid-row fr-grid-row--gutters">
 		<div class="fr-col-12 fr-col-md-6">
 			<DsfrSelect
-				label="Table"
+				label="Table à filter"
 				:options="tableOptions"
 				v-model="selectedTable"
 			/>
 		</div>
 		<div class="fr-col-12 fr-col-md-6">
 			<CgfrSelectList
-				label="Attributes"
+				label="Attributs à exporter"
 				:options="attributeOptions"
 				v-model="selectedAttributes"
 				:disabled="!selectedTable"

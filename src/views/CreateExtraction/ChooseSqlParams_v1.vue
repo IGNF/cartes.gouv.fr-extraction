@@ -8,6 +8,7 @@ import { createIntersectSQL } from '@/composables/Extractions/useExtractionExten
 import { DEFAULT_MAP_SRID } from '@/composables/useMapConstants'
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 import type { ClauseWhere } from '@/types/sql.types.js';
+import { clauseWhereToString } from '@/composables/sqlUtils.js';
 
 const props = defineProps<{
     extractible: Extractible | null
@@ -22,7 +23,7 @@ const format = ref<ExtractionRequestBody['inputs']['format']>('GPKG')
 const projection = ref('EPSG:4326')
 const encoding = ref('UTF-8')
 const relations = ref<RelationInput>({})
-const clauseWhere = ref<ClauseWhere>({ table: '', filter: { attribute: '', operator: '=', value: '' } })
+const clauseWhere = ref<ClauseWhere[]>([{ table: '', filter: { attribute: '', operator: '=', value: '' }, exportedAttributes: [] }])
 const createExtractionStore = useCreateExtractionStore()
 const { extentLayer } = storeToRefs(createExtractionStore)
 
@@ -187,6 +188,8 @@ watch(requestBody, (newValue) => {
 	                	v-model="clauseWhere"
 	                />
                     {{ clauseWhere }}
+                    <br />
+                    {{ clauseWhereToString(clauseWhere) }}
 	                <!-- <ExpertRequestBuilder
 	                	v-else
 	                	:relations="extractible?.type_infos.relations || []"

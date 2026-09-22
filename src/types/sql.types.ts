@@ -36,10 +36,18 @@ export type FilterGroup = {
     filters: (Filter | FilterGroup)[];
 }
 
+export type ExportedAttributes = string[]
+
 export type ClauseWhere = {
     table: string;
     filter : Filter | FilterGroup;
+    exportedAttributes: ExportedAttributes;
 }
 
+export type TableAttributes = {
+    [tableName: string]: {
+        attributes: string[];
+    }
+}
 
 export type logicalOperator = 'AND' | 'OR';

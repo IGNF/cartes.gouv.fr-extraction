@@ -12,27 +12,31 @@ const props = withDefaults(defineProps<{
 
 const model = defineModel<ClauseWhere[]>({ required: true, default: () => [] })
 
-const defaultClause = (): ClauseWhere => ({ table: '', filter: { attribute: '', operator: '=', value: '' } })
+const defaultClause = (): ClauseWhere => ({
+	table: '',
+	filter: { attribute: '', operator: '=', value: '' },
+	exportedAttributes: [],
+})
 
-const clauses = ref<ClauseWhere[]>(model.value.length ? model.value : [defaultClause()])
+const items = ref<ClauseWhere[]>(model.value.length ? model.value : [defaultClause()])
 const activeAccordion = ref(-1)
 
-watch(clauses, () => {
-	model.value = clauses.value
+watch(items, () => {
+	model.value = items.value
 }, { deep: true })
 
 function addClause() {
-	clauses.value.push(defaultClause())
-	activeAccordion.value = clauses.value.length - 1
+	items.value.push(defaultClause())
+	activeAccordion.value = items.value.length - 1
 }
 
 function deleteClause(index: number) {
-	clauses.value.splice(index, 1)
+	items.value.splice(index, 1)
 	activeAccordion.value = -1
 }
 
 function getClauseTitle(index: number) {
-	return clauses.value[index].table ? `Condition sur ${clauses.value[index].table}` : 'Veuillez sélectionner une table'
+	return items.value[index].table ? `Condition sur ${items.value[index].table}` : 'Veuillez sélectionner une table'
 }
 </script>
 
@@ -49,7 +53,7 @@ function getClauseTitle(index: number) {
 		<div class="fr-col-12">
 			<DsfrAccordionsGroup v-model="activeAccordion">
 				<DsfrAccordion
-					v-for="(_, index) in clauses"
+					v-for="(_, index) in items"
 					:key="`clause-${index}`"
 				>
 					<template #title>
@@ -68,7 +72,7 @@ function getClauseTitle(index: number) {
 					</template>
 					<AdvancedRequestForm
 						:relations="relations"
-						v-model="clauses[index]"
+						v-model="items[index]"
 						@delete="deleteClause(index)"
 					/>
 				</DsfrAccordion>
