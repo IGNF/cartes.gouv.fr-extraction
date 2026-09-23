@@ -6,7 +6,10 @@ WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
 COPY geopf-extensions-openlayers-1.0.0-beta*.tgz .
-RUN npm ci
+
+RUN echo "@ignf:registry=https://npm.pkg.github.com" > .npmrc \
+ && echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> .npmrc \
+ && npm ci
 
 # Vérifier que les dépendances sont installées
 RUN npm list --depth=0
