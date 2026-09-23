@@ -29,7 +29,7 @@ export type Filter = {
     operator: OperatorMap[K]["operators"];
     value: OperatorMap[K]["value"];
   }
-}[keyof OperatorMap];
+}[keyof OperatorMap] | undefined;
  
 export type FilterGroup = {
     logicalOperator: logicalOperator;

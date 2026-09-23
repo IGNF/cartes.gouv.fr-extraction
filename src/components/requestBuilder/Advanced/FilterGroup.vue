@@ -18,7 +18,6 @@ const props = withDefaults(defineProps<{
 
 const model = defineModel<FilterGroup>({
 	required: true,
-	default: () => ({ logicalOperator: 'AND', filters: [] }),
 })
 
 const emit = defineEmits<{ 'delete-filter-group': [] }>()
@@ -28,7 +27,7 @@ const logicalOperatorOptions: { label: string, value: logicalOperator }[] = [
 	{ label: 'OU', value: 'OR' },
 ]
 
-const defaultFilter = (): Filter => ({ attribute: '', operator: '=', value: '' })
+const filters = ref<(Filter | FilterGroup)[]>([...model.value.filters])
 
 const canAddFilterGroup = computed(() => props.depth < props.maxDepth)
 
@@ -40,41 +39,44 @@ const selectedLogicalOperator = computed({
 })
 
 function isFilterGroup(filter: Filter | FilterGroup): filter is FilterGroup {
-	return 'filters' in filter
+	return Boolean(filter && 'filters' in filter)
+}
+
+function isValidFilter(filter: Filter | FilterGroup): filter is Exclude<Filter, undefined> | FilterGroup {
+	return Boolean(filter) && (!isFilterGroup(filter) || filter.filters.length > 0)
+}
+
+function updateModel() {
+	model.value = {
+		...model.value,
+		filters: filters.value.filter(isValidFilter),
+	}
 }
 
 function updateFilter(index: number, filter: Filter | FilterGroup) {
-	const filters = [...model.value.filters]
-	filters[index] = filter
-	model.value = { ...model.value, filters }
+	filters.value[index] = filter
+	updateModel()
 }
 
 function addFilter() {
-	model.value = {
-		...model.value,
-		filters: [...model.value.filters, defaultFilter()],
-	}
+	filters.value.push(undefined)
 }
 
 function addFilterGroup() {
 	if (!canAddFilterGroup.value) return
 
-	model.value = {
-		...model.value,
-		filters: [...model.value.filters, { logicalOperator: 'AND', filters: [defaultFilter()] }],
-	}
+	filters.value.push({ logicalOperator: 'AND', filters: [] })
 }
 
 function deleteFilter(index: number) {
-	model.value = {
-		...model.value,
-		filters: model.value.filters.filter((_, i) => i !== index),
-	}
+	filters.value.splice(index, 1)
+	updateModel()
 }
 </script>
 
 <template>
 	<div class="fr-p-2w filter-group">
+		{{ model }}
 		<div class="fr-grid-row fr-grid-row--middle fr-grid-row--gutters">
 			<div class="fr-col">
 				<DsfrSegmentedSet
@@ -94,7 +96,7 @@ function deleteFilter(index: number) {
 
 		<div class="fr-mt-2w">
 			<div
-				v-for="(filter, index) in model.filters"
+				v-for="(filter, index) in filters"
 				:key="index"
 				class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters fr-mb-2w"
 			>

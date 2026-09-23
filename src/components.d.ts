@@ -7,10 +7,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AdvancedRequestBuilder: typeof import('./components/requestBuilder/AdvancedRequestBuilder.vue')['default']
-    AdvancedRequestForm: typeof import('./components/requestBuilder/AdvancedRequestForm.vue')['default']
+    AdvancedRequestBuilder: typeof import('./components/requestBuilder/Advanced/AdvancedRequestBuilder.vue')['default']
+    AdvancedRequestForm: typeof import('./components/requestBuilder/Advanced/AdvancedRequestForm.vue')['default']
     CardList: typeof import('./components/CardList.vue')['default']
-    ConditionForm: typeof import('./components/requestBuilder/ConditionForm.vue')['default']
+    ConditionForm: typeof import('./components/requestBuilder/Advanced/ConditionForm.vue')['default']
     Controls: typeof import('./components/map/Controls/Controls.vue')['default']
     copy: typeof import('./components/requestBuilder/FilterForm copy.vue')['default']
     DeleteModal: typeof import('./components/Modals/DeleteModal.vue')['default']
@@ -29,7 +29,7 @@ declare module 'vue' {
     ExtractionListElement: typeof import('./components/ExtractionListElement.vue')['default']
     FilterForm: typeof import('./components/requestBuilder/FilterForm.vue')['default']
     'FilterForm copy': typeof import('./components/requestBuilder/FilterForm copy.vue')['default']
-    FilterGroup: typeof import('./components/requestBuilder/FilterGroup.vue')['default']
+    FilterGroup: typeof import('./components/requestBuilder/Advanced/FilterGroup.vue')['default']
     Layer: typeof import('./components/map/Layer.vue')['default']
     LayerImport: typeof import('./components/map/Controls/LayerImport.vue')['default']
     Map: typeof import('./components/map/Map.vue')['default']
@@ -46,9 +46,7 @@ declare module 'vue' {
     SearchEngine: typeof import('./components/map/Controls/SearchEngine.vue')['default']
     StoreData: typeof import('./components/async-data/StoreData.vue')['default']
     SuccessModal: typeof import('./components/Modals/SuccessModal.vue')['default']
-    TableAttributeSelector: typeof import('./components/requestBuilder/TableAttributeSelector.vue')['default']
-    TableAttSelector: typeof import('./components/requestBuilder/TableAttSelector.vue')['default']
-    TableSelector: typeof import('./components/requestBuilder/TableSelector.vue')['default']
+    TableAttributeSelector: typeof import('./components/requestBuilder/Advanced/TableAttributeSelector.vue')['default']
     VectorLayer: typeof import('./components/map/VectorLayer.vue')['default']
     View: typeof import('./components/map/View.vue')['default']
     Zoom: typeof import('./components/map/Controls/Zoom.vue')['default']

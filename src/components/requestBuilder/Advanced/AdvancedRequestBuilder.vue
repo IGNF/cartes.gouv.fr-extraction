@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { DsfrAccordion, DsfrAccordionsGroup, DsfrButton } from '@gouvminint/vue-dsfr'
-import type { ExtractibleRelation } from '@/types/extractibles.types'
+import type { ExtractibleRelation, RelationInput } from '@/types/extractibles.types'
 import type { ClauseWhere } from '@/types/sql.types'
+import { clauseWhereToRelationInput } from '@/composables/sqlUtils'
 import AdvancedRequestForm from './AdvancedRequestForm.vue'
 
 const props = withDefaults(defineProps<{
@@ -10,19 +11,19 @@ const props = withDefaults(defineProps<{
 	relations: () => [],
 })
 
-const model = defineModel<ClauseWhere[]>({ required: true, default: () => [] })
+const model = defineModel<RelationInput>({ required: true, default: () => ({}) })
 
 const defaultClause = (): ClauseWhere => ({
 	table: '',
-	filter: { attribute: '', operator: '=', value: '' },
+	filter: undefined,
 	exportedAttributes: [],
 })
 
-const items = ref<ClauseWhere[]>(model.value.length ? model.value : [defaultClause()])
+const items = ref<ClauseWhere[]>([defaultClause()])
 const activeAccordion = ref(-1)
 
 watch(items, () => {
-	model.value = items.value
+	model.value = clauseWhereToRelationInput(items.value.filter((item) => item.table !== ''))
 }, { deep: true })
 
 function addClause() {
@@ -73,7 +74,6 @@ function getClauseTitle(index: number) {
 					<AdvancedRequestForm
 						:relations="relations"
 						v-model="items[index]"
-						@delete="deleteClause(index)"
 					/>
 				</DsfrAccordion>
 			</DsfrAccordionsGroup>

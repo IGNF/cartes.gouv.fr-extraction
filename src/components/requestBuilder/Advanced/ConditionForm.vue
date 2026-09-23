@@ -9,15 +9,13 @@ const props = withDefaults(defineProps<{
 	relation: () => ({ name: '', type: '', attributes: {} }),
 })
 
-const model = defineModel<Filter>({ required: true, default: () => ({ attribute: '', operator: '=', value: '' }) })
+const model = defineModel<Filter | undefined>()
 
-const arrayOperators: Operator[] = ['IN', 'NOT IN']
-const numberOperators: Operator[] = ['<', '<=', '>', '>=']
 const operatorOptions: Operator[] = ['=', '!=', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN']
 
-const selectedAttribute = ref(model.value.attribute)
-const selectedOperator = ref<Operator>(model.value.operator)
-const attributeValue = ref(String(model.value.value ?? ''))
+const selectedAttribute = ref(model.value?.attribute ?? '')
+const selectedOperator = ref<Operator>(model.value?.operator ?? '=')
+const attributeValue = ref(String(model.value?.value ?? ''))
 
 const attributeOptions = computed(() => Object.keys(props.relation.attributes || {}))
 
@@ -26,7 +24,10 @@ const attributeOptions = computed(() => Object.keys(props.relation.attributes ||
  * (tableau pour IN/NOT IN, nombre pour les comparateurs numériques, chaîne sinon).
  */
 function buildFilter(attribute: string, operator: Operator, rawValue: string): Filter {
-	if (arrayOperators.includes(operator)) {
+	if (!attribute) {
+		throw new Error('Attribute is required')
+	}
+	if (operator === 'IN' || operator === 'NOT IN') {
 		return {
 			attribute,
 			operator,
@@ -34,7 +35,7 @@ function buildFilter(attribute: string, operator: Operator, rawValue: string): F
 		}
 	}
 
-	if (numberOperators.includes(operator)) {
+	if (operator === '<' || operator === '<=' || operator === '>' || operator === '>=') {
 		return { attribute, operator, value: Number(rawValue) }
 	}
 
@@ -42,12 +43,18 @@ function buildFilter(attribute: string, operator: Operator, rawValue: string): F
 }
 
 watch([selectedAttribute, selectedOperator, attributeValue], () => {
+	if (!selectedAttribute.value) {
+		model.value = undefined
+		return
+	}
+
 	model.value = buildFilter(selectedAttribute.value, selectedOperator.value, attributeValue.value)
 })
 </script>
 
 <template>
 	<div class="fr-grid-row fr-grid-row--gutters">
+		{{ model }}
 		<div class="fr-col-12 fr-col-md-4">
 			<DsfrSelect
 				label="Attribut"
