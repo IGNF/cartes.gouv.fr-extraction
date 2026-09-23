@@ -108,7 +108,6 @@ function deleteFilter(index: number) {
 
 <template>
 	<div class="fr-p-2w filter-group">
-		{{ model }}
 		<div class="fr-grid-row fr-grid-row--middle fr-grid-row--gutters">
 			<div class="fr-col">
 				<DsfrSegmentedSet

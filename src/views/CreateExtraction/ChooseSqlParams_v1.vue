@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Extractible, ExtractionRequestBody, RelationInput } from '@/types/extractibles.types';
-import { CgfrSqlEditor } from 'cartes.gouv.fr-vue-components'
+import { CgfrSqlEditor } from '@ignf/cartes.gouv.fr-vue-components'
 import ChooseSqlParamsMap from '../Cartes/ChooseSqlParamsMap.vue';
 import { DsfrToggleSwitch } from '@gouvminint/vue-dsfr';
 import { storeToRefs } from 'pinia'
@@ -173,7 +173,7 @@ watch(requestBody, (newValue) => {
                         no-text
                     />
                 </div>
-                <div class="fr-grid-row w-100">
+                <div class="w-100">
                     <RequestBuilder
                         v-if="!advancedSettings"
                         :relations="extractible?.type_infos.relations || []"
@@ -184,11 +184,6 @@ watch(requestBody, (newValue) => {
 	                	:relations="extractible?.type_infos.relations || []"
                     	v-model="relations"
 	                />
-	                <!-- <ExpertRequestBuilder
-	                	v-else
-	                	:relations="extractible?.type_infos.relations || []"
-	                	v-model="relations"
-	                /> -->
                 </div>
             </div>
         </div>

@@ -81,7 +81,6 @@ function handleExtractionSuccess() {
       :extractible="selectedExtractible" 
       v-model="request"/>
     </div>
-        {{ request }}
     <div class="fr-grid-row nav-row">
         <!-- Bouton Précédent -->
         <DsfrButton 
