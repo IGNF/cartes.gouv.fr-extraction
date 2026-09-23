@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Extractible, ExtractionRequestBody, RelationInput } from '@/types/extractibles.types';
-import { CgfrSqlEditor } from 'cartes.gouv.fr-vue-components'
+import { CgfrSqlEditor } from '@ignf/cartes.gouv.fr-vue-components'
 import ChooseSqlParamsMap from '../Cartes/ChooseSqlParamsMap.vue';
 
 const props = defineProps<{

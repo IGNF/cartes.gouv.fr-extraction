@@ -4,7 +4,7 @@ import "geopf-extensions-openlayers/css/Dsfr.css";
 import { watch } from 'vue';
 import Patience from '@/components/utils/Patience.vue'
 import StoreData from '@/components/async-data/StoreData.vue';
-import { CgfrFooter, CgfrHeader } from 'cartes.gouv.fr-vue-components'
+import { CgfrFooter, CgfrHeader } from '@ignf/cartes.gouv.fr-vue-components'
 import { useAppStore } from '@/stores/appStore';
 import HomePage from "./HomePage.vue";
 import { getBaseUrl } from '@/config/configService';

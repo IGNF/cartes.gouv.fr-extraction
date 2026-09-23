@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CgfrSelectList } from 'cartes.gouv.fr-vue-components'
+import { CgfrSelectList } from '@ignf/cartes.gouv.fr-vue-components'
 import type { ExtractibleRelation } from '@/types/extractibles.types'
 
 type TableParams = Record<string, { attributes: string[] }>

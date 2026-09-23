@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { CgfrSelectList } from 'cartes.gouv.fr-vue-components'
+import { CgfrSelectList } from '@ignf/cartes.gouv.fr-vue-components'
+import { storeToRefs } from 'pinia'
+import { useCreateExtractionStore } from '@/stores/createExtractionStore'
+import { createIntersectSQL } from '@/composables/Extractions/useExtractionExtentUtils'
+import { DEFAULT_MAP_SRS, DEFAULT_MAP_SRID } from '@/composables/useMapConstants'
 import type { ExtractibleRelation, RelationInput } from '@/types/extractibles.types'
 
 const props = withDefaults(defineProps<{
