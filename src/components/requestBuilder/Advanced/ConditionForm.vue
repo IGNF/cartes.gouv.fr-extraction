@@ -90,7 +90,6 @@ watch([selectedAttribute, selectedOperator, attributeValue], () => {
 
 <template>
 	<div class="fr-grid-row fr-grid-row--gutters">
-		{{ model }}
 		<div class="fr-col-12 fr-col-md-4">
 			<DsfrSelect
 				label="Attribut"
