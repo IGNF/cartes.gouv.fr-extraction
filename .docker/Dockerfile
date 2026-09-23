@@ -7,6 +7,8 @@ COPY package.json .
 COPY package-lock.json .
 COPY geopf-extensions-openlayers-1.0.0-beta*.tgz .
 
+ARG NPM_TOKEN
+
 RUN echo "@ignf:registry=https://npm.pkg.github.com" > .npmrc \
  && echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> .npmrc \
  && npm ci
