@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CgfrSelectList } from 'cartes.gouv.fr-vue-components'
+import { CgfrSelectList } from '@ignf/cartes.gouv.fr-vue-components'
 import { storeToRefs } from 'pinia'
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 import { createIntersectSQL } from '@/composables/Extractions/useExtractionExtentUtils'

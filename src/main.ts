@@ -10,7 +10,7 @@ import { initializeConfig, isProduction, isDevelopment } from "./config/configSe
 import "@gouvfr/dsfr/dist/dsfr.min.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons.min.css";
 import "@gouvminint/vue-dsfr/styles";
-import "cartes.gouv.fr-vue-components/dist/index.css";
+import "@ignf/cartes.gouv.fr-vue-components/dist/index.css";
 
 import "./main.css";
 

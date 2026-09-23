@@ -1,5 +1,5 @@
 <script setup>
-import { CgfrModalCookies, CgfrModalTheme } from 'cartes.gouv.fr-vue-components'
+import { CgfrModalCookies, CgfrModalTheme } from '@ignf/cartes.gouv.fr-vue-components'
 </script>
 
 <template>
