@@ -173,7 +173,7 @@ watch(requestBody, (newValue) => {
                         no-text
                     />
                 </div>
-                <div class="fr-grid-row">
+                <div class="fr-grid-row w-100">
                     <RequestBuilder
                         v-if="!advancedSettings"
                         :relations="extractible?.type_infos.relations || []"

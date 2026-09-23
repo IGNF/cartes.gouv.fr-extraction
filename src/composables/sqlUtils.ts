@@ -47,3 +47,17 @@ export function clauseWhereToRelationInput(clauseWhere: ClauseWhere | ClauseWher
 		return relations
 	}, {})
 }
+
+/**
+ * Convertit un RelationInput en tableau de ClauseWhere, pour hydrater le formulaire à partir
+ * d'un modèle existant (ex : relance d'une extraction). Le filtre étant stocké dans le
+ * RelationInput sous forme de chaîne SQL brute, il ne peut pas être reconstruit sous sa forme
+ * structurée (Filter | FilterGroup) : seules la table et les attributs exportés sont restaurés.
+ */
+export function relationInputToClauseWhere(relationInput: RelationInput): ClauseWhere[] {
+	return Object.entries(relationInput).map(([table, relation]) => ({
+		table,
+		filter: undefined,
+		exportedAttributes: relation.attributes ?? [],
+	}))
+}

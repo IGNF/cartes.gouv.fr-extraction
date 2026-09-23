@@ -19,6 +19,40 @@ const attributeValue = ref(String(model.value?.value ?? ''))
 
 const attributeOptions = computed(() => Object.keys(props.relation.attributes || {}))
 
+const initModel = ref<Filter | undefined>(model.value)
+const isHydrating = ref(false)
+
+watch(
+	() => model.value,
+	(newModel) => {
+		initModel.value = newModel
+	},
+	{ deep: true, immediate: true }
+)
+
+/**
+ * Restaure les champs du formulaire depuis le filtre reçu.
+ * Ignoré si le modèle reçu correspond déjà à la saisie actuelle (écho de notre propre mise à jour).
+ */
+watch(
+	initModel,
+	async (newModel) => {
+		const currentFilter = selectedAttribute.value
+			? buildFilter(selectedAttribute.value, selectedOperator.value, attributeValue.value)
+			: undefined
+		if (JSON.stringify(currentFilter) === JSON.stringify(newModel)) return
+
+		isHydrating.value = true
+		selectedAttribute.value = newModel?.attribute ?? ''
+		selectedOperator.value = newModel?.operator ?? '='
+		attributeValue.value = String(newModel?.value ?? '')
+
+		await nextTick()
+		isHydrating.value = false
+	},
+	{ deep: true, immediate: true }
+)
+
 /**
  * Convertit la valeur textuelle saisie selon la catégorie d'opérateur choisie
  * (tableau pour IN/NOT IN, nombre pour les comparateurs numériques, chaîne sinon).
@@ -43,6 +77,8 @@ function buildFilter(attribute: string, operator: Operator, rawValue: string): F
 }
 
 watch([selectedAttribute, selectedOperator, attributeValue], () => {
+	if (isHydrating.value) return
+
 	if (!selectedAttribute.value) {
 		model.value = undefined
 		return

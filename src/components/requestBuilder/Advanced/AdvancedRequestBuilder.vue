@@ -2,7 +2,7 @@
 import { DsfrAccordion, DsfrAccordionsGroup, DsfrButton } from '@gouvminint/vue-dsfr'
 import type { ExtractibleRelation, RelationInput } from '@/types/extractibles.types'
 import type { ClauseWhere } from '@/types/sql.types'
-import { clauseWhereToRelationInput } from '@/composables/sqlUtils'
+import { clauseWhereToRelationInput, relationInputToClauseWhere } from '@/composables/sqlUtils'
 import AdvancedRequestForm from './AdvancedRequestForm.vue'
 
 const props = withDefaults(defineProps<{
@@ -22,9 +22,47 @@ const defaultClause = (): ClauseWhere => ({
 const items = ref<ClauseWhere[]>([defaultClause()])
 const activeAccordion = ref(-1)
 
+const initModel = ref<RelationInput | undefined>(model.value)
+const isHydrating = ref(false)
+
+watch(
+	() => model.value,
+	(newModel) => {
+		initModel.value = newModel
+	},
+	{ deep: true, immediate: true }
+)
+
+/**
+ * Reconstruit les clauses depuis le modèle reçu (ex : relance d'une extraction).
+ * Ignoré si le modèle reçu correspond déjà aux clauses actuelles : il s'agit alors d'un
+ * écho de notre propre mise à jour, pas d'une nouvelle donnée à hydrater.
+ */
+watch(
+	initModel,
+	async (newModel) => {
+		if (!newModel) return
+
+		const currentRelationInput = clauseWhereToRelationInput(items.value.filter((item) => item.table !== ''))
+		if (JSON.stringify(currentRelationInput) === JSON.stringify(newModel)) return
+
+		isHydrating.value = true
+		const clauses = relationInputToClauseWhere(newModel)
+		items.value = clauses.length ? clauses : [defaultClause()]
+		activeAccordion.value = -1
+
+		await nextTick()
+		isHydrating.value = false
+	},
+	{ deep: true, immediate: true }
+)
+
 watch(items, () => {
+	if (isHydrating.value) return
+
 	model.value = clauseWhereToRelationInput(items.value.filter((item) => item.table !== ''))
 }, { deep: true })
+
 
 function addClause() {
 	items.value.push(defaultClause())

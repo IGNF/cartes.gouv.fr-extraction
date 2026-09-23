@@ -55,8 +55,9 @@ export function extractGeoJsonFromFilter(filter: string): Array<{ geojson: Recor
  * d'une couche vectorielle.
  *
  * Les géométries sont clonées puis reprojetées vers le SRID de destination
- * avant d'être sérialisées en GeoJSON. Une seule géométrie est utilisée
- * directement ; plusieurs géométries sont regroupées avec `ST_Collect`.
+ * avant d'être sérialisées en GeoJSON. Une seule géométrie produit une
+ * unique condition ; plusieurs géométries produisent une condition par
+ * géométrie, combinées avec `OR`.
  *
  * @param layer Couche vectorielle contenant les géométries à intersecter.
  * @param destinationSrid SRID de la projection cible utilisée dans la requête.
@@ -96,7 +97,9 @@ export function createIntersectSQL(layer: VectorLayer, destinationSrid: number):
 		return `ST_Intersects(geometrie, ${geometrySqlList[0]})`
 	}
 
-	return `ST_Intersects(geometrie, ST_Collect(ARRAY[${geometrySqlList.join(', ')}]))`
+	return geometrySqlList
+		.map((geometrySql) => `ST_Intersects(geometrie, ${geometrySql})`)
+		.join(' OR ')
 }
 
 

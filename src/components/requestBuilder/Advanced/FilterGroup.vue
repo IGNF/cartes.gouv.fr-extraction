@@ -38,6 +38,36 @@ const selectedLogicalOperator = computed({
 	},
 })
 
+const initModel = ref<FilterGroup>(model.value)
+const isHydrating = ref(false)
+
+watch(
+	() => model.value,
+	(newModel) => {
+		initModel.value = newModel
+	},
+	{ deep: true, immediate: true }
+)
+
+/**
+ * Restaure la liste des filtres depuis le groupe reçu.
+ * Ignoré si le modèle reçu correspond déjà aux filtres actuels (écho de notre propre mise à jour).
+ */
+watch(
+	initModel,
+	async (newModel) => {
+		const currentFilters = filters.value.filter(isValidFilter)
+		if (JSON.stringify(currentFilters) === JSON.stringify(newModel.filters)) return
+
+		isHydrating.value = true
+		filters.value = [...newModel.filters]
+
+		await nextTick()
+		isHydrating.value = false
+	},
+	{ deep: true, immediate: true }
+)
+
 function isFilterGroup(filter: Filter | FilterGroup): filter is FilterGroup {
 	return Boolean(filter && 'filters' in filter)
 }
@@ -47,6 +77,8 @@ function isValidFilter(filter: Filter | FilterGroup): filter is Exclude<Filter, 
 }
 
 function updateModel() {
+	if (isHydrating.value) return
+
 	model.value = {
 		...model.value,
 		filters: filters.value.filter(isValidFilter),

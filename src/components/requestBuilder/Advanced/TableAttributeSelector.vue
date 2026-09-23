@@ -23,11 +23,50 @@ const attributeOptions = computed(() => {
 	return Object.keys(relation.attributes || {})
 })
 
-watch(selectedTable, () => {
+const initModel = ref<TableParams | undefined>(tableParams.value)
+const isHydrating = ref(false)
+
+watch(
+	() => tableParams.value,
+	(newModel) => {
+		initModel.value = newModel
+	},
+	{ deep: true, immediate: true }
+)
+
+/**
+ * Restaure la table et les attributs sélectionnés depuis le modèle reçu.
+ * Ignoré si le modèle reçu correspond déjà à la sélection actuelle (écho de notre propre mise à jour).
+ */
+watch(
+	initModel,
+	async (newModel) => {
+		if (!newModel) return
+
+		const currentParams: TableParams = selectedTable.value
+			? { [selectedTable.value]: { attributes: [...selectedAttributes.value] } }
+			: {}
+		if (JSON.stringify(currentParams) === JSON.stringify(newModel)) return
+
+		isHydrating.value = true
+		const tableName = Object.keys(newModel)[0] ?? ''
+		selectedTable.value = tableName
+		selectedAttributes.value = tableName ? [...(newModel[tableName]?.attributes ?? [])] : []
+
+		await nextTick()
+		isHydrating.value = false
+	},
+	{ deep: true, immediate: true }
+)
+
+watch(selectedTable, (newTable, oldTable) => {
+	if (isHydrating.value || newTable === oldTable) return
 	selectedAttributes.value = []
 })
 
 watch([selectedTable, selectedAttributes], () => {
+	if (isHydrating.value) return
+
 	if (!selectedTable.value) {
 		tableParams.value = {}
 		return
@@ -38,7 +77,7 @@ watch([selectedTable, selectedAttributes], () => {
 			attributes: [...selectedAttributes.value],
 		},
 	}
-}, { immediate: true })
+})
 </script>
 
 <template>

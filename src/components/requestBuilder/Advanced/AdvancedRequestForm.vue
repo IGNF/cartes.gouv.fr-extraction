@@ -32,12 +32,55 @@ function initFilterGroup(filter: Filter | FilterGroupType): FilterGroupType {
 	return { logicalOperator: 'AND', filters: [filter] }
 }
 
+function initTableAttributeSelection(clause: ClauseWhere): TableAttributes {
+	if (!clause.table) {
+		return { table: { attributes: [] } }
+	}
+
+	return { [clause.table]: { attributes: [...clause.exportedAttributes] } }
+}
+
 const filterGroup = ref<FilterGroupType | undefined>(model.value.filter ? initFilterGroup(model.value.filter) : undefined)
-const TableAttributeSelection = ref<TableAttributes>({ table: { attributes: [] } })
+const TableAttributeSelection = ref<TableAttributes>(initTableAttributeSelection(model.value))
 const selectedTableName = computed(() => Object.keys(TableAttributeSelection.value)[0] ?? '')
 
 const selectedRelation = computed<ExtractibleRelation>(() =>
 	props.relations.find((relation) => relation.name === selectedTableName.value) ?? { name: '', type: '', attributes: {} }
+)
+
+const initModel = ref<ClauseWhere>(model.value)
+const isHydrating = ref(false)
+
+watch(
+	() => model.value,
+	(newModel) => {
+		initModel.value = newModel
+	},
+	{ deep: true, immediate: true }
+)
+
+/**
+ * Restaure le groupe de filtres et la sélection de table depuis la clause reçue.
+ * Ignoré si le modèle reçu correspond déjà à l'état local actuel (écho de notre propre mise à jour).
+ */
+watch(
+	initModel,
+	async (newModel) => {
+		const currentClause: ClauseWhere = {
+			table: selectedTableName.value,
+			filter: filterGroup.value?.filters.length ? filterGroup.value : undefined,
+			exportedAttributes: TableAttributeSelection.value[selectedTableName.value]?.attributes ?? [],
+		}
+		if (JSON.stringify(currentClause) === JSON.stringify(newModel)) return
+
+		isHydrating.value = true
+		filterGroup.value = newModel.filter ? initFilterGroup(newModel.filter) : undefined
+		TableAttributeSelection.value = initTableAttributeSelection(newModel)
+
+		await nextTick()
+		isHydrating.value = false
+	},
+	{ deep: true, immediate: true }
 )
 
 function addFilterGroup() {
@@ -45,6 +88,8 @@ function addFilterGroup() {
 }
 
 watch([filterGroup, TableAttributeSelection], () => {
+	if (isHydrating.value) return
+
 	model.value = {
 		table: selectedTableName.value,
 		filter: filterGroup.value?.filters.length ? filterGroup.value : undefined,
@@ -56,7 +101,6 @@ watch([filterGroup, TableAttributeSelection], () => {
 <template>
 	<TableAttributeSelector
 		:relations="relations"
-		:table-name="selectedTableName"
 		v-model="TableAttributeSelection"
 	/>
 	<div class="fr-grid-row fr-grid-row--gutters">
