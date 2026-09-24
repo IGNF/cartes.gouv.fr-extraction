@@ -24,6 +24,8 @@ export async function useCreateExtraction(
   if (!requestBody) return new Error('Aucun paramètre d\'extraction défini.')
   if (!processID) return new Error('Aucun processID défini.')
 
+  requestBody.outputs.jobName = extractionName
+
   let response: createExtractionResponse
   try {
     const createResult = await useCreateExtractionRequest(requestBody, processID)
