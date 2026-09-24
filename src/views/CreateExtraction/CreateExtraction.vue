@@ -11,6 +11,7 @@ import { onMounted } from 'vue'
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 import { filterExtractiblesByLayerIntersection } from '@/composables/layerUtils'
 import ChooseSqlParams_v1 from './ChooseSqlParams_v1.vue';
+import { useGetExtractibleByID } from '@/composables/Extractions/Requests/gpfRequests'
 
 const dataStore = useDataStore()
 const { getExtractible } = dataStore;
@@ -24,10 +25,17 @@ const extractibles = computed(() => {
 })
 
 const currentStep = ref(1)
-watch(currentStep, (newStep) => {
+watch(currentStep, (newStep, previousStep) => {
   if (newStep === 3 && !selectedExtractible.value) {
     currentStep.value = 2; // Retourner à l'étape précédente si aucune extraction n'est sélectionnée
     alert('Veuillez sélectionner une extraction avant de continuer.');
+  }
+
+  if (newStep === 2 && previousStep === 3) {
+    currentStep.value = 1;
+    selectedExtractible.value = null;
+    request.value = undefined;
+    createExtractionStore.reset()
   }
 })
 
@@ -36,12 +44,13 @@ const request = ref<ExtractionRequestBody | undefined>(undefined)
 const nameExtractionModalRef = ref<InstanceType<typeof NameExtractionModal> | null>(null)
 const successModalRef = ref<InstanceType<typeof SuccessModal> | null>(null)
 
-onBeforeMount(() => {
+// Restaurer l'état de l'extraction à partir du store avant le montage du composant
+// Permet de gérer l'affichage lorsqu'on relance une extraction depuis l'historique
+onBeforeMount(async () => {
   if (createExtractionStore.selectedExtractibleID !== null || createExtractionStore.requestBody !== undefined) {
-    const match = extractibles.value.find(
-      (e) => e.processID === createExtractionStore.selectedExtractibleID
-    )
-    if (match) selectedExtractible.value = match
+    if (createExtractionStore.selectedExtractibleID !== null) {
+      selectedExtractible.value = await useGetExtractibleByID(createExtractionStore.selectedExtractibleID)
+    }
     if (createExtractionStore.requestBody !== undefined) {
       request.value = createExtractionStore.requestBody
     }
@@ -50,8 +59,6 @@ onBeforeMount(() => {
       request: request.value,
     } )
     currentStep.value = 3
-    createExtractionStore.reset()
-    createExtractionStore.setExtentLayerFromRequestBody(request.value)
   }
 })
 
@@ -77,7 +84,7 @@ function handleExtractionSuccess() {
         :extractibles="extractibles" 
         v-model:selectedExtractible="selectedExtractible"/>
       <ChooseSqlParams_v1 
-      v-show="currentStep === 3" 
+      v-if="currentStep === 3" 
       :extractible="selectedExtractible" 
       v-model="request"/>
     </div>
