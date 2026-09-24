@@ -34,6 +34,7 @@ export type Link = {
 
 // Type pour les jobs d'extraction
 export type ExtractionJob = {
+  jobName?: string
   jobID: string
   status: 'running' | 'successful' | 'failed' | 'dismissed'
   message?: string
