@@ -24,6 +24,8 @@ export async function useCreateExtraction(
   if (!requestBody) return new Error('Aucun paramètre d\'extraction défini.')
   if (!processID) return new Error('Aucun processID défini.')
 
+  requestBody.outputs.jobName = extractionName
+
   let response: createExtractionResponse
   try {
     const createResult = await useCreateExtractionRequest(requestBody, processID)
@@ -43,18 +45,18 @@ export async function useCreateExtraction(
     return error instanceof Error ? error : new Error('Erreur inconnue lors de la création du job d\'extraction.')
   }
 
-  const historicContent: HistoricFileContent = {
-    jobID: response.jobID,
-    name: extractionName,
-    params: requestBody,
-    uuidStoredData: processID
-  }
+  // const historicContent: HistoricFileContent = {
+  //   jobID: response.jobID,
+  //   name: extractionName,
+  //   params: requestBody,
+  //   uuidStoredData: processID
+  // }
 
-  try {
-    await useCreateHistoricDocument(historicContent)
-  } catch (error) {
-    return error instanceof Error ? error : new Error('Erreur lors de la création du document historique.')
-  }
+  // try {
+  //   await useCreateHistoricDocument(historicContent)
+  // } catch (error) {
+  //   return error instanceof Error ? error : new Error('Erreur lors de la création du document historique.')
+  // }
 
   return response
 }
@@ -76,13 +78,13 @@ export async function useDeleteExtraction(
     }
   }
 
-  try {
-    await useDeleteExtractionHistoricDocument(documentID)
-  } catch (error) {
-    return error instanceof Error
-      ? error
-      : new Error('Erreur lors de la suppression du document historique.')
-  }
+  // try {
+  //   await useDeleteExtractionHistoricDocument(documentID)
+  // } catch (error) {
+  //   return error instanceof Error
+  //     ? error
+  //     : new Error('Erreur lors de la suppression du document historique.')
+  // }
  
   return deleteExtractionResponse
 }

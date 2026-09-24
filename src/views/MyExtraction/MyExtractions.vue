@@ -47,7 +47,7 @@ onMounted(async () => {
 const extractionList = computed<Extraction[]>(() => {
   return jobs.value.map((job) => ({
     status: job.status,
-    name: job.name?.trim() || "Extraction sans nom",
+    name: job.jobName?.trim() || "Extraction sans nom : " + job.jobID,
     jobID: job.jobID,
     params: job.params,
     message: job.message || '',

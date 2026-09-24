@@ -80,6 +80,7 @@ export type ExtractionRequestBody = {
         logs?: Object;
         summary?: Object;
         extractedData: Object;
+        jobName?: string;
     }
 }
 
