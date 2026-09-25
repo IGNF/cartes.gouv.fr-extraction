@@ -34,7 +34,7 @@ export type Filter = {
 export type FilterGroup = {
     logicalOperator: logicalOperator;
     filters: (Filter | FilterGroup)[];
-}
+} | undefined;
 
 export type ExportedAttributes = string[]
 
@@ -42,12 +42,12 @@ export type ClauseWhere = {
     table: string;
     filter : Filter | FilterGroup;
     exportedAttributes: ExportedAttributes;
-}
+} | undefined;
 
 export type TableAttributes = {
     [tableName: string]: {
         attributes: string[];
     }
-}
+} |  {};
 
 export type logicalOperator = 'AND' | 'OR';

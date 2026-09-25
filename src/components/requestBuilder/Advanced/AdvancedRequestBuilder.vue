@@ -13,11 +13,7 @@ const props = withDefaults(defineProps<{
 
 const model = defineModel<RelationInput>({ required: true, default: () => ({}) })
 
-const defaultClause = (): ClauseWhere => ({
-	table: '',
-	filter: undefined,
-	exportedAttributes: [],
-})
+const defaultClause = (): ClauseWhere => undefined
 
 const items = ref<ClauseWhere[]>([defaultClause()])
 const activeAccordion = ref(-1)
@@ -43,7 +39,7 @@ watch(
 	async (newModel) => {
 		if (!newModel) return
 
-		const currentRelationInput = clauseWhereToRelationInput(items.value.filter((item) => item.table !== ''))
+		const currentRelationInput = clauseWhereToRelationInput(items.value.filter((item) => item?.table))
 		if (JSON.stringify(currentRelationInput) === JSON.stringify(newModel)) return
 
 		isHydrating.value = true
@@ -60,7 +56,7 @@ watch(
 watch(items, () => {
 	if (isHydrating.value) return
 
-	model.value = clauseWhereToRelationInput(items.value.filter((item) => item.table !== ''))
+	model.value = clauseWhereToRelationInput(items.value.filter((item) => item?.table))
 }, { deep: true })
 
 
@@ -75,7 +71,8 @@ function deleteClause(index: number) {
 }
 
 function getClauseTitle(index: number) {
-	return items.value[index].table ? `Condition sur ${items.value[index].table}` : 'Veuillez sélectionner une table'
+	const tableName = items.value[index]?.table
+	return tableName ? `Condition sur ${tableName}` : 'Veuillez sélectionner une table'
 }
 </script>
 
@@ -83,7 +80,7 @@ function getClauseTitle(index: number) {
 	<div class="fr-grid-row fr-grid-row--gutters">
 		<div class="fr-col-12">
 			<DsfrButton
-				label="Ajouter une clause"
+				label="Ajouter une requête"
 				icon="fr-icon-add-line"
 				secondary
 				@click="addClause"

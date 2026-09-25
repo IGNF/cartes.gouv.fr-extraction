@@ -10,10 +10,12 @@ const props = withDefaults(defineProps<{
 	relation: ExtractibleRelation
 	depth?: number
 	maxDepth?: number
+	initialLogicalOperator?: logicalOperator
 }>(), {
 	relation: () => ({ name: '', type: '', attributes: {} }),
 	depth: 1,
 	maxDepth: DEFAULT_MAX_FILTER_GROUP_DEPTH,
+	initialLogicalOperator: 'AND',
 })
 
 const model = defineModel<FilterGroup>({
@@ -32,7 +34,7 @@ const filters = ref<(Filter | FilterGroup)[]>([...model.value.filters])
 const canAddFilterGroup = computed(() => props.depth < props.maxDepth)
 
 const selectedLogicalOperator = computed({
-	get: () => model.value.logicalOperator,
+	get: () => model.value.logicalOperator ?? props.initialLogicalOperator,
 	set: (value: logicalOperator) => {
 		model.value = { ...model.value, logicalOperator: value }
 	},
@@ -94,10 +96,10 @@ function addFilter() {
 	filters.value.push(undefined)
 }
 
-function addFilterGroup() {
+function addFilterGroup(logicalOperator: logicalOperator) {
 	if (!canAddFilterGroup.value) return
 
-	filters.value.push({ logicalOperator: 'AND', filters: [] })
+	filters.value.push({ logicalOperator, filters: [] })
 }
 
 function deleteFilter(index: number) {
@@ -138,6 +140,7 @@ function deleteFilter(index: number) {
 						:depth="props.depth + 1"
 						:max-depth="props.maxDepth"
 						:model-value="filter"
+						:initial-logical-operator="props.initialLogicalOperator"
 						@update:model-value="updateFilter(index, $event)"
 						@delete-filter-group="deleteFilter(index)"
 					/>
@@ -154,7 +157,7 @@ function deleteFilter(index: number) {
 						icon-only
 						tertiary
 						no-outline
-						label="Supprimer le filtre"
+						label="Supprimer la condition"
 						@click="deleteFilter(index)"
 					/>
 				</div>
@@ -163,7 +166,7 @@ function deleteFilter(index: number) {
 			<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle">
 				<div class="fr-col-auto">
 					<DsfrButton
-						label="Ajouter un filtre"
+						label="Ajouter une condition"
 						icon="fr-icon-add-line"
 						tertiary
 						@click="addFilter"
@@ -172,10 +175,19 @@ function deleteFilter(index: number) {
 				<div class="fr-col-auto">
 					<DsfrButton
 						v-if="canAddFilterGroup"
-						label="Ajouter un groupe"
+						label="Ajouter un groupe ET"
 						icon="fr-icon-add-line"
 						tertiary
-						@click="addFilterGroup"
+						@click="addFilterGroup('AND')"
+					/>
+				</div>
+				<div class="fr-col-auto">
+					<DsfrButton
+						v-if="canAddFilterGroup"
+						label="Ajouter un groupe OU"
+						icon="fr-icon-add-line"
+						tertiary
+						@click="addFilterGroup('OR')"
 					/>
 				</div>
 			</div>
