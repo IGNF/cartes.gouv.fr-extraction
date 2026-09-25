@@ -9,6 +9,7 @@
  */
 
 import type {
+    Extractible,
     ExtractionRequestBody,
     createExtractionErrorResponse,
     createExtractionResponse,
@@ -35,6 +36,47 @@ export function isExtractionErrorResponse(value: unknown): value is ExtractionEr
     );
 }
 
+
+export async function useGetExtractibleByID(processID: string): Promise<Extractible> {
+    const appStore = useAppStore();
+    const service = appStore.service;
+    const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
+
+    if (!service || !extractionApiBaseUrl) {
+        throw new Error('Service API non initialisé');
+    }
+
+    const response = await service.getFetch()(`${extractionApiBaseUrl}/processes/${processID}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    const process = await response.json() as { links?: Link[] };
+
+    if (!response.ok) {
+        throw process;
+    }
+
+    const describedByUrl = process.links?.find((link) => link.rel === 'describedby')?.href;
+    if (!describedByUrl) {
+        throw new Error(`Métadonnées introuvables pour le processus ${processID}`);
+    }
+
+    const extractibleResponse = await service.getFetch()(describedByUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    const extractible = await extractibleResponse.json() as Extractible;
+
+    if (!extractibleResponse.ok) {
+        throw extractible;
+    }
+
+    return { ...extractible, processID };
+}
 
 export async function useCreateExtractionRequest(requestBody: ExtractionRequestBody, processID: string | undefined): Promise<createExtractionResponse | createExtractionErrorResponse | createExtractionUnauthorizedErrorResponse> {
     const appStore = useAppStore();

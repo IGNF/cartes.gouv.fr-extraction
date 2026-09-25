@@ -8,39 +8,17 @@ import type { ExtractibleRelation, RelationInput } from '@/types/extractibles.ty
 
 const props = withDefaults(defineProps<{
 	relations: ExtractibleRelation[]
-	ExtractibleSrs?: string
 }>(), {
 	relations: () => [],
-	ExtractibleSrs: DEFAULT_MAP_SRS,
 })
 
 const model = defineModel<RelationInput>({ required: true })
 const initModel = ref<RelationInput | undefined>(model.value)
 const isHydrating = ref(false)
-const createExtractionStore = useCreateExtractionStore()
-const { extentLayer } = storeToRefs(createExtractionStore)
 
 const selectedTableNames = ref<string[]>([])
 
 const tableOptions = computed(() => props.relations.map((relation) => relation.name))
-
-/**
- * Extrait le code EPSG/SRID cible du système de coordonnées de l'extractible
- * pour appliquer le filtre spatial. Utilise Web Mercator (3857) par défaut
- * si le système de coordonnées est absent ou invalide.
- */
-const destinationSrid = computed(() => {
-	const match = props.ExtractibleSrs?.match(/(\d+)/)
-	if (!match) return DEFAULT_MAP_SRID
-
-	const srid = Number.parseInt(match[1], 10)
-	return Number.isNaN(srid) ? DEFAULT_MAP_SRID : srid
-})
-
-const extentFilter = computed(() => {
-	if (!extentLayer.value) return ''
-	return createIntersectSQL(extentLayer.value, destinationSrid.value)
-})
 
 watch(
 	() => model.value,
@@ -64,7 +42,16 @@ watch(
 	{ deep: true, immediate: true }
 )
 
-watch([selectedTableNames, extentFilter], () => {
+/**
+ * Synchronise le modèle de requête avec les tables sélectionnées.
+ *
+ * Pendant l'hydratation, la sélection est reconstruite depuis le modèle existant :
+ * on évite alors de l'écraser avant que cette initialisation soit terminée. Une fois
+ * l'hydratation terminée, chaque table sélectionnée est associée à tous ses attributs
+ * disponibles. Les tables devenues indisponibles sont simplement ignorées et une
+ * sélection vide réinitialise complètement le modèle.
+ */
+watch(selectedTableNames, () => {
 	if (isHydrating.value) return
 
 	if (!selectedTableNames.value.length) {
@@ -78,7 +65,7 @@ watch([selectedTableNames, extentFilter], () => {
 
 		accumulator[tableName] = {
 			attributes: Object.keys(relation.attributes || {}),
-			filters: extentFilter.value,
+			filters: '',
 		}
 
 		return accumulator
