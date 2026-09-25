@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Extractible, ExtractionRequestBody, RelationInput } from '@/types/extractibles.types';
-import { CgfrSqlEditor } from '@ignf/cartes.gouv.fr-vue-components'
 import ChooseSqlParamsMap from '../Cartes/ChooseSqlParamsMap.vue';
 import { DsfrToggleSwitch } from '@gouvminint/vue-dsfr';
 import { storeToRefs } from 'pinia'
 import { createIntersectSQL } from '@/composables/Extractions/useExtractionExtentUtils'
+import { hasNonSpatialFilter } from '@/composables/sqlUtils'
 import { DEFAULT_MAP_SRID } from '@/composables/useMapConstants'
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 
@@ -12,8 +12,8 @@ const props = defineProps<{
     extractible: Extractible | null
 }>()
 
-const model = defineModel<ExtractionRequestBody>()
-const initModel = ref<ExtractionRequestBody | undefined>(model.value)
+const requestBodyModel = defineModel<ExtractionRequestBody>()
+const initModel = ref<ExtractionRequestBody | undefined>(requestBodyModel.value)
 const isHydrating = ref(false)
 
 const code = ref()
@@ -71,6 +71,8 @@ onMounted(() => {
     
 })
 
+// Ce watch est utilisé lors de l'hydratation (lorsqu'on relance une extraction existante)
+// Permet de reconstruire les model de données locaux à partir d'un requestBody existant.
 watch(
   initModel,
   async (newModel) => {
@@ -86,9 +88,16 @@ watch(
     format.value = newModel.inputs?.format ?? 'GPKG'
     projection.value = newModel.inputs?.srs ?? 'EPSG:4326'
     relations.value = newModel.inputs?.relations ?? {}
+    // Si des filtres sont présents dans les relations
+    // et qu'ils ne correspondent pas uniquement au filtre d'emprise,
+    // alors on active les paramètres avancés.
+    if (Object.values(relations.value).some(relation => hasNonSpatialFilter(relation.filters))) {
+        advancedSettings.value = true
+    }
+    console.log("Relations après application du filtre d'emprise :", relations.value);
 
     await nextTick()
-    model.value = requestBody.value
+    requestBodyModel.value = requestBody.value
     isHydrating.value = false
   },
   { deep: true, immediate: true }
@@ -110,10 +119,11 @@ const requestBody = computed((): ExtractionRequestBody => {
     }
 })
 
+// MAJ du model de requestBody transmis au composant parent via defineModel
 watch(requestBody, (newValue) => {
     if (isHydrating.value) return
     console.log("Nouveau requestBody dans ChooseSqlParams :", newValue);
-    model.value = newValue
+    requestBodyModel.value = newValue
 }, { deep: true })
 
 </script>
