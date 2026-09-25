@@ -197,7 +197,7 @@ function deleteFilter(index: number) {
 
 <style scoped>
 .filter-group {
-	border: 1px solid var(--border-default-grey);
+	border-left: 2.5px solid var(--border-open-blue-france);
 }
 .filter-group__delete-button {
 	text-decoration: underline;
