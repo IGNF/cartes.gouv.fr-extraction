@@ -2,9 +2,16 @@
 import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAppStore } from '@/stores/appStore';
+import { useCreateExtractionStore } from '@/stores/createExtractionStore';
 
 const appStore = useAppStore();
+const createExtractionStore = useCreateExtractionStore();
 const router = useRouter();
+
+function startNewExtraction() {
+	createExtractionStore.reset();
+	void router.push('/new-extraction');
+}
 
 const onConnect = () => {
   // création d'une nouvelle instance du service d'authentification
@@ -49,7 +56,7 @@ const onConnect = () => {
 						label="Créer une extraction"
 						icon="fr-icon-arrow-right-line"
 						icon-right
-						@click="() => router.push('/new-extraction')"
+						@click="startNewExtraction"
 					/>
 				</template>
 				<template name="not-connected" v-else>
