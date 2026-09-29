@@ -63,7 +63,6 @@ export async function useCreateExtraction(
 
 export async function useDeleteExtraction(
   jobID: string,
-  documentID: string,
   jobStatus?: string
 ): Promise<DeleteExtractionResponse | Error | null> {
   let deleteExtractionResponse: DeleteExtractionResponse | null = null
@@ -92,7 +91,6 @@ export async function useDeleteExtraction(
 export async function useRelaunchExtraction(
   requestBody: ExtractionRequestBody | undefined,
   jobID: string,
-  documentID: string,
   processID: string | undefined,
   extractionName: string,
   jobStatus?: string
@@ -103,7 +101,7 @@ export async function useRelaunchExtraction(
   if (!jobID) return new Error('Aucun jobID défini.')
 
   // 1) Suppression du job d'extraction existant et du document historique associé
-  const deleteResponse = await useDeleteExtraction(jobID, documentID, jobStatus)
+  const deleteResponse = await useDeleteExtraction(jobID, jobStatus)
   if (deleteResponse instanceof Error) {
     return deleteResponse
   }
