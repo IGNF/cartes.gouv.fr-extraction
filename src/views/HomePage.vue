@@ -1,17 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAppStore } from '@/stores/appStore';
-import { useCreateExtractionStore } from '@/stores/createExtractionStore';
+import { useStartNewExtraction } from '@/composables/Extractions/Requests/useExtraction';
 
 const appStore = useAppStore();
-const createExtractionStore = useCreateExtractionStore();
 const router = useRouter();
-
-function startNewExtraction() {
-	createExtractionStore.reset();
-	void router.push('/new-extraction');
-}
+const startNewExtraction = useStartNewExtraction();
 
 const onConnect = () => {
   // création d'une nouvelle instance du service d'authentification

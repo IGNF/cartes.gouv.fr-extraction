@@ -5,6 +5,7 @@ import type { HistoricFileContent } from "@/types/historique.types";
 import { isExtractionErrorResponse } from '@/composables/Extractions/Requests/gpfRequests'
 import { useCreateHistoricDocument, useDeleteExtractionHistoricDocument } from "./historicRequests";
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
+import { useRouter } from 'vue-router'
 
 
 /**
@@ -59,6 +60,16 @@ export async function useCreateExtraction(
   // }
 
   return response
+}
+
+export function useStartNewExtraction(): () => void {
+  const store = useCreateExtractionStore()
+  const router = useRouter()
+
+  return () => {
+    store.reset()
+    void router.push('/new-extraction')
+  }
 }
 
 export async function useDeleteExtraction(

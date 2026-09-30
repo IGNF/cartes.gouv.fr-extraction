@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useNormalizeString } from '@/composables/utils';
 import type { Extraction, ExtractionJob } from '@/types/my-extractions.types';
 import ExtractionListElement from './ExtractionListElement.vue';
+import { useStartNewExtraction } from '@/composables/Extractions/Requests/useExtraction.js';
 
 const router = useRouter();
 
@@ -22,6 +23,8 @@ const hasMore = ref(true)
 const isFirstPage = ref(true)
 const pendingJobs = ref<ExtractionJob[]>([])
 const reachedEnd = ref(false)
+
+const startNewExtraction = useStartNewExtraction();
 
 async function fetchJobs() {
     if (isLoading.value || !hasMore.value) return
@@ -110,7 +113,7 @@ const filteredExtractions = computed(() => {
             class="fr-ml-auto"
             icon="fr-icon-add-line"
             icon-right
-            @click="() => router.push('/new-extraction')"
+            @click="startNewExtraction"
         >
             Créer une extraction
         </DsfrButton>
