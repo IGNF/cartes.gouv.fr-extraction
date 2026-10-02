@@ -29,6 +29,8 @@ const deleteRequest = (index: number) => {
 </script>
 
 <template>
+	MODEL expert
+	{{ model }}
 	<div class="fr-grid-row fr-grid-row--gutters">
 		<div class="fr-col-12">
 			<DsfrAccordionsGroup v-model="activeRequestAccordion">

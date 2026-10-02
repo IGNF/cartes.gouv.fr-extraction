@@ -9,6 +9,7 @@
  */
 
 import type {
+    Extractible,
     ExtractionRequestBody,
     createExtractionErrorResponse,
     createExtractionResponse,
@@ -35,6 +36,47 @@ export function isExtractionErrorResponse(value: unknown): value is ExtractionEr
     );
 }
 
+
+export async function useGetExtractibleByID(processID: string): Promise<Extractible> {
+    const appStore = useAppStore();
+    const service = appStore.service;
+    const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
+
+    if (!service || !extractionApiBaseUrl) {
+        throw new Error('Service API non initialisé');
+    }
+
+    const response = await service.getFetch()(`${extractionApiBaseUrl}/processes/${processID}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    const process = await response.json() as { links?: Link[] };
+
+    if (!response.ok) {
+        throw process;
+    }
+
+    const describedByUrl = process.links?.find((link) => link.rel === 'describedby')?.href;
+    if (!describedByUrl) {
+        throw new Error(`Métadonnées introuvables pour le processus ${processID}`);
+    }
+
+    const extractibleResponse = await service.getFetch()(describedByUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    const extractible = await extractibleResponse.json() as Extractible;
+
+    if (!extractibleResponse.ok) {
+        throw extractible;
+    }
+
+    return { ...extractible, processID };
+}
 
 export async function useCreateExtractionRequest(requestBody: ExtractionRequestBody, processID: string | undefined): Promise<createExtractionResponse | createExtractionErrorResponse | createExtractionUnauthorizedErrorResponse> {
     const appStore = useAppStore();
@@ -180,6 +222,38 @@ export async function useGetJobByID(jobID: string) {
         return data;
     } catch (error: unknown) {
         console.error('Erreur lors de la récupération du job :', error);
+        throw error;
+    }
+}
+
+export async function useGetJobInputs(jobID: string): Promise<ExtractionRequestBody["inputs"]> {
+    const appStore = useAppStore();
+    const service = appStore.service;
+    const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
+
+    if (!service || !extractionApiBaseUrl) {
+        throw new Error('Service API non initialisé');
+    }
+
+    try {
+        const url = `${extractionApiBaseUrl}/jobs/${jobID}/inputs`;
+        const response = await service.getFetch()(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json() as ExtractionRequestBody["inputs"];
+
+        if (!response.ok) {
+            throw data;
+        }
+
+        console.log('Inputs du job récupérés avec succès :', data);
+        return data;
+    } catch (error: unknown) {
+        console.error('Erreur lors de la récupération des inputs du job :', error);
         throw error;
     }
 }
