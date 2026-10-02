@@ -109,6 +109,12 @@ function deleteFilter(index: number) {
 </script>
 
 <template>
+	<div class="filter-group-wrapper">
+		<span
+			v-if="props.depth > 1"
+			class="filter-group__drag-icon"
+			aria-hidden="true"
+		></span>
 	<div class="fr-p-2w filter-group">
 		<div class="fr-grid-row fr-grid-row--middle fr-grid-row--gutters">
 			<div class="fr-col">
@@ -163,7 +169,7 @@ function deleteFilter(index: number) {
 				</div>
 			</div>
 
-			<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle">
+			<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-pt-4v">
 				<div class="fr-col-auto">
 					<DsfrButton
 						label="Ajouter une condition"
@@ -193,11 +199,30 @@ function deleteFilter(index: number) {
 			</div>
 		</div>
 	</div>
+	</div>
 </template>
 
 <style scoped>
+.filter-group-wrapper {
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+}
+
+.filter-group__drag-icon {
+	flex: 0 0 auto;
+	display: block;
+	width: 1.5rem;
+	height: 1.5rem;
+	background-color: var(--text-action-high-blue-france);
+	-webkit-mask: url('@/assets/ri-draggable.svg') center / contain no-repeat;
+	mask: url('@/assets/ri-draggable.svg') center / contain no-repeat;
+}
+
 .filter-group {
-	border-left: 2.5px solid var(--border-open-blue-france);
+	flex: 1;
+	min-width: 0;
+	border-left: 5px solid var(--border-open-blue-france);
 }
 .filter-group__delete-button {
 	text-decoration: underline;

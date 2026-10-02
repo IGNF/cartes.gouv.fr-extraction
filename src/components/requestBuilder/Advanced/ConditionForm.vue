@@ -89,31 +89,63 @@ watch([selectedAttribute, selectedOperator, attributeValue], () => {
 </script>
 
 <template>
-	<div class="fr-grid-row fr-grid-row--gutters">
-		<div class="fr-col-12 fr-col-md-4">
-			<DsfrSelect
-				label="Attribut"
-				:options="attributeOptions"
-				v-model="selectedAttribute"
-			/>
+	<div class="condition-form">
+		<div class="condition-form__icon">
+			<span class="condition-form__drag-icon" aria-hidden="true"></span>
 		</div>
+		<div class="condition-form__fields fr-grid-row fr-grid-row--gutters">
+			<div class="fr-col-12 fr-col-md-4">
+				<DsfrSelect
+					label="Attribut"
+					:options="attributeOptions"
+					v-model="selectedAttribute"
+				/>
+			</div>
 
-		<div class="fr-col-12 fr-col-md-4">
-			<DsfrSelect
-				label="Opérateur"
-				:options="operatorOptions"
-				v-model="selectedOperator"
-				:disabled="!selectedAttribute"
-			/>
-		</div>
+			<div class="fr-col-12 fr-col-md-4">
+				<DsfrSelect
+					label="Opérateur"
+					:options="operatorOptions"
+					v-model="selectedOperator"
+					:disabled="!selectedAttribute"
+				/>
+			</div>
 
-		<div class="fr-col-12 fr-col-md-4">
-			<DsfrInput
-				label="Valeur"
-				label-visible
-				v-model="attributeValue"
-				:disabled="!selectedAttribute"
-			/>
+			<div class="fr-col-12 fr-col-md-4">
+				<DsfrInput
+					label="Valeur"
+					label-visible
+					v-model="attributeValue"
+					:disabled="!selectedAttribute"
+				/>
+			</div>
 		</div>
 	</div>
 </template>
+
+<style scoped>
+.condition-form {
+	display: flex;
+	/* align-items: flex-start; */
+	align-items: center;
+	gap: 1rem;
+}
+
+.condition-form__icon {
+	flex: 0 0 auto;
+}
+
+.condition-form__drag-icon {
+	display: block;
+	width: 1.5rem;
+	height: 1.5rem;
+	background-color: var(--text-action-high-blue-france);
+	-webkit-mask: url('@/assets/ri-draggable.svg') center / contain no-repeat;
+	mask: url('@/assets/ri-draggable.svg') center / contain no-repeat;
+}
+
+.condition-form__fields {
+	flex: 1;
+	min-width: 0;
+}
+</style>

@@ -133,7 +133,7 @@ const filteredExtractions = computed(() => {
     />
     <div v-if="hasMore" class="fr-grid-row fr-grid-row--center">
         <DsfrButton
-            label="Charger plus de jobs"
+            label="Charger plus d'extractions"
             icon="fr-icon-add-line"
             secondary
             :disabled="isLoading"
