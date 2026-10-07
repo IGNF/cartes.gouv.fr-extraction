@@ -91,6 +91,7 @@ function getClauseTitle(index: number) {
 				<DsfrAccordion
 					v-for="(_, index) in items"
 					:key="`clause-${index}`"
+					class="advanced-request-builder__accordion"
 				>
 					<template #title>
 						<span class="advanced-request-builder__accordion-title">
@@ -117,6 +118,14 @@ function getClauseTitle(index: number) {
 </template>
 
 <style scoped>
+.advanced-request-builder__accordion > :deep([id^="accordion-v"]) {
+	margin-left: 0;
+	margin-right: 0;
+	border-left: 1px solid var(--border-action-high-blue-france);
+	border-right: 1px solid var(--border-action-high-blue-france);
+	border-bottom: 1px solid var(--border-action-high-blue-france);
+}
+
 .advanced-request-builder__accordion-title {
 	display: flex;
 	align-items: center;
