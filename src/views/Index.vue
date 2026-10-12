@@ -1,39 +1,35 @@
 <script setup lang="ts">
 import "ol/ol.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
-import { watch } from 'vue';
+import { computed, toRaw } from 'vue';
 import Patience from '@/components/utils/Patience.vue'
 import StoreData from '@/components/async-data/StoreData.vue';
 import { CgfrFooter, CgfrHeader } from '@ignf/cartes.gouv.fr-vue-components'
-import { useAppStore } from '@/stores/appStore';
-import HomePage from "./HomePage.vue";
-import { getBaseUrl } from '@/config/configService';
+import { useStore } from 'cartes.gouv.fr-service';
 
-const appStore = useAppStore();
+const store = useStore();
+const isAuthenticated = computed(() => Boolean(store.connexion?.authenticated));
+const user = computed(() => store.connexion?.user || {});
 
 // gestion de la connexion
 const onConnect = () => {
-  appStore.service?.getAccessLogin()
+  toRaw(store.getService())?.getAccessLogin()
   .then((url:string) => {
     window.location.href = url; // redirection vers la page sso
   });
 }
 // gestion de la déconnexion
 const onDisconnect = () => {
-  appStore.service?.getAccessLogout()
+  toRaw(store.getService())?.getAccessLogout()
   .then((url:string) => {
     window.location.href = url; // redirection vers la page sso
   });
 }
 
-// Get baseUrl from centralized configuration service
-const baseUrl = getBaseUrl();
 </script>
 
 <template>
-  <!-- INFO : on ne peut pas utiliser user directement depuis useAuth 
-   car user est une string, alors que le composant CgfrHeader 
-   attend un objet utilisateur -->
+  <!-- Le profil utilisateur est lu directement dans le store de la bibliothèque. -->
   <div id="app">
 
 
@@ -43,8 +39,8 @@ const baseUrl = getBaseUrl();
       badge-text="Extraction"
       badge-icon="fr-icon-road-map-fill"
       badge-color="pink-macaron"
-      :authenticated="appStore.isAuthenticated"
-      :user="appStore.user" 
+      :authenticated="isAuthenticated"
+      :user="user"
       @login="onConnect"
       @logout="onDisconnect"
     />

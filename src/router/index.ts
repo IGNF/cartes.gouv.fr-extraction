@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAppStore } from '@/stores/appStore'
+import { useStore } from 'cartes.gouv.fr-service'
 import { getBaseUrl } from '@/config/configService'
 
 import MyExtractions from '@/views/MyExtraction/MyExtractions.vue'
@@ -72,8 +72,8 @@ function createAppRouter() {
   // si la route cible nécessite une connexion
   // (`meta.requiresAuth`) et que l'utilisateur n'est pas authentifié,
   // on redirige vers la page d'accueil
-  const appStore = useAppStore()
-  if (to.meta.requiresAuth && !appStore.isAuthenticated) {
+  const store = useStore()
+  if (to.meta.requiresAuth && !store.connexion?.authenticated) {
     return {
       path: '/extraction',
     }
