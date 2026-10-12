@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAppStore } from '@/stores/appStore';
+import { useStartNewExtraction } from '@/composables/Extractions/Requests/useExtraction';
 
 const appStore = useAppStore();
 const router = useRouter();
+const startNewExtraction = useStartNewExtraction();
 
 const onConnect = () => {
   // création d'une nouvelle instance du service d'authentification
@@ -49,7 +50,7 @@ const onConnect = () => {
 						label="Créer une extraction"
 						icon="fr-icon-arrow-right-line"
 						icon-right
-						@click="() => router.push('/new-extraction')"
+						@click="startNewExtraction"
 					/>
 				</template>
 				<template name="not-connected" v-else>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { DsfrAccordion, DsfrAccordionsGroup, DsfrButton } from '@gouvminint/vue-dsfr'
 import type { ExtractibleRelation, RelationInput } from '@/types/extractibles.types'
+import TableAttributeSelector from './Advanced/TableAttributeSelector.vue'
 
 type TableParams = Record<string, { attributes: string[] }>
 

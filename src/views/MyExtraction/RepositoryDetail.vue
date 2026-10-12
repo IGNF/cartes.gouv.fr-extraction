@@ -11,10 +11,7 @@ const props = defineProps<{
     <div class="fr-container">
         <h2>{{ repository.title }}</h2>
         <p>{{ repository.description }}</p>
-        <ExtractionList
-            :extractions="repository.extractions"
-            :repositoryId="id"
-        />
+        <ExtractionList />
     </div>
 </template>
 <style scoped> 

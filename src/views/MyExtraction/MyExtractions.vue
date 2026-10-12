@@ -1,60 +1,18 @@
 <script setup lang="ts">
-import { downloadAllItemsAsZip, getResultDownloadList, useGetExtractionResults, useGetJobByID } from '@/composables/Extractions/Requests/gpfRequests'
-import { useGetHistoricDocumentList } from '@/composables/Extractions/Requests/historicRequests'
+import { downloadAllItemsAsZip, getResultDownloadList, useGetExtractionResults, useGetJobByID, useGetJobInputs } from '@/composables/Extractions/Requests/gpfRequests'
 import { useDeleteExtraction, useRelaunchExtraction, useRelaunchExtractionWithNewParams } from '@/composables/Extractions/Requests/useExtraction'
-import type { ExtractionJob, Extraction } from '@/types/my-extractions.types'
-import type { HistoricContentWithDocumentID } from '@/types/historique.types'
+import type { Extraction } from '@/types/my-extractions.types'
+import type { ExtractionRequestBody } from '@/types/extractibles.types'
 import type { RelaunchAction } from '@/types/UITypes'
+import ExtractionList from '@/components/ExtractionList.vue'
+import DeleteModal from '@/components/Modals/DeleteModal.vue'
+import RelaunchModal from '@/components/Modals/RelaunchModal.vue'
 import { useRouter } from 'vue-router'
 
-type EnrichedExtractionJob = HistoricContentWithDocumentID & ExtractionJob
-const jobs = ref<EnrichedExtractionJob[]>([])
 const deleteModalRef = ref<InstanceType<typeof DeleteModal>>()
 const relaunchModalRef = ref<InstanceType<typeof RelaunchModal>>()
 const selectedExtraction = ref<Extraction | undefined>()
 const router = useRouter()
-
-async function fetchJobs() {
-  try {
-    const historicDocuments = await useGetHistoricDocumentList()
-
-    jobs.value = (
-      await Promise.all(
-        historicDocuments.map(async (document) => {
-          try {
-            const job = await useGetJobByID(document.jobID)
-
-            return {
-              ...job,
-              ...document,
-            }
-          } catch (error) {
-            console.error(`Erreur lors de la récupération du job pour le document ${document._id} :`, error)
-            return null
-          }
-        })
-      )
-    ).filter((job): job is EnrichedExtractionJob => job !== null)
-  } catch (error) {
-    console.error('Erreur lors de la récupération des jobs :', error)
-  }
-}
-
-onMounted(async () => {
-  await fetchJobs()
-})
-
-const extractionList = computed<Extraction[]>(() => {
-  return jobs.value.map((job) => ({
-    status: job.status,
-    name: job.jobName?.trim() || "Extraction sans nom : " + job.jobID,
-    jobID: job.jobID,
-    params: job.params,
-    message: job.message || '',
-    url: `https://data.geopf.fr/extraction${job.links?.[0]?.href || ''}`,
-    updated: new Date(job.updated)
-  }))
-})
 
 async function onDownloadExtraction(extraction: Extraction) {
   try {
@@ -77,8 +35,8 @@ async function onConfirmDelete() {
     return
   }
   try {
-    await useDeleteExtraction(selectedExtraction.value.jobID, jobs.value.find(job => job.jobID === selectedExtraction.value?.jobID)?.documentID || '')
-    await fetchJobs() // Rafraîchir la liste des jobs après la suppression
+    const result = await useDeleteExtraction(selectedExtraction.value.jobID, selectedExtraction.value.status)
+    if (result instanceof Error) throw result
     deleteModalRef.value?.closeModal()
   } catch (error) {
     console.error('Erreur lors de la suppression :', error)
@@ -95,18 +53,37 @@ async function onConfirmRelaunchExtraction(action: RelaunchAction) {
     console.error('Aucune extraction sélectionnée pour la relance.')
     return
   }
-  let currentJob = jobs.value.find(job => job.jobID === selectedExtraction.value?.jobID)
-  if (!currentJob) {
-    console.error('Job actuel introuvable pour la relance.')
+  const extraction = selectedExtraction.value
+  let currentJob: Awaited<ReturnType<typeof useGetJobByID>>
+  let params: ExtractionRequestBody
+  try {
+    currentJob = await useGetJobByID(extraction.jobID)
+    // useGetJobInputs ne renvoie que les inputs : on reconstitue le corps de requête complet.
+    params = {
+      inputs: await useGetJobInputs(currentJob.jobID),
+      outputs: {
+        logs: {},
+        summary: {},
+        extractedData: {},
+      },
+    }
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des paramètres du job ${extraction.jobID} :`, error)
     return
   }
+
   if (action === 'replace') {
     console.log(`Relancer l'extraction ${selectedExtraction.value} en mode remplacement`)
-    await useRelaunchExtraction(currentJob.params, selectedExtraction.value.jobID, currentJob.documentID, currentJob.uuidStoredData, currentJob.name, currentJob.status)
-    await fetchJobs() // Rafraîchir la liste des jobs après la suppression
+    try {
+      const result = await useRelaunchExtraction(params, currentJob.jobID, currentJob.processID, selectedExtraction.value.name, currentJob.status)
+      if (result instanceof Error) throw result
+    } catch (error) {
+      console.error('Erreur lors de la relance de l’extraction :', error)
+      return
+    }
   } else if (action === 'duplicate') {
     console.log(`Relancer l'extraction ${selectedExtraction.value} en mode duplication`)
-    useRelaunchExtractionWithNewParams(currentJob.params, currentJob.processID)
+    useRelaunchExtractionWithNewParams(params, currentJob.processID)
     router.push('/new-extraction')
   }
   relaunchModalRef.value?.closeModal()
@@ -115,15 +92,13 @@ async function onConfirmRelaunchExtraction(action: RelaunchAction) {
 </script>
 <template>
     <div class="fr-container">
-        <ExtractionList 
-            :extractions="extractionList"
+        <ExtractionList
             @download="onDownloadExtraction"
             @delete="onDeleteExtraction"
             @relaunch="onRelaunchExtraction" />
         <DeleteModal
             ref="deleteModalRef"
             :extraction-name="selectedExtraction?.name"
-            :job-id="selectedExtraction?.name"
             @delete="onConfirmDelete" />
         <RelaunchModal
             ref="relaunchModalRef"
