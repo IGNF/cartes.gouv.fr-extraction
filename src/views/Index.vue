@@ -3,6 +3,7 @@ import "ol/ol.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
 import { watch } from 'vue';
 import Patience from '@/components/utils/Patience.vue'
+import Alerts from '@/components/alerts/Alerts.vue'
 import StoreData from '@/components/async-data/StoreData.vue';
 import { CgfrFooter, CgfrHeader } from '@ignf/cartes.gouv.fr-vue-components'
 import { useAppStore } from '@/stores/appStore';
@@ -51,7 +52,7 @@ const baseUrl = getBaseUrl();
 
 
     <!-- SECOND GRID ROW -->
-    <div class="alerts" />
+    <Alerts class="Alerts" />
 
 
     <!-- THIRD GRID ROW -->
