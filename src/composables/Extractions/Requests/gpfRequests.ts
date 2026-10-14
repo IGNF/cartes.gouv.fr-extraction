@@ -23,7 +23,8 @@ import type {
     DeleteExtractionResponse,
     ExtractionErrorResponse,
 } from '@/types/my-extractions.types';
-import { useAppStore } from '@/stores/appStore';
+import { toRaw } from 'vue';
+import { useStore } from 'cartes.gouv.fr-service';
 import { getRuntimeConfig } from '@/config/configService';
 import JSZip from 'jszip';
 
@@ -38,8 +39,7 @@ export function isExtractionErrorResponse(value: unknown): value is ExtractionEr
 
 
 export async function useGetExtractibleByID(processID: string): Promise<Extractible> {
-    const appStore = useAppStore();
-    const service = appStore.service;
+    const service = toRaw(useStore().getService());
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
     if (!service || !extractionApiBaseUrl) {
@@ -79,8 +79,7 @@ export async function useGetExtractibleByID(processID: string): Promise<Extracti
 }
 
 export async function useCreateExtractionRequest(requestBody: ExtractionRequestBody, processID: string | undefined): Promise<createExtractionResponse | createExtractionErrorResponse | createExtractionUnauthorizedErrorResponse> {
-    const appStore = useAppStore();
-    const service = appStore.service;
+    const service = toRaw(useStore().getService());
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
     if (!service || !extractionApiBaseUrl) {
@@ -145,8 +144,7 @@ export async function useGetJobs(options?: {
     page?: number
     limit?: number
 }) {
-    const appStore = useAppStore();
-    const service = appStore.service;
+    const service = toRaw(useStore().getService());
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
     if (!service || !extractionApiBaseUrl) {
@@ -195,8 +193,7 @@ export async function useGetJobs(options?: {
 }
 
 export async function useGetJobByID(jobID: string) {
-    const appStore = useAppStore();
-    const service = appStore.service;
+    const service = toRaw(useStore().getService());
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
     if (!service || !extractionApiBaseUrl) {
@@ -227,8 +224,7 @@ export async function useGetJobByID(jobID: string) {
 }
 
 export async function useGetJobInputs(jobID: string): Promise<ExtractionRequestBody["inputs"]> {
-    const appStore = useAppStore();
-    const service = appStore.service;
+    const service = toRaw(useStore().getService());
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
     if (!service || !extractionApiBaseUrl) {
@@ -259,8 +255,7 @@ export async function useGetJobInputs(jobID: string): Promise<ExtractionRequestB
 }
 
 export async function useGetExtractionResults(jobID: string) {
-    const appStore = useAppStore();
-    const service = appStore.service;
+    const service = toRaw(useStore().getService());
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
     if (!service || !extractionApiBaseUrl) {
@@ -291,8 +286,7 @@ export async function useGetExtractionResults(jobID: string) {
 }
 
 export async function useDeleteExtractionRequest(jobID: string): Promise<DeleteExtractionResponse | null> {
-    const appStore = useAppStore();
-    const service = appStore.service;
+    const service = toRaw(useStore().getService());
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
     if (!service || !extractionApiBaseUrl) {

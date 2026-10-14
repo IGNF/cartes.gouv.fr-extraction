@@ -24,7 +24,7 @@
     "@gouvfr/dsfr": "1.14.4",
     "@gouvminint/vue-dsfr": "^8.16.1",
     "@vueuse/core": "^14.0.0",
-    "cartes.gouv.fr-service": "git+https://github.com/IGNF/cartes.gouv.fr-service#v0.0.8",
+    "cartes.gouv.fr-service": "git+https://github.com/IGNF/cartes.gouv.fr-service#v0.0.9",
     "@ignf/cartes.gouv.fr-vue-components": "^1.0.0",
     "codemirror": "^6.0.2",
     "focus-trap": "^7.5.4",

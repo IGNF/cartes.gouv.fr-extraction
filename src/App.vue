@@ -1,20 +1,9 @@
 <script setup lang="ts">
 import "ol/ol.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
-import { watch } from "vue";
-
-import { useLogger } from "vue-logger-plugin";
-import { useAppStore } from "./stores/appStore";
-
-import { setSettings } from "cartes.gouv.fr-service";
+import { getService, setSettings, useAuth, useStore } from "cartes.gouv.fr-service";
 import Index from "./views/Index.vue";
-
-import { getService, useAuth } from "cartes.gouv.fr-service";
 import { getRuntimeConfig } from "./config/configService";
-
-const log = useLogger();
-
-const appStore = useAppStore();
 
 // Get the runtime configuration (loaded from config.json or import.meta.env)
 const config = getRuntimeConfig();
@@ -42,17 +31,14 @@ setSettings({
   IamEntrepotApiUrlRemote: config.IAM_ENTREPOT_API_URL_REMOTE,
 });
 
-const service = getService({ mode: 'local' });
-appStore.service = service;
+// Réhydrater le service depuis le store persisté avant l'initialisation unique de l'authentification.
+const store = useStore();
+const persisted = store.connexion ? { ...store.connexion } : {};
+const service = getService({ mode: 'local', ...persisted });
+store.setService(service);
 
-const { isAuthenticated, user } = useAuth({ service, options: { routing : false} });
-
-// Nécessaire de watch les deux porpriétés car elles sont mises à jour de manière asynchrone, 
-// et on veut s'assurer que le store est mis à jour dès que l'une ou l'autre change.
-watch([isAuthenticated, user], ([authenticated, currentUser]) => {
-  appStore.isAuthenticated = authenticated;
-  appStore.user = authenticated ? service.user : currentUser;
-}, { immediate: true });
+// Les composants lisent ensuite directement l'état de connexion dans le store de la bibliothèque.
+useAuth({ service, options: { routing: false } });
 
 </script>
 

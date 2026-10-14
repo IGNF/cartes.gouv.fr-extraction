@@ -1,15 +1,17 @@
 <script setup lang="ts">
+import { computed, toRaw } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAppStore } from '@/stores/appStore';
+import { useStore } from 'cartes.gouv.fr-service';
 import { useStartNewExtraction } from '@/composables/Extractions/Requests/useExtraction';
 
-const appStore = useAppStore();
+const store = useStore();
+const isAuthenticated = computed(() => Boolean(store.connexion?.authenticated));
 const router = useRouter();
 const startNewExtraction = useStartNewExtraction();
 
 const onConnect = () => {
-  // création d'une nouvelle instance du service d'authentification
-	appStore.service?.getAccessLogin()
+	// Le service utilise des champs privés inaccessibles à travers le Proxy Pinia.
+	toRaw(store.getService())?.getAccessLogin()
 		.then((url: string) => {
 			window.location.href = url;
 		});
@@ -39,7 +41,7 @@ const onConnect = () => {
 				Un service pour filtrer, sélectionner et extraire précisément les données géographiques dont vous avez besoin.
 			</div>
 			<div>
-				<template name="connected" v-if="appStore.isAuthenticated">
+				<template name="connected" v-if="isAuthenticated">
 					<DsfrButton
 						secondary
 						label="Mes extractions"
