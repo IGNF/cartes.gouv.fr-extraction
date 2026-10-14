@@ -36,6 +36,7 @@ docker run -p 8080:8080 \
   -e IAM_ENTREPOT_API_URL="https://data.geopf.fr/api" \
   -e IAM_REDIRECT_REMOTE="https://cartes.gouv.fr" \
   -e IAM_ENTREPOT_API_URL_REMOTE="https://cartes.gouv.fr/api" \
+  -e ALERTS_URL="https://gpf-annex-qua.priv.geopf.fr/annexes/cartes.gouv.fr-config/public/alerts.json" \
   -e MODE="production" \
   extraction:latest 
 ```

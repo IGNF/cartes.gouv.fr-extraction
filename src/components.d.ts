@@ -9,6 +9,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     AdvancedRequestBuilder: typeof import('./components/requestBuilder/Advanced/AdvancedRequestBuilder.vue')['default']
     AdvancedRequestForm: typeof import('./components/requestBuilder/Advanced/AdvancedRequestForm.vue')['default']
+    Alert: typeof import('./components/alerts/Alert.vue')['default']
+    Alerts: typeof import('./components/alerts/Alerts.vue')['default']
     CardList: typeof import('./components/CardList.vue')['default']
     ConditionForm: typeof import('./components/requestBuilder/Advanced/ConditionForm.vue')['default']
     Controls: typeof import('./components/map/Controls/Controls.vue')['default']
@@ -17,6 +19,7 @@ declare module 'vue' {
     Drawing: typeof import('./components/map/Controls/Drawing.vue')['default']
     DsfrAccordion: typeof import('@gouvminint/vue-dsfr')['DsfrAccordion']
     DsfrAccordionsGroup: typeof import('@gouvminint/vue-dsfr')['DsfrAccordionsGroup']
+    DsfrAlert: typeof import('@gouvminint/vue-dsfr')['DsfrAlert']
     DsfrButton: typeof import('@gouvminint/vue-dsfr')['DsfrButton']
     DsfrCheckbox: typeof import('@gouvminint/vue-dsfr')['DsfrCheckbox']
     DsfrDataTable: typeof import('@gouvminint/vue-dsfr')['DsfrDataTable']

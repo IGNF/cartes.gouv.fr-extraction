@@ -1,0 +1,41 @@
+[
+  {
+    "id": "local-alert-info",
+    "title": "Maintenances programmées",
+    "description": "Calendrier prévisionnel des maintenances programmées",
+    "link": { "url": "/niveau-de-service", "label": "En savoir plus" },
+    "severity": "info",
+    "details": "Des opérations de maintenance sont planifiées le dernier mardi après-midi du mois.",
+    "date": "2026-10-01T08:00:00.000Z",
+    "visibility": { "homepage": true, "contact": false, "map": true, "serviceLevel": true, "extraction": true }
+  },
+  {
+    "id": "local-alert-warning",
+    "title": "Service dégradé",
+    "description": "Ralentissements constatés sur les extractions",
+    "link": { "url": "https://cartes.gouv.fr/niveau-de-service", "label": "Voir le niveau de service" },
+    "severity": "warning",
+    "details": "Les temps de traitement peuvent être plus longs qu'à l'accoutumée.",
+    "date": "2026-10-05T10:30:00.000Z",
+    "visibility": { "homepage": false, "contact": true, "map": true, "serviceLevel": true, "extraction": true }
+  },
+  {
+    "id": "local-alert-alert",
+    "title": "Incident en cours",
+    "description": "Le service d'extraction est indisponible",
+    "link": {},
+    "severity": "alert",
+    "details": "",
+    "date": "2026-10-10T14:00:00.000Z",
+    "visibility": { "homepage": true, "contact": true, "map": true, "serviceLevel": true, "extraction": true }
+  },
+  {
+    "id": "local-alert-hidden",
+    "title": "Alerte non visible sur la carte",
+    "description": "Ne doit pas s'afficher dans l'interface d'extraction (visibility.extraction = false)",
+    "link": {},
+    "severity": "info",
+    "date": "2026-10-11T09:00:00.000Z",
+    "visibility": { "homepage": true, "contact": false, "map": false, "serviceLevel": false, "extraction": false }
+  }
+]
