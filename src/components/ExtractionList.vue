@@ -26,61 +26,93 @@ const reachedEnd = ref(false)
 
 const startNewExtraction = useStartNewExtraction();
 
+// async function fetchJobs() {
+//     if (isLoading.value || !hasMore.value) return
+
+//     isLoading.value = true
+//     try {
+//         if (isFirstPage.value) {
+//             const runningJobs = await useGetJobs({ statuses: ['RUNNING'] })
+//             const firstPageLimit = Math.max(0, limit - runningJobs.length)
+//             const firstPageJobs = firstPageLimit > 0
+//                 ? await useGetJobs({ page: 1, limit: firstPageLimit, statuses: ['SUCCESSFUL', 'FAILED', 'DISMISSED'] })
+//                 : []
+//             const existingIDs = new Set<string>()
+//             jobs.value = [...runningJobs, ...firstPageJobs].filter(job => {
+//                 if (existingIDs.has(job.jobID)) return false
+//                 existingIDs.add(job.jobID)
+//                 return true
+//             })
+//             // Relire la page 1 avec limit=4 au prochain clic : la première requête
+//             // a pu utiliser une limite plus petite pour faire place aux jobs en cours.
+//             reachedEnd.value = firstPageLimit > 0 && firstPageJobs.length < firstPageLimit
+//             hasMore.value = !reachedEnd.value
+//             isFirstPage.value = false
+//             return
+//         }
+
+//         // Garder les jobs récupérés en avance mais pas encore affichés.
+//         const queued = [...pendingJobs.value]
+//         const existingIDs = new Set([...jobs.value, ...queued].map(job => job.jobID))
+//         let nextPage = page.value
+//         let end = reachedEnd.value
+
+//         // Plusieurs pages API peuvent être nécessaires pour obtenir quatre nouveaux jobs
+//         // après dédoublonnage avec la première page et les résultats déjà affichés.
+//         while (queued.length < limit && !end) {
+//             const newJobs = await useGetJobs({ page: nextPage, limit, statuses: ['SUCCESSFUL', 'FAILED', 'DISMISSED'] })
+//             nextPage++
+//             for (const job of newJobs) {
+//                 if (!existingIDs.has(job.jobID)) {
+//                     existingIDs.add(job.jobID)
+//                     queued.push(job)
+//                 }
+//             }
+//             end = newJobs.length < limit
+//         }
+
+//         jobs.value = [...jobs.value, ...queued.slice(0, limit)]
+//         pendingJobs.value = queued.slice(limit)
+//         page.value = nextPage
+//         reachedEnd.value = end
+//         hasMore.value = !end || pendingJobs.value.length > 0
+//     } catch (error) {
+//         console.error('Erreur lors de la récupération des jobs :', error)
+//     } finally {
+//         isLoading.value = false
+//     }
+// }
+
+import { useGetHistoricDocumentList } from '@/composables/Extractions/Requests/historicRequests'
+import type { HistoricContentWithDocumentID } from '@/types/historique.types'
+
+type EnrichedExtractionJob = HistoricContentWithDocumentID & ExtractionJob
+
 async function fetchJobs() {
-    if (isLoading.value || !hasMore.value) return
+  try {
+    jobs.value = await useGetJobs()
+    const historicDocuments = await useGetHistoricDocumentList()
 
-    isLoading.value = true
-    try {
-        if (isFirstPage.value) {
-            const runningJobs = await useGetJobs({ statuses: ['RUNNING'] })
-            const firstPageLimit = Math.max(0, limit - runningJobs.length)
-            const firstPageJobs = firstPageLimit > 0
-                ? await useGetJobs({ page: 1, limit: firstPageLimit, statuses: ['SUCCESSFUL', 'FAILED', 'DISMISSED'] })
-                : []
-            const existingIDs = new Set<string>()
-            jobs.value = [...runningJobs, ...firstPageJobs].filter(job => {
-                if (existingIDs.has(job.jobID)) return false
-                existingIDs.add(job.jobID)
-                return true
-            })
-            // Relire la page 1 avec limit=4 au prochain clic : la première requête
-            // a pu utiliser une limite plus petite pour faire place aux jobs en cours.
-            reachedEnd.value = firstPageLimit > 0 && firstPageJobs.length < firstPageLimit
-            hasMore.value = !reachedEnd.value
-            isFirstPage.value = false
-            return
-        }
+    jobs.value = (
+      await Promise.all(
+        historicDocuments.map(async (document) => {
+          try {
+            const job = await useGetJobByID(document.jobID)
 
-        // Garder les jobs récupérés en avance mais pas encore affichés.
-        const queued = [...pendingJobs.value]
-        const existingIDs = new Set([...jobs.value, ...queued].map(job => job.jobID))
-        let nextPage = page.value
-        let end = reachedEnd.value
-
-        // Plusieurs pages API peuvent être nécessaires pour obtenir quatre nouveaux jobs
-        // après dédoublonnage avec la première page et les résultats déjà affichés.
-        while (queued.length < limit && !end) {
-            const newJobs = await useGetJobs({ page: nextPage, limit, statuses: ['SUCCESSFUL', 'FAILED', 'DISMISSED'] })
-            nextPage++
-            for (const job of newJobs) {
-                if (!existingIDs.has(job.jobID)) {
-                    existingIDs.add(job.jobID)
-                    queued.push(job)
-                }
+            return {
+              ...job,
+              ...document,
             }
-            end = newJobs.length < limit
-        }
-
-        jobs.value = [...jobs.value, ...queued.slice(0, limit)]
-        pendingJobs.value = queued.slice(limit)
-        page.value = nextPage
-        reachedEnd.value = end
-        hasMore.value = !end || pendingJobs.value.length > 0
-    } catch (error) {
-        console.error('Erreur lors de la récupération des jobs :', error)
-    } finally {
-        isLoading.value = false
-    }
+          } catch (error) {
+            console.error(`Erreur lors de la récupération du job pour le document ${document._id} :`, error)
+            return null
+          }
+        })
+      )
+    ).filter((job): job is EnrichedExtractionJob => job !== null)
+  } catch (error) {
+    console.error('Erreur lors de la récupération des jobs :', error)
+  }
 }
 
 onMounted(() => {

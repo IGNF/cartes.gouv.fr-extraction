@@ -1,4 +1,6 @@
 
+import type { HistoricContentWithDocumentID } from '@/types/historique.types'
+
 // Types pour les extractions de l'utilisateur
 export type ExtractionItem = {
   title: string
@@ -16,6 +18,9 @@ export type Extraction = {
   jobID: string
   message?: string
 }
+
+// Variante utilisée par le parcours basé sur les documents historiques.
+export type ExtractionWithHistory = Extraction & HistoricContentWithDocumentID
 
 export type RepositoryItem = {
   title: string
