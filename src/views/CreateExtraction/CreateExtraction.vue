@@ -31,7 +31,7 @@ watch(currentStep, (newStep, previousStep) => {
     alert('Veuillez sélectionner une extraction avant de continuer.');
   }
 
-  if (newStep === 2 && previousStep === 3) {
+  if (newStep === 2 && previousStep === 3 && !selectedExtractible.value) {
     currentStep.value = 1;
     selectedExtractible.value = null;
     request.value = undefined;

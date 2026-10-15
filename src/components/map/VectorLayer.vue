@@ -53,11 +53,9 @@ function mountLayer() {
   if (!currentMap) return;
 
   const source = new VectorSource(props.sourceOptions || {});
-  const defaultGeoJsonStyle = layerImportOptions.vectorStyleOptions?.GeoJSON?.defaultStyle;
   vectorLayer.value = new OpenLayersVectorLayer({
     source,
     ...(props.layerOptions || {}),
-    style: defaultGeoJsonStyle,
   });
 
   if (!currentMap.getLayers().getArray().includes(vectorLayer.value)) {
