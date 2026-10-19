@@ -1,4 +1,5 @@
 import type { GeoJSONObject } from 'ol/format/GeoJSON';
+import type { dataTypes } from './sql.types';
 
 /**
  * https://data.geopf.fr/extraction/processes?page=1&limit=10
@@ -39,7 +40,7 @@ export type Extractible = {
 export type ExtractibleRelation = {
     name: string;
     type: string;
-    attributes: { [key: string]: any };
+    attributes: { [key: string]: dataTypes };
 }
 
 /**

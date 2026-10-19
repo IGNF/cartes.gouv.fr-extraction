@@ -49,6 +49,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SearchableCardList: typeof import('./components/SearchableCardList.vue')['default']
     SearchEngine: typeof import('./components/map/Controls/SearchEngine.vue')['default']
+    SqlInput: typeof import('./components/requestBuilder/Advanced/SqlInput.vue')['default']
     StoreData: typeof import('./components/async-data/StoreData.vue')['default']
     SuccessModal: typeof import('./components/Modals/SuccessModal.vue')['default']
     TableAttributeSelector: typeof import('./components/requestBuilder/Advanced/TableAttributeSelector.vue')['default']
