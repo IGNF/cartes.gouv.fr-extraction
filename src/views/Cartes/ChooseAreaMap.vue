@@ -75,6 +75,10 @@ onMounted(() => {
               :layer-import-options="layerImportOptions"
               :map-id="mainMap"
             />
+            <ResetExtentControl
+              visibility
+              :map-id="mainMap"
+            />
             <Zoom
               visibility
               :zoom-options="zoomOptions"
