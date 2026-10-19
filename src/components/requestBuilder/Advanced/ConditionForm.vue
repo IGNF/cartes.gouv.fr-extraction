@@ -18,6 +18,7 @@ const operatorOptions: Operator[] = ['=', '!=', '<', '<=', '>', '>=', 'LIKE', 'N
 const selectedAttribute = ref(model.value?.attribute ?? '')
 const selectedOperator = ref<Operator>(model.value?.operator ?? '=')
 const attributeValue = ref(filterValueToString(model.value?.value))
+const hasInputError = ref(false)
 
 const attributeOptions = computed(() => Object.keys(props.relation.attributes || {}))
 const selectedDataType = computed(() => props.relation.attributes?.[selectedAttribute.value])
@@ -83,7 +84,7 @@ function buildFilter(attribute: string, operator: Operator, rawValue: string): F
 	return { attribute, operator, value: rawValue }
 }
 
-watch([selectedAttribute, selectedOperator, attributeValue], () => {
+watch([selectedAttribute, selectedOperator, attributeValue, hasInputError], () => {
 	if (isHydrating.value) return
 
 	if (!selectedAttribute.value) {
@@ -91,8 +92,10 @@ watch([selectedAttribute, selectedOperator, attributeValue], () => {
 		return
 	}
 
+	if (hasInputError.value) return
+
 	model.value = buildFilter(selectedAttribute.value, selectedOperator.value, attributeValue.value)
-})
+}, { flush: 'post' })
 </script>
 
 <template>
@@ -121,6 +124,7 @@ watch([selectedAttribute, selectedOperator, attributeValue], () => {
 			<div class="fr-col-12 fr-col-md-4">
 				<SqlInput
 					v-model="attributeValue"
+					v-model:has-error="hasInputError"
 					:data-type="selectedDataType"
 					:operator="selectedOperator"
 					:disabled="!selectedAttribute"

@@ -11,6 +11,7 @@ const props = defineProps<{
 }>()
 
 const model = defineModel<string>({ default: '' })
+const hasError = defineModel<boolean>('hasError', { default: false })
 const hintId = `sql-input-hint-${useId()}`
 
 const inputText = ref('')
@@ -110,6 +111,14 @@ const inputError = computed(() => {
 })
 
 const errorMessage = computed(() => operatorError.value ?? inputError.value)
+
+watch(
+	errorMessage,
+	(message) => {
+		hasError.value = Boolean(message)
+	},
+	{ immediate: true, flush: 'sync' }
+)
 
 const canAdd = computed(() => Boolean(inputText.value.trim()) && !inputError.value)
 
