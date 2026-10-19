@@ -172,7 +172,7 @@ watch(requestBody, (newValue) => {
                           :title="title1"
                           class="w-100"
                         >
-                            <ChooseSqlParamsMap />
+                            <ChooseSqlParamsMap :extent="extractible?.extent" />
                         </DsfrAccordion>
                     </DsfrAccordionsGroup>
                 </div>

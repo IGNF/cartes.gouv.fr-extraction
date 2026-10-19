@@ -11,8 +11,10 @@ import type Geometry from 'ol/geom/Geometry'
 import { getUid } from 'ol/util'
 import { extractGeoJsonFromFilter } from '@/composables/Extractions/useExtractionExtentUtils'
 import { DEFAULT_GEOJSON_SRS, DEFAULT_MAP_SRS } from '@/composables/useMapConstants'
+import { layerImportOptions } from '@/composables/getDefaultControlOptions.js'
 
 const geoJsonFormat = new GeoJSON()
+const defaultGeoJsonStyle = layerImportOptions.vectorStyleOptions?.GeoJSON?.defaultStyle
 
 export const useCreateExtractionStore = defineStore('createExtraction', () => {
   const selectedExtractibleID = ref<string | null>(null)
@@ -41,7 +43,7 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
     return {
       visible: extentLayer.value.getVisible(),
       opacity: extentLayer.value.getOpacity(),
-      style: extentLayer.value.getStyle() || undefined,
+      style: defaultGeoJsonStyle,
       zIndex: extentLayer.value.getZIndex()
     }
   })

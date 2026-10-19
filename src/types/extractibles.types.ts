@@ -1,3 +1,5 @@
+import type { GeoJSONObject } from 'ol/format/GeoJSON';
+
 /**
  * https://data.geopf.fr/extraction/processes?page=1&limit=10
  * Un process GPF est associé à une liste 
@@ -21,7 +23,7 @@ export type ProcessLink = {
  */
 export type Extractible = {
     name: string;
-    extent: any
+    extent: GeoJSONObject;
     creation: string;
     srs: string;
     contact: string;
