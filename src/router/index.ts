@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useStore } from 'cartes.gouv.fr-service'
 import { getBaseUrl } from '@/config/configService'
 
-import MyExtractions from '@/views/MyExtraction/MyExtractions.vue'
+import MyExtractions from '@/views/MyExtraction/MyExtractionsWithHistory.vue'
 import HomePage from '@/views/HomePage.vue'
 import CreateExtraction from '@/views/CreateExtraction/CreateExtraction.vue'
 

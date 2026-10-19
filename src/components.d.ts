@@ -30,6 +30,8 @@ declare module 'vue' {
     ExtractibleGrid: typeof import('./components/template-grid/ExtractibleGrid.vue')['default']
     ExtractionList: typeof import('./components/ExtractionList.vue')['default']
     ExtractionListElement: typeof import('./components/ExtractionListElement.vue')['default']
+    ExtractionListElementWithHistory: typeof import('./components/ExtractionListElementWithHistory.vue')['default']
+    ExtractionListWithHistory: typeof import('./components/ExtractionListWithHistory.vue')['default']
     FilterForm: typeof import('./components/requestBuilder/FilterForm.vue')['default']
     'FilterForm copy': typeof import('./components/requestBuilder/FilterForm copy.vue')['default']
     FilterGroup: typeof import('./components/requestBuilder/Advanced/FilterGroup.vue')['default']
