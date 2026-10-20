@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useStore } from 'cartes.gouv.fr-service'
+import { createAuthGuard } from 'authentification-vue-oidc'
 import { getBaseUrl } from '@/config/configService'
 
 import MyExtractions from '@/views/MyExtraction/MyExtractionsWithHistory.vue'
@@ -50,7 +50,9 @@ const routes = [
   },
   {
     path: '/login',
-    redirect: '/extraction',
+    name: 'login',
+    component: HomePage,
+    meta: { isAuthCallback: true },
   },
   {
     path: '/logout',
@@ -69,16 +71,8 @@ function createAppRouter() {
   const specificTitle = to.meta.title ? `${to.meta.title} - ` : ''
   document.title = `${specificTitle}${MAIN_TITLE}`
 
-  // si la route cible nécessite une connexion
-  // (`meta.requiresAuth`) et que l'utilisateur n'est pas authentifié,
-  // on redirige vers la page d'accueil
-  const store = useStore()
-  if (to.meta.requiresAuth && !store.connexion?.authenticated) {
-    return {
-      path: '/extraction',
-    }
-  }
   })
+  router.beforeEach(createAuthGuard())
 
   return router
 }

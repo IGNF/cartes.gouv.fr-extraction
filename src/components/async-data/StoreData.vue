@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import { computed, toRaw, watch } from "vue";
+import { watch } from "vue";
 import { useLogger } from "vue-logger-plugin";
 import { useDataStore } from "@/stores/dataStoreExtraction"
-import { useStore } from "cartes.gouv.fr-service";
+import { useAuth } from "authentification-vue-oidc";
 
-const store = useStore();
-const isAuthenticated = computed(() => Boolean(store.connexion?.authenticated));
+const { isAuthenticated, user } = useAuth();
 const storeData = useDataStore()
 const log = useLogger();
-const { fetchData } = storeData;
+const { fetchData, resetData } = storeData;
 
 // INFO
 // l'opération est asynchrone, il faut donc attendre que le store soit chargé 
 // avant d'initialiser la carte.
-watch(isAuthenticated, async (isAuthenticated) => {
-  log.debug("Authentication status changed:", isAuthenticated);
-  if (isAuthenticated) {
+watch(() => isAuthenticated.value ? user.value?.sub : undefined, async (subject) => {
+  resetData();
+  if (subject) {
     log.debug("User is authenticated, fetching data...");
-    await fetchData(toRaw(store.getService()));
+    await fetchData();
   }
 }, { immediate: true });
 </script>

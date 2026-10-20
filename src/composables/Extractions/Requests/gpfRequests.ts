@@ -23,8 +23,7 @@ import type {
     DeleteExtractionResponse,
     ExtractionErrorResponse,
 } from '@/types/my-extractions.types';
-import { toRaw } from 'vue';
-import { useStore } from 'cartes.gouv.fr-service';
+import { createAuthFetch } from 'authentification-vue-oidc';
 import { getRuntimeConfig } from '@/config/configService';
 import JSZip from 'jszip';
 
@@ -39,14 +38,14 @@ export function isExtractionErrorResponse(value: unknown): value is ExtractionEr
 
 
 export async function useGetExtractibleByID(processID: string): Promise<Extractible> {
-    const service = toRaw(useStore().getService());
+    const authFetch = createAuthFetch();
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service || !extractionApiBaseUrl) {
+    if (!extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
 
-    const response = await service.getFetch()(`${extractionApiBaseUrl}/processes/${processID}`, {
+    const response = await authFetch(`${extractionApiBaseUrl}/processes/${processID}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -63,7 +62,7 @@ export async function useGetExtractibleByID(processID: string): Promise<Extracti
         throw new Error(`Métadonnées introuvables pour le processus ${processID}`);
     }
 
-    const extractibleResponse = await service.getFetch()(describedByUrl, {
+    const extractibleResponse = await authFetch(describedByUrl, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -79,10 +78,10 @@ export async function useGetExtractibleByID(processID: string): Promise<Extracti
 }
 
 export async function useCreateExtractionRequest(requestBody: ExtractionRequestBody, processID: string | undefined): Promise<createExtractionResponse | createExtractionErrorResponse | createExtractionUnauthorizedErrorResponse> {
-    const service = toRaw(useStore().getService());
+    const authFetch = createAuthFetch();
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service || !extractionApiBaseUrl) {
+    if (!extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
         if (!processID) {
@@ -90,9 +89,8 @@ export async function useCreateExtractionRequest(requestBody: ExtractionRequestB
     }
 
     console.log('Lancement de l\'extraction avec les données suivantes :', requestBody);
-    console.log('Service API utilisé :', service);
     try {
-        const response = await service.getFetch()(`${extractionApiBaseUrl}/processes/${processID}/execution`, {
+        const response = await authFetch(`${extractionApiBaseUrl}/processes/${processID}/execution`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -144,10 +142,10 @@ export async function useGetJobs(options?: {
     page?: number
     limit?: number
 }) {
-    const service = toRaw(useStore().getService());
+    const authFetch = createAuthFetch();
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service || !extractionApiBaseUrl) {
+    if (!extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
 
@@ -168,7 +166,7 @@ export async function useGetJobs(options?: {
 
     try {
         const url = `${extractionApiBaseUrl}/jobs${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
-        const response = await service.getFetch()(url, {
+        const response = await authFetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -193,16 +191,16 @@ export async function useGetJobs(options?: {
 }
 
 export async function useGetJobByID(jobID: string) {
-    const service = toRaw(useStore().getService());
+    const authFetch = createAuthFetch();
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service || !extractionApiBaseUrl) {
+    if (!extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
 
     try {
         const url = `${extractionApiBaseUrl}/jobs/${jobID}`;
-        const response = await service.getFetch()(url, {
+        const response = await authFetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -224,16 +222,16 @@ export async function useGetJobByID(jobID: string) {
 }
 
 export async function useGetJobInputs(jobID: string): Promise<ExtractionRequestBody["inputs"]> {
-    const service = toRaw(useStore().getService());
+    const authFetch = createAuthFetch();
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service || !extractionApiBaseUrl) {
+    if (!extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
 
     try {
         const url = `${extractionApiBaseUrl}/jobs/${jobID}/inputs`;
-        const response = await service.getFetch()(url, {
+        const response = await authFetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -255,16 +253,16 @@ export async function useGetJobInputs(jobID: string): Promise<ExtractionRequestB
 }
 
 export async function useGetExtractionResults(jobID: string) {
-    const service = toRaw(useStore().getService());
+    const authFetch = createAuthFetch();
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service || !extractionApiBaseUrl) {
+    if (!extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
 
     try {
         const url = `${extractionApiBaseUrl}/jobs/${jobID}/results`;
-        const response = await service.getFetch()(url, {
+        const response = await authFetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -286,16 +284,16 @@ export async function useGetExtractionResults(jobID: string) {
 }
 
 export async function useDeleteExtractionRequest(jobID: string): Promise<DeleteExtractionResponse | null> {
-    const service = toRaw(useStore().getService());
+    const authFetch = createAuthFetch();
     const extractionApiBaseUrl = getRuntimeConfig().IAM_API_EXTRACTION_URL;
 
-    if (!service || !extractionApiBaseUrl) {
+    if (!extractionApiBaseUrl) {
         throw new Error('Service API non initialisé');
     }
 
     try {
         const url = `${extractionApiBaseUrl}/jobs/${jobID}`;
-        const response = await service.getFetch()(url, {
+        const response = await authFetch(url, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

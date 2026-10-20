@@ -12,8 +12,7 @@
 
 
 import type { DocumentCreateRequestBody, HistoricFileContent, DocumentListItem, HistoricContentWithDocumentID } from '@/types/historique.types'
-import { toRaw } from 'vue'
-import { useStore } from 'cartes.gouv.fr-service'
+import { createAuthFetch } from 'authentification-vue-oidc'
 import { getRuntimeConfig } from '@/config/configService'
 
 export function useGetHistoricFilename(jobID: string): string {
@@ -21,10 +20,10 @@ export function useGetHistoricFilename(jobID: string): string {
 }
 
 export async function useCreateHistoricDocument(historicContent: HistoricFileContent): Promise<void> {
-    const service = toRaw(useStore().getService())
+    const authFetch = createAuthFetch()
     const documentsApiBase = getRuntimeConfig().IAM_ENTREPOT_API_URL
 
-    if (!service || !documentsApiBase) {
+    if (!documentsApiBase) {
         throw new Error('Service API non initialisé')
     }
 
@@ -49,7 +48,7 @@ export async function useCreateHistoricDocument(historicContent: HistoricFileCon
         let labels = ['cartes.gouv.fr-extraction']
         formData.append('labels', labels.join(','))
 
-        const response = await service.getFetch()(`${documentsApiBase}/users/me/documents`, {
+        const response = await authFetch(`${documentsApiBase}/users/me/documents`, {
             method: 'POST',
             body: formData,
         })
@@ -66,10 +65,10 @@ export async function useCreateHistoricDocument(historicContent: HistoricFileCon
 }
 
 export async function useGetHistoricDocumentContent(jobID: string): Promise<HistoricFileContent | null> {
-    const service = toRaw(useStore().getService())
+    const authFetch = createAuthFetch()
     const documentsApiBase = getRuntimeConfig().IAM_ENTREPOT_API_URL
 
-    if (!service || !documentsApiBase) {
+    if (!documentsApiBase) {
         throw new Error('Service API non initialisé')
     }
 
@@ -79,7 +78,7 @@ export async function useGetHistoricDocumentContent(jobID: string): Promise<Hist
             labels: 'cartes.gouv.fr-extraction',
         })
 
-        const listResponse = await service.getFetch()(`${documentsApiBase}/users/me/documents?${query.toString()}`, {
+        const listResponse = await authFetch(`${documentsApiBase}/users/me/documents?${query.toString()}`, {
             method: 'GET',
         })
 
@@ -97,7 +96,7 @@ export async function useGetHistoricDocumentContent(jobID: string): Promise<Hist
             return null
         }
 
-        const contentResponse = await service.getFetch()(
+        const contentResponse = await authFetch(
             `${documentsApiBase}/users/me/documents/${firstDocument._id}/file`,
             {
                 method: 'GET',
@@ -130,10 +129,10 @@ export async function useGetHistoricDocumentContent(jobID: string): Promise<Hist
 }
 
 export async function useGetHistoricDocumentList(): Promise<HistoricContentWithDocumentID[]> {
-    const service = toRaw(useStore().getService())
+    const authFetch = createAuthFetch()
     const documentsApiBase = getRuntimeConfig().IAM_ENTREPOT_API_URL
 
-    if (!service || !documentsApiBase) {
+    if (!documentsApiBase) {
         throw new Error('Service API non initialisé')
     }
 
@@ -142,7 +141,7 @@ export async function useGetHistoricDocumentList(): Promise<HistoricContentWithD
             labels: 'cartes.gouv.fr-extraction',
         })
 
-        const listResponse = await service.getFetch()(`${documentsApiBase}/users/me/documents?${query.toString()}`, {
+        const listResponse = await authFetch(`${documentsApiBase}/users/me/documents?${query.toString()}`, {
             method: 'GET',
         })
 
@@ -158,7 +157,7 @@ export async function useGetHistoricDocumentList(): Promise<HistoricContentWithD
 
         return await Promise.all(
             documents.map(async (document) => {
-                const contentResponse = await service.getFetch()(
+                const contentResponse = await authFetch(
                     `${documentsApiBase}/users/me/documents/${document._id}/file`,
                     {
                         method: 'GET',
@@ -188,15 +187,15 @@ export async function useGetHistoricDocumentList(): Promise<HistoricContentWithD
 }
 
 export async function useDeleteExtractionHistoricDocument(documentID: string): Promise<void> {
-    const service = toRaw(useStore().getService())
+    const authFetch = createAuthFetch()
     const documentsApiBase = getRuntimeConfig().IAM_ENTREPOT_API_URL
 
-    if (!service || !documentsApiBase) {
+    if (!documentsApiBase) {
         throw new Error('Service API non initialisé')
     }
 
     try {
-        const response = await service.getFetch()(`${documentsApiBase}/users/me/documents/${documentID}`, {
+        const response = await authFetch(`${documentsApiBase}/users/me/documents/${documentID}`, {
             method: 'DELETE',
         })
 

@@ -1,11 +1,12 @@
 import { createPinia } from "pinia";
 import { createApp } from "vue";
 import { createLogger } from "vue-logger-plugin";
-import { storePlugin } from "pinia-plugin-store";
+import { createAuth } from "authentification-vue-oidc";
 
 import App from "./App.vue";
 import createAppRouter from "./router/index";
-import { initializeConfig, isProduction, isDevelopment } from "./config/configService";
+import { initializeConfig, isProduction } from "./config/configService";
+import { createAuthOptions } from "./config/authentification-options";
 
 import "@gouvfr/dsfr/dist/dsfr.min.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons.min.css";
@@ -29,20 +30,20 @@ async function bootstrap() {
     await initializeConfig();
 
     const pinia = createPinia();
-    const store = storePlugin({
-      stores: ["service"],
-      storage: localStorage,
-    });
-    pinia.use(store);
-
     const logger = createLogger({
       enabled: true,
       level: isProduction() ? "error" : "debug",
       callerInfo: true,
     });
 
+    const app = createApp(App);
+    app.use(pinia)
+    app.use(createAuth(createAuthOptions()))
+    app.use(logger);
     const router = createAppRouter();
-    createApp(App).use(pinia).use(router).use(logger).mount("#app");
+    app.use(router);
+    await router.isReady();
+    app.mount("#app");
   } catch (error) {
     console.error('[Bootstrap] Échec de l\'initialisation de l\'application :', error);
     // Affichage de l'erreur à l'utilisateur
