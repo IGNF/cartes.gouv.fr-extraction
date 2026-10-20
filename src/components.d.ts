@@ -45,6 +45,7 @@ declare module 'vue' {
     RelaunchModal: typeof import('./components/Modals/RelaunchModal.vue')['default']
     RequestBuilder: typeof import('./components/requestBuilder/RequestBuilder.vue')['default']
     RequestForm: typeof import('./components/requestBuilder/RequestForm.vue')['default']
+    ResetExtentControl: typeof import('./components/map/Controls/ResetExtentControl.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchableCardList: typeof import('./components/SearchableCardList.vue')['default']
