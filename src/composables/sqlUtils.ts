@@ -352,7 +352,47 @@ function isFilterGroup(filter: Filter | FilterGroup): filter is FilterGroup {
 	return Boolean(filter && 'filters' in filter)
 }
 
-function formatValue(value: string | number | boolean | (string | number | boolean)[]): string {
+/**
+ * Analyse une liste SQL de la forme `(v1, v2)` ; les valeurs non entourées d'apostrophes
+ * sont converties en nombre ou booléen lorsque c'est possible, sinon conservées telles quelles.
+ */
+export function parseSqlList(input: string): FilterValue[] {
+	const content = unwrapParentheses(input)
+	if (!content) return []
+
+	const items: string[] = []
+	let current = ''
+	let inString = false
+	for (let index = 0; index < content.length; index++) {
+		const char = content[index]
+		if (char === "'") {
+			if (inString && content[index + 1] === "'") {
+				current += "''"
+				index++
+				continue
+			}
+			inString = !inString
+		} else if (char === ',' && !inString) {
+			items.push(current)
+			current = ''
+			continue
+		}
+		current += char
+	}
+	items.push(current)
+
+	return items
+		.map(item => item.trim())
+		.filter(Boolean)
+		.map(item => {
+			if (/^'[\s\S]*'$/.test(item)) return item.slice(1, -1).replace(/''/g, "'")
+			if (/^(?:true|false)$/i.test(item)) return item.toLowerCase() === 'true'
+			if (/^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(item)) return Number(item)
+			return item
+		})
+}
+
+export function formatValue(value: string | number | boolean | (string | number | boolean)[]): string {
 	if (Array.isArray(value)) {
 		return `(${value.map(formatValue).join(', ')})`
 	}

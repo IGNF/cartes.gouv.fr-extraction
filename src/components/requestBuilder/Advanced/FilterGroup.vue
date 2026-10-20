@@ -137,7 +137,7 @@ function deleteFilter(index: number) {
 			<div
 				v-for="(filter, index) in filters"
 				:key="index"
-				class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters fr-mb-2w"
+				class="fr-grid-row fr-grid-row--top fr-grid-row--gutters fr-mb-2w"
 			>
 				<div class="fr-col">
 					<FilterGroup
@@ -164,6 +164,7 @@ function deleteFilter(index: number) {
 						tertiary
 						no-outline
 						label="Supprimer la condition"
+						class="fr-mt-7v"
 						@click="deleteFilter(index)"
 					/>
 				</div>

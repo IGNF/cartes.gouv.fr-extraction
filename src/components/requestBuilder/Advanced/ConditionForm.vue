@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { DsfrInput, DsfrSelect } from '@gouvminint/vue-dsfr'
+import { DsfrSelect } from '@gouvminint/vue-dsfr'
+import SqlInput from './SqlInput.vue'
+import { formatValue, parseSqlList } from '@/composables/sqlUtils'
 import type { ExtractibleRelation } from '@/types/extractibles.types'
 import type { Filter, Operator } from '@/types/sql.types'
 
@@ -15,9 +17,15 @@ const operatorOptions: Operator[] = ['=', '!=', '<', '<=', '>', '>=', 'LIKE', 'N
 
 const selectedAttribute = ref(model.value?.attribute ?? '')
 const selectedOperator = ref<Operator>(model.value?.operator ?? '=')
-const attributeValue = ref(String(model.value?.value ?? ''))
+const attributeValue = ref(filterValueToString(model.value?.value))
+const hasInputError = ref(false)
 
 const attributeOptions = computed(() => Object.keys(props.relation.attributes || {}))
+const selectedDataType = computed(() => props.relation.attributes?.[selectedAttribute.value])
+
+function filterValueToString(value: Exclude<Filter, undefined>['value'] | undefined): string {
+	return Array.isArray(value) ? formatValue(value) : String(value ?? '')
+}
 
 const initModel = ref<Filter | undefined>(model.value)
 const isHydrating = ref(false)
@@ -45,7 +53,7 @@ watch(
 		isHydrating.value = true
 		selectedAttribute.value = newModel?.attribute ?? ''
 		selectedOperator.value = newModel?.operator ?? '='
-		attributeValue.value = String(newModel?.value ?? '')
+		attributeValue.value = filterValueToString(newModel?.value)
 
 		await nextTick()
 		isHydrating.value = false
@@ -65,7 +73,7 @@ function buildFilter(attribute: string, operator: Operator, rawValue: string): F
 		return {
 			attribute,
 			operator,
-			value: rawValue.split(',').map((item) => item.trim()).filter(Boolean),
+			value: parseSqlList(rawValue),
 		}
 	}
 
@@ -76,7 +84,7 @@ function buildFilter(attribute: string, operator: Operator, rawValue: string): F
 	return { attribute, operator, value: rawValue }
 }
 
-watch([selectedAttribute, selectedOperator, attributeValue], () => {
+watch([selectedAttribute, selectedOperator, attributeValue, hasInputError], () => {
 	if (isHydrating.value) return
 
 	if (!selectedAttribute.value) {
@@ -84,8 +92,10 @@ watch([selectedAttribute, selectedOperator, attributeValue], () => {
 		return
 	}
 
+	if (hasInputError.value) return
+
 	model.value = buildFilter(selectedAttribute.value, selectedOperator.value, attributeValue.value)
-})
+}, { flush: 'post' })
 </script>
 
 <template>
@@ -112,10 +122,11 @@ watch([selectedAttribute, selectedOperator, attributeValue], () => {
 			</div>
 
 			<div class="fr-col-12 fr-col-md-4">
-				<DsfrInput
-					label="Valeur"
-					label-visible
+				<SqlInput
 					v-model="attributeValue"
+					v-model:has-error="hasInputError"
+					:data-type="selectedDataType"
+					:operator="selectedOperator"
 					:disabled="!selectedAttribute"
 				/>
 			</div>
@@ -126,8 +137,7 @@ watch([selectedAttribute, selectedOperator, attributeValue], () => {
 <style scoped>
 .condition-form {
 	display: flex;
-	/* align-items: flex-start; */
-	align-items: center;
+	align-items: flex-start;
 	gap: 1rem;
 }
 
@@ -147,5 +157,6 @@ watch([selectedAttribute, selectedOperator, attributeValue], () => {
 .condition-form__fields {
 	flex: 1;
 	min-width: 0;
+	align-items: flex-start;
 }
 </style>
