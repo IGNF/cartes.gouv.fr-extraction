@@ -1,36 +1,32 @@
 <script setup lang="ts">
 import "ol/ol.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
-import { computed, toRaw } from 'vue';
+import { computed, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import Patience from '@/components/utils/Patience.vue'
 import Alerts from '@/components/alerts/Alerts.vue'
 import StoreData from '@/components/async-data/StoreData.vue';
 import { CgfrFooter, CgfrHeader } from '@ignf/cartes.gouv.fr-vue-components'
-import { useStore } from 'cartes.gouv.fr-service';
+import { useAuth } from 'authentification-vue-oidc';
 
-const store = useStore();
-const isAuthenticated = computed(() => Boolean(store.connexion?.authenticated));
-const user = computed(() => store.connexion?.user || {});
+const { isAuthenticated, user: authUser, status, login, logout, error } = useAuth();
+const route = useRoute();
+const actionError = ref('');
+// Le bandeau utilise encore le format de profil first_name / last_name.
+const user = computed(() => ({
+  first_name: authUser.value?.claims.given_name || authUser.value?.name || '',
+  last_name: authUser.value?.claims.family_name || '',
+  email: authUser.value?.email || '',
+}));
 
-// gestion de la connexion
-const onConnect = () => {
-  toRaw(store.getService())?.getAccessLogin()
-  .then((url:string) => {
-    window.location.href = url; // redirection vers la page sso
-  });
-}
-// gestion de la déconnexion
-const onDisconnect = () => {
-  toRaw(store.getService())?.getAccessLogout()
-  .then((url:string) => {
-    window.location.href = url; // redirection vers la page sso
-  });
-}
+
+const onConnect = () => login({ returnTo: route.fullPath });
+const onDisconnect = () => logout();
 
 </script>
 
 <template>
-  <!-- Le profil utilisateur est lu directement dans le store de la bibliothèque. -->
+  <!-- La session et le profil sont fournis par la bibliothèque OIDC. -->
   <div id="app">
 
 
@@ -53,6 +49,9 @@ const onDisconnect = () => {
 
     <!-- THIRD GRID ROW -->
     <div class="fr-container  fr-mt-3w  fr-mt-md-5w  fr-mb-5w Content">
+      <p v-if="actionError || error" role="alert">
+        {{ actionError || "L'authentification est indisponible. Veuillez réessayer de vous connecter." }}
+      </p>
       <Suspense>
         <!-- Chargement du dataStore avec une patience 
               avant afficahge de la cartographie 

@@ -1,20 +1,27 @@
 <script setup lang="ts">
-import { computed, toRaw } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'cartes.gouv.fr-service';
+import { useAuth } from 'authentification-vue-oidc';
 import { useStartNewExtraction } from '@/composables/Extractions/Requests/useExtraction';
 
-const store = useStore();
-const isAuthenticated = computed(() => Boolean(store.connexion?.authenticated));
+const { isAuthenticated, status, login } = useAuth();
+const pending = ref(false);
+const connectionError = ref('');
+const connectionDisabled = computed(() => pending.value || ['initializing', 'authenticating'].includes(status.value));
 const router = useRouter();
 const startNewExtraction = useStartNewExtraction();
 
-const onConnect = () => {
-	// Le service utilise des champs privés inaccessibles à travers le Proxy Pinia.
-	toRaw(store.getService())?.getAccessLogin()
-		.then((url: string) => {
-			window.location.href = url;
-		});
+const onConnect = async () => {
+	if (connectionDisabled.value) return;
+	pending.value = true;
+	connectionError.value = '';
+	try {
+		await login({ returnTo: '/extraction' });
+	} catch {
+		connectionError.value = 'Impossible de vous connecter. Veuillez réessayer.';
+	} finally {
+		pending.value = false;
+	}
 }
 
 </script>
@@ -58,11 +65,13 @@ const onConnect = () => {
 				<template name="not-connected" v-else>
 					<DsfrButton
 						label="Connectez-vous pour commencer"
+						:disabled="connectionDisabled"
 						icon="fr-icon-arrow-right-line"
 						icon-right
 						@click="onConnect"
 					/>
 				</template>
+				<p v-if="connectionError" role="alert">{{ connectionError }}</p>
 			</div>
 
 		</div>

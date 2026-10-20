@@ -6,6 +6,7 @@ WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
 COPY geopf-extensions-openlayers-1.0.0-beta*.tgz .
+COPY authentification-vue-oidc-0.1.0.tgz .
 
 ARG NPM_TOKEN
 

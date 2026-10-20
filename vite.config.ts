@@ -51,7 +51,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "cartes.gouv.fr-service": fileURLToPath(new URL("./node_modules/cartes.gouv.fr-service/src/index.js", import.meta.url)),
     },
     dedupe: ["vue", "pinia", "vue-demi"],
   },
