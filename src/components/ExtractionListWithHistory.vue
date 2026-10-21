@@ -45,7 +45,13 @@ async function fetchJobs() {
         )
 
         jobs.value = enrichedJobs.filter((job): job is EnrichedExtractionJob => job !== null)
-            .sort((a, b) => Number(b.status === 'running') - Number(a.status === 'running'))
+            .sort((a, b) => {
+                const priority = (status: string) => status === 'running' ? 0 : status === 'successful' ? 1 : 2
+                const priorityDifference = priority(a.status) - priority(b.status)
+                if (priorityDifference !== 0) return priorityDifference
+
+                return new Date(b.updated).getTime() - new Date(a.updated).getTime()
+            })
         visibleCount.value = Math.max(limit, jobs.value.filter(job => job.status === 'running').length)
     } catch (error) {
         errorMessage.value = 'Impossible de récupérer les extractions depuis l’historique.'
