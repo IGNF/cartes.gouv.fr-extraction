@@ -7,6 +7,7 @@ import { useNormalizeString } from '@/composables/utils'
 import type { HistoricContentWithDocumentID } from '@/types/historique.types'
 import type { ExtractionJob, ExtractionWithHistory } from '@/types/my-extractions.types'
 import ExtractionListElementWithHistory from './ExtractionListElementWithHistory.vue'
+import Patience from './utils/Patience.vue'
 
 type EnrichedExtractionJob = HistoricContentWithDocumentID & ExtractionJob
 
@@ -98,23 +99,26 @@ defineExpose({ refresh: fetchJobs })
     </div>
     <DsfrSearchBar v-model="searchValue" class="mw-50 fr-mb-20v" placeholder="Rechercher" />
     <DsfrAlert v-if="errorMessage" type="error" title="Erreur de chargement" :description="errorMessage" />
-    <ExtractionListElementWithHistory
-        v-for="extraction in visibleExtractions"
-        :key="extraction.documentID"
-        :extraction="extraction"
-        @download="emit('download', $event)"
-        @delete="emit('delete', $event)"
-        @relaunch="emit('relaunch', $event)"
-    />
-    <div v-if="hasMore" class="fr-grid-row fr-grid-row--center">
-        <DsfrButton
-            label="Charger plus d'extractions"
-            icon="fr-icon-add-line"
-            secondary
-            :disabled="isLoading"
-            @click="visibleCount += limit"
+    <Patience v-if="isLoading" />
+    <template v-else>
+        <ExtractionListElementWithHistory
+            v-for="extraction in visibleExtractions"
+            :key="extraction.documentID"
+            :extraction="extraction"
+            @download="emit('download', $event)"
+            @delete="emit('delete', $event)"
+            @relaunch="emit('relaunch', $event)"
         />
-    </div>
+        <div v-if="hasMore" class="fr-grid-row fr-grid-row--center">
+            <DsfrButton
+                label="Charger plus d'extractions"
+                icon="fr-icon-add-line"
+                secondary
+                :disabled="isLoading"
+                @click="visibleCount += limit"
+            />
+        </div>
+    </template>
 </template>
 
 <style scoped>
