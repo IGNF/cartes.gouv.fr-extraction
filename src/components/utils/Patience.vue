@@ -2,8 +2,8 @@
 </script>
 
 <template>
-  <div class="patience-container">
-    <span class="loader" />
+  <div class="patience-container" role="status" aria-label="Chargement en cours">
+    <span class="patience-spinner" aria-hidden="true" />
   </div>
 </template>
 
@@ -11,20 +11,19 @@
 .patience-container{
   display: flex;
   width: 100%;
-  height: 100%;
+  min-height: 160px;
   justify-content: center;
   align-items: center;
 }
-.loader {
+.patience-spinner {
   width: 48px;
   height: 48px;
-  border: 5px solid #000000;
+  flex-shrink: 0;
+  border: 5px solid var(--text-action-high-blue-france, #000091);
   border-bottom-color: transparent;
   border-radius: 50%;
   display: inline-block;
   box-sizing: border-box;
-  /* remonte un peu par rapport au vrai centre */
-  margin-top: -50px;
   animation: rotation 1s linear infinite;
 }
 @keyframes rotation {

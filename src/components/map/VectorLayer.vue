@@ -77,7 +77,7 @@ watch(
     removeLayer();
     mountLayer();
   },
-  { immediate: true, deep: true }
+  { immediate: true }
 );
 
 onUnmounted(() => {

@@ -7,6 +7,7 @@ import { useNormalizeString } from '@/composables/utils'
 import type { HistoricContentWithDocumentID } from '@/types/historique.types'
 import type { ExtractionJob, ExtractionWithHistory } from '@/types/my-extractions.types'
 import ExtractionListElementWithHistory from './ExtractionListElementWithHistory.vue'
+import Patience from './utils/Patience.vue'
 
 type EnrichedExtractionJob = HistoricContentWithDocumentID & ExtractionJob
 
@@ -44,7 +45,13 @@ async function fetchJobs() {
         )
 
         jobs.value = enrichedJobs.filter((job): job is EnrichedExtractionJob => job !== null)
-            .sort((a, b) => Number(b.status === 'running') - Number(a.status === 'running'))
+            .sort((a, b) => {
+                const priority = (status: string) => status === 'running' ? 0 : status === 'successful' ? 1 : 2
+                const priorityDifference = priority(a.status) - priority(b.status)
+                if (priorityDifference !== 0) return priorityDifference
+
+                return new Date(b.updated).getTime() - new Date(a.updated).getTime()
+            })
         visibleCount.value = Math.max(limit, jobs.value.filter(job => job.status === 'running').length)
     } catch (error) {
         errorMessage.value = 'Impossible de récupérer les extractions depuis l’historique.'
@@ -98,23 +105,26 @@ defineExpose({ refresh: fetchJobs })
     </div>
     <DsfrSearchBar v-model="searchValue" class="mw-50 fr-mb-20v" placeholder="Rechercher" />
     <DsfrAlert v-if="errorMessage" type="error" title="Erreur de chargement" :description="errorMessage" />
-    <ExtractionListElementWithHistory
-        v-for="extraction in visibleExtractions"
-        :key="extraction.documentID"
-        :extraction="extraction"
-        @download="emit('download', $event)"
-        @delete="emit('delete', $event)"
-        @relaunch="emit('relaunch', $event)"
-    />
-    <div v-if="hasMore" class="fr-grid-row fr-grid-row--center">
-        <DsfrButton
-            label="Charger plus d'extractions"
-            icon="fr-icon-add-line"
-            secondary
-            :disabled="isLoading"
-            @click="visibleCount += limit"
+    <Patience v-if="isLoading" />
+    <template v-else>
+        <ExtractionListElementWithHistory
+            v-for="extraction in visibleExtractions"
+            :key="extraction.documentID"
+            :extraction="extraction"
+            @download="emit('download', $event)"
+            @delete="emit('delete', $event)"
+            @relaunch="emit('relaunch', $event)"
         />
-    </div>
+        <div v-if="hasMore" class="fr-grid-row fr-grid-row--center">
+            <DsfrButton
+                label="Charger plus d'extractions"
+                icon="fr-icon-add-line"
+                secondary
+                :disabled="isLoading"
+                @click="visibleCount += limit"
+            />
+        </div>
+    </template>
 </template>
 
 <style scoped>
