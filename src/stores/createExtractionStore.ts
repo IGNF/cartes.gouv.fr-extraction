@@ -8,7 +8,9 @@ import VectorLayerImpl from 'ol/layer/Vector'
 import Feature from 'ol/Feature'
 import GeoJSON from 'ol/format/GeoJSON'
 import type Geometry from 'ol/geom/Geometry'
+import { get as getProjection } from 'ol/proj'
 import { getUid } from 'ol/util'
+import { CRS } from 'geopf-extensions-openlayers'
 import { extractGeoJsonFromFilter } from '@/composables/Extractions/useExtractionExtentUtils'
 import { DEFAULT_GEOJSON_SRS, DEFAULT_MAP_SRS } from '@/composables/useMapConstants'
 import { layerImportOptions } from '@/composables/getDefaultControlOptions.js'
@@ -64,7 +66,7 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
   })
 
   // Liste des géométries GeoJSON de l'emprise, transformées en EPSG:4326 pour l'export.
-  const extentGeometries = computed<Record<string, unknown>[]>(() => {
+  const extentGeometries = computed(() => {
     if (!extentLayer.value) return []
 
     const source = extentLayer.value.getSource()
@@ -85,7 +87,7 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
 
         return geoJsonFormat.writeGeometryObject(geometryClone, {
           dataProjection: DEFAULT_GEOJSON_SRS,
-          featureProjection: DEFAULT_MAP_SRS,
+          featureProjection: DEFAULT_GEOJSON_SRS,
         })
       })
   })
@@ -167,15 +169,23 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
       return
     }
 
+    // La duplication peut précéder tout montage de Map.vue : enregistrer notamment
+    // le Lambert-93 avant la lecture, sinon OpenLayers ne reprojette pas le GeoJSON.
+    CRS.loadByDefault()
+
     const features = geometries
       .map(({ geojson, srid }) => {
         try {
+          const dataProjection = getProjection(`EPSG:${srid}`)
+          if (!dataProjection) return null
+
           // Lit le GeoJSON dans son SRID d'origine puis le reprojette en 3857
           // pour rester cohérent avec les cartes OpenLayers du parcours.
           const geometry = geoJsonFormat.readGeometry(geojson, {
-            dataProjection: `EPSG:${srid}`,
+            dataProjection,
             featureProjection: DEFAULT_MAP_SRS,
           })
+          if (!geometry) return null
 
           return new Feature({ geometry })
         } catch {
