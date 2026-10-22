@@ -134,6 +134,11 @@ type OperatorMap = {
     operators: "IN" | "NOT IN";
     value: (string | number | boolean)[];
   };
+
+  nullOperator: {
+    operators: "IS NULL" | "IS NOT NULL";
+    value: null;
+  };
 };
 
 export type Operator = OperatorMap[keyof OperatorMap]["operators"];

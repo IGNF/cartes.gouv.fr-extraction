@@ -213,6 +213,9 @@ class RelationInputFilterParser {
 		if (!attribute) throw this.syntaxError('Attribut attendu')
 
 		const operator = this.parseOperator()
+		if (operator === 'IS NULL' || operator === 'IS NOT NULL') {
+			return { attribute, operator, value: null }
+		}
 		if (operator === 'IN' || operator === 'NOT IN') {
 			return { attribute, operator, value: this.parseArray() }
 		}
@@ -237,7 +240,7 @@ class RelationInputFilterParser {
 	private parseOperator(): Operator {
 		this.skipWhitespace()
 		const remainingInput = this.input.slice(this.index)
-		const match = /^(NOT\s+(?:LIKE|IN)|LIKE|IN|!=|<=|>=|=|<|>)(?=\s|\()/i.exec(remainingInput)
+		const match = /^(IS\s+(?:NOT\s+)?NULL|NOT\s+(?:LIKE|IN)|LIKE|IN|!=|<=|>=|=|<|>)(?=\s|\(|\)|$)/i.exec(remainingInput)
 		if (!match) throw this.syntaxError('Opérateur de filtre attendu')
 
 		this.index += match[0].length
@@ -392,7 +395,8 @@ export function parseSqlList(input: string): FilterValue[] {
 		})
 }
 
-export function formatValue(value: string | number | boolean | (string | number | boolean)[]): string {
+export function formatValue(value: string | number | boolean | (string | number | boolean)[] | null): string {
+	if (value === null) return 'NULL'
 	if (Array.isArray(value)) {
 		return `(${value.map(formatValue).join(', ')})`
 	}
@@ -403,6 +407,9 @@ export function formatValue(value: string | number | boolean | (string | number 
 }
 
 function filterToString(filter: Exclude<Filter, undefined>): string {
+	if (filter.operator === 'IS NULL' || filter.operator === 'IS NOT NULL') {
+		return `${filter.attribute} ${filter.operator}`
+	}
 	return `${filter.attribute} ${filter.operator} ${formatValue(filter.value)}`
 }
 
