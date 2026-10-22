@@ -141,6 +141,11 @@ export const useCreateExtractionStore = defineStore('createExtraction', () => {
     const currentMap = getMap()
     const previousExtentLayer = extentLayer.value
 
+    // Le widget d'import ajoute déjà cette couche à la carte, mais VectorLayer.vue
+    // en affiche une reconstruction avec des features clonées. Retirer l'original
+    // évite une seconde emprise visible qui échappe aux interactions de suppression.
+    currentMap?.removeLayer(layer)
+
     if (previousExtentLayer) {
       // Récupère les features de l'ancienne couche avant sa suppression pour les reporter sur la nouvelle.
       const previousFeatures = previousExtentLayer.getSource?.()?.getFeatures?.() ?? []
