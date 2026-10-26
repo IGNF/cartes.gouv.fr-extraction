@@ -49,9 +49,6 @@ const onDisconnect = () => logout();
 
     <!-- THIRD GRID ROW -->
     <div class="fr-container  fr-mt-3w  fr-mt-md-5w  fr-mb-5w Content">
-      <p v-if="actionError || error" role="alert">
-        {{ actionError || "L'authentification est indisponible. Veuillez réessayer de vous connecter." }}
-      </p>
       <Suspense>
         <!-- Chargement du dataStore avec une patience 
               avant afficahge de la cartographie 
@@ -69,7 +66,7 @@ const onDisconnect = () => logout();
 
 
     <!-- LAST GRID ROW -->
-    <CgfrFooter class="footer"/>
+    <CgfrFooter class="footer" compact />
   </div>
 </template>
 
