@@ -3,6 +3,10 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from 'authentification-vue-oidc';
 import { useStartNewExtraction } from '@/composables/Extractions/Requests/useExtraction';
+import background800 from '@/assets/images/publish/background-800.webp';
+import background1200 from '@/assets/images/publish/background-1200.webp';
+import background1600 from '@/assets/images/publish/background-1600.webp';
+import background2160 from '@/assets/images/publish/background-2160.webp';
 
 const { isAuthenticated, status, login } = useAuth();
 const pending = ref(false);
@@ -16,7 +20,7 @@ const onConnect = async () => {
 	pending.value = true;
 	connectionError.value = '';
 	try {
-		await login({ returnTo: '/extraction' });
+		await login({ returnTo: '/' });
 	} catch {
 		connectionError.value = 'Impossible de vous connecter. Veuillez réessayer.';
 	} finally {
@@ -30,7 +34,14 @@ const onConnect = async () => {
 	<section class="home-page">
 		<div class="background-layer" aria-hidden="true">
 			<div class="background-left" />
-			<div class="background-right" />
+			<img
+				class="background-right"
+				:src="background1600"
+				:srcset="`${background800} 800w, ${background1200} 1200w, ${background1600} 1600w, ${background2160} 2160w`"
+				sizes="66.667vw"
+				alt=""
+				fetchpriority="high"
+			/>
 		</div>
 		<div class="card-layer">
 			<div class="icon-container">
@@ -52,7 +63,7 @@ const onConnect = async () => {
 					<DsfrButton
 						secondary
 						label="Mes extractions"
-						@click="() => router.push('/myextractions')"
+						@click="() => router.push({ name: 'repositories' })"
 					/>
 					<DsfrButton
 						class="fr-ml-2v"
@@ -101,15 +112,17 @@ const onConnect = async () => {
 
 .background-right {
 	width: 66.6667%;
-	background-image: url('https://picsum.photos/1600/1000?random=7');
-	background-size: cover;
-	background-position: center;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
 }
 
 .card-layer {
 	position: relative;
 	display: flex;
 	width: 480px;
+	max-width: 100%;
+	box-sizing: border-box;
 	padding: 40px;
 	flex-direction: column;
 	align-items: flex-start;

@@ -46,7 +46,7 @@ export default defineConfig({
       ],
     }),
   ],
-  base: process.env.BASE_URL || "/extraction",
+  base: process.env.BASE_URL || "/extraire-une-donnee/",
   envPrefix: ["VITE_", "IAM_", "ALERTS_"],
   resolve: {
     alias: {

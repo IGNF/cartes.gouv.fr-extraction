@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<{
 			img-ratio="medium"
 			:horizontal="false"
 			:no-arrow="false"
-			:link="`/myextractions/${item.url_name}`"
+			:link="`/mes-extractions/${item.url_name}`"
 			size="sm"
 		/>
 	</div>

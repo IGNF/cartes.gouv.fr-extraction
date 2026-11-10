@@ -85,7 +85,7 @@ async function onConfirmRelaunchExtraction(action: RelaunchAction) {
             await extractionListRef.value?.refresh()
         } else if (action === 'duplicate') {
             useRelaunchExtractionWithNewParams(params, extraction.uuidStoredData)
-            await router.push('/new-extraction')
+            await router.push('/nouvelle-extraction')
         }
         relaunchModalRef.value?.closeModal()
         selectedExtraction.value = undefined
@@ -100,6 +100,10 @@ async function onConfirmRelaunchExtraction(action: RelaunchAction) {
 
 <template>
     <div class="fr-container" :aria-busy="isProcessing">
+        <DsfrBreadcrumb :links="[
+            { text: 'Tableau de bord', to: '/tableau-de-bord/' },
+            { text: 'Mes extractions' },
+        ]" />
         <DsfrAlert v-if="errorMessage" type="error" title="Erreur" :description="errorMessage" />
         <ExtractionListWithHistory
             ref="extractionListRef"

@@ -16,12 +16,12 @@ docker images | grep extraction
 docker run -p 8080:8080 extraction:latest
 ```
 
-Puis ouvrez votre navigateur sur `http://localhost:8080`
+Puis ouvrez votre navigateur sur `http://localhost:8080/extraire-une-donnee/`
 
 ## 4. **Tester avec des variables d'environnement** (si nécessaire)
 ```bash
 docker run -p 8080:8080 \
-  -e BASE_URL="/extraction" \
+  -e BASE_URL="/extraire-une-donnee/" \
   -e IAM_CHECK_SSO_DISABLE="1" \
   -e IAM_CHECK_SSO_AUTO_AUTH="1" \
   -e IAM_CHECK_SSO_TYPE="keycloak" \
