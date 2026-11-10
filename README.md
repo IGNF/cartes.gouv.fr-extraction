@@ -92,5 +92,10 @@ Exemple rapide :
 
 ```bash
 docker build --no-cache -f .docker/Dockerfile -t extraction:latest .
-docker run -p 8080:8080 extraction:latest
+docker run --rm -p 8080:8080 \
+  -e IAM_URL="https://sso-qua.priv.geopf.fr" \
+  -e IAM_REALM="geoplateforme" \
+  -e IAM_CLIENT_ID="cartes-gouv-public" \
+  -e IAM_DISABLE="0" \
+  extraction:latest
 ```
