@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Substituer les variables d'environnement dans le config template
-envsubst < /app/dist/config/config-template.json > /usr/share/nginx/html/extraction/config/config.json
+envsubst < /app/dist/config/config-template.json > /usr/share/nginx/html/extraire-une-donnee/config/config.json
 
 # Exécuter la commande passée en argument
 exec "$@"

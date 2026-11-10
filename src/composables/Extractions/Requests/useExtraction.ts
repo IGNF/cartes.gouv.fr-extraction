@@ -68,7 +68,7 @@ export function useStartNewExtraction(): () => void {
 
   return () => {
     store.reset()
-    void router.push('/new-extraction')
+    void router.push('/nouvelle-extraction')
   }
 }
 

@@ -84,7 +84,7 @@ async function onConfirmRelaunchExtraction(action: RelaunchAction) {
   } else if (action === 'duplicate') {
     console.log(`Relancer l'extraction ${selectedExtraction.value} en mode duplication`)
     useRelaunchExtractionWithNewParams(params, currentJob.processID)
-    router.push('/new-extraction')
+    router.push('/nouvelle-extraction')
   }
   relaunchModalRef.value?.closeModal()
 }

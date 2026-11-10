@@ -32,7 +32,7 @@ defineExpose(modalInterface)
     <p class="fr-mb-2w">
       Votre extraction de données a été lancée avec succès. Vous pouvez suivre son avancement depuis l’espace
       <RouterLink
-        to="/myextractions"
+        :to="{ name: 'repositories' }"
         class="fr-link"
       >
         Mes extractions

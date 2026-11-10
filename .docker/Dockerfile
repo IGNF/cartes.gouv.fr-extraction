@@ -46,15 +46,17 @@ ARG USER_ENV=nginx
 # Copie de la configuration Nginx
 COPY --from=builder /app/nginx-default.conf /etc/nginx/conf.d/default.conf
 
-# Copie des fichiers construits dans un sous-dossier /extraction
-# pour correspondre au base path Vite (/extraction)
-COPY --from=builder /app/dist /usr/share/nginx/html/extraction
+# Copie des fichiers construits dans le sous-dossier du service
+# pour correspondre au base path Vite (/extraire-une-donnee/)
+COPY --from=builder /app/dist /usr/share/nginx/html/extraire-une-donnee
+
+ENV BASE_URL=/extraire-une-donnee/
 
 USER ${USER_ENV}
 
 # On prevoit de monter un volume sous k8s 
 # pour écriture du fichier d'environnement de la webapp
-VOLUME ["/usr/share/nginx/html/extraction/config"]
+VOLUME ["/usr/share/nginx/html/extraire-une-donnee/config"]
 
 COPY --from=builder /app/dist/config /app/dist/config
 

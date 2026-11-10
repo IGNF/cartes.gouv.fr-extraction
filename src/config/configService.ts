@@ -14,7 +14,7 @@ let configLoaded = false;
 let configError: Error | null = null;
 
 // Charge la configuration depuis un fichier JSON (typiquement monté via ConfigMap)
-async function loadConfigFromFile(configPath = `${import.meta.env.BASE_URL}/config/config.json`): Promise<Config> {
+async function loadConfigFromFile(configPath = `${import.meta.env.BASE_URL.replace(/\/+$/, '')}/config/config.json`): Promise<Config> {
   console.log(`[Config] Chargement de la configuration depuis ${configPath}...`);
   const response = await fetch(configPath);
   if (!response.ok) {
@@ -47,7 +47,7 @@ function loadConfigFromEnv(): Config {
  * En développement local, si ce fichier n'existe pas, on utilise import.meta.env.
  */
 export async function initializeConfig(options: { configPath?: string } = {}): Promise<void> {
-  const { configPath = `${import.meta.env.BASE_URL}/config/config.json` } = options;
+  const { configPath = `${import.meta.env.BASE_URL.replace(/\/+$/, '')}/config/config.json` } = options;
 
   console.log(`[Config] Chemin de configuration : ${configPath}`);
 

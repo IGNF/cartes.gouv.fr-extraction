@@ -6,26 +6,25 @@ import MyExtractions from '@/views/MyExtraction/MyExtractionsWithHistory.vue'
 import HomePage from '@/views/HomePage.vue'
 import CreateExtraction from '@/views/CreateExtraction/CreateExtraction.vue'
 
-const MAIN_TITLE = 'Gabarit de démarrage VueDsfr'
+const MAIN_TITLE = 'Extraire une donnée | cartes.gouv.fr'
 
 const routes = [
   {
     path: '/',
     name: 'extraction',
     component: HomePage,
-    alias: '/extraction',
   },
   {
-    path: '/new-extraction',
-    name: 'new-extraction',
+    path: '/nouvelle-extraction',
+    name: 'nouvelle-extraction',
     component: CreateExtraction,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, title: 'Créer une extraction' },
   },
   {
-    path: '/myextractions',
+    path: '/mes-extractions/',
     name: 'repositories',
     component: MyExtractions,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, title: 'Mes extractions' },
     //    children: [
     //   {
     //     path: '', // /repositories
@@ -56,7 +55,7 @@ const routes = [
   },
   {
     path: '/logout',
-    redirect: '/extraction',
+    redirect: { name: 'extraction' },
   },
 ]
 
@@ -67,10 +66,8 @@ function createAppRouter() {
   })
 
   router.beforeEach((to) => {
-  // Cf. https://github.com/vueuse/head pour des transformations avancées de Head
-  const specificTitle = to.meta.title ? `${to.meta.title} - ` : ''
-  document.title = `${specificTitle}${MAIN_TITLE}`
-
+    const specificTitle = to.meta.title ? `${to.meta.title} | ` : ''
+    document.title = `${specificTitle}${MAIN_TITLE}`
   })
   router.beforeEach(createAuthGuard())
 
