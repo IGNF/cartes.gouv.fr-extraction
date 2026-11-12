@@ -38,7 +38,7 @@ export const useDataStore = defineStore('data', () => {
         if (!extractionApiBaseUrl) throw new Error('Service API non initialisé')
         const authFetch = createAuthFetch()
         const response = await authFetch(
-          `${extractionApiBaseUrl}/processes?page=1&limit=10`,
+          `${extractionApiBaseUrl}/processes?`,
           {
             headers: {
               'Content-Type': 'application/json'
