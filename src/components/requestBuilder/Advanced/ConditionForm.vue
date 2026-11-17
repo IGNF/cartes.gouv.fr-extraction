@@ -156,8 +156,8 @@ function buildFilter(attribute: string, simpleOperator: simpleSqlOperator, rawVa
 		return { attribute, operator, value: Number(rawValue) }
 	}
 
-	if (simpleOperator === 'commence par' || simpleOperator === 'ne commence pas par') rawValue = `%${rawValue}`
-	else if (simpleOperator === 'finit par' || simpleOperator === 'ne finit pas par') rawValue = `${rawValue}%`
+	if (simpleOperator === 'commence par' || simpleOperator === 'ne commence pas par') rawValue = `${rawValue}%`
+	else if (simpleOperator === 'finit par' || simpleOperator === 'ne finit pas par') rawValue = `%${rawValue}`
 	else if (simpleOperator.includes('contient')) rawValue = `%${rawValue}%`
 
 	return { attribute, operator, value: rawValue }
