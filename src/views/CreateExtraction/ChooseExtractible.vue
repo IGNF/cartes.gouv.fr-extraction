@@ -70,9 +70,6 @@ onMounted(() => {
                 <DsfrSearchBar class="fr-mr-2v" 
                     v-model="searchedString"
                 />
-                <DsfrButton secondary>
-                    Filtres
-                </DsfrButton>
             </div>
             <DsfrDataTable
                 title=""

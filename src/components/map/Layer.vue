@@ -1,19 +1,12 @@
 <script setup lang="js">
 import { useLogger } from "vue-logger-plugin";
 import { useMapStore } from "@/stores/mapStore";
-import { DEFAULT_CONF } from "@/composables/getLayerDefaultConf.js";
+import { getDefaultWmtsConfig } from "@/composables/getLayerDefaultConf.js";
 import { 
   LayerMapBox as GeoportalMapBox,
   LayerWMS as GeoportalWMS,
   LayerWMTS as GeoportalWMTS
 } from 'geopf-extensions-openlayers';
-
-import { 
-  createVectorLayer, 
-  createServiceLayer,
-  createMapBoxLayer,
-  createComputeLayer
-} from '@/features/layer.js';
 
 const log = useLogger();
 
@@ -27,6 +20,10 @@ const props = defineProps({
   mapId: {
     type: String,
     default: 'mainMap'
+  },
+  gpfLayerName: {
+    type: String,
+    default: undefined
   }
 });
 
@@ -41,19 +38,21 @@ function mountLayerIfReady() {
   let currentMap = mapStore.getMapRef(props.mapId);
   if (!map.value || layer) return;
 
-  // les options sont obligatoires pour configurer une couche
-  if (!props.layerOptions || Object.keys(props.layerOptions).length === 0) return;
+  const layerName = props.gpfLayerName || props.layerOptions.name;
+  if (!layerName) return;
 
-  const service = props.layerOptions.service;
-  const name = props.layerOptions.name;
-  const position = props.layerOptions.position;
+  const configuration = getDefaultWmtsConfig(layerName);
+  const layerOptions = { ...configuration, ...props.layerOptions };
+  const service = layerOptions.service;
+  const name = props.layerOptions.name || layerName;
+  const position = layerOptions.position;
 
   if (name && service) {
     const options = {
-      position: props.layerOptions.position,
-      visible: props.layerOptions.visible,
-      opacity: props.layerOptions.opacity,
-      grayscale: props.layerOptions.grayscale,
+      position,
+      visible: layerOptions.visible,
+      opacity: layerOptions.opacity,
+      grayscale: layerOptions.grayscale,
       sourceParams: { crossOrigin: "anonymous" },
     };
 
@@ -66,7 +65,7 @@ function mountLayerIfReady() {
       case "WMS":
         layer = new GeoportalWMS({
           layer: name,
-          configuration: DEFAULT_CONF,
+          configuration,
           apiKey: "entree-carto",
           olParams: Object.assign(options, preload),
         });
@@ -74,19 +73,19 @@ function mountLayerIfReady() {
       case "WMTS":
         layer = new GeoportalWMTS({
           layer: name,
-          configuration: DEFAULT_CONF,
+          configuration,
           apiKey: "entree-carto",
           olParams: Object.assign(options, preload),
         });
         break;
       case "TMS":
         options.declutter = true;
-        options.styleName = props.layerOptions.style || "default";
+        options.styleName = layerOptions.style || "default";
         layer = new GeoportalMapBox(
           {
             layer: name,
-            style: props.layerOptions.style,
-            configuration: DEFAULT_CONF,
+            style: layerOptions.style,
+            configuration,
             apiKey: "entree-carto",
           },
           options

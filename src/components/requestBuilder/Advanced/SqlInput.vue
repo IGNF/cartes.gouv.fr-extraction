@@ -56,7 +56,7 @@ const hint = computed(() => {
 	const messages: string[] = []
 	if (dateKind.value) messages.push(dateHints[dateKind.value])
 	else if (category.value) messages.push(categoryHints[category.value])
-	if (isLike.value) messages.push('Utilisez % pour remplacer n\'importe quelle suite de caractères (ex. : Par%).')
+	// if (isLike.value) messages.push('Utilisez % pour remplacer n\'importe quelle suite de caractères (ex. : Par%).')
 	if (isArray.value) messages.push('Appuyez sur Entrée ou sur + pour ajouter chaque valeur.')
 	return messages.join(' ')
 })

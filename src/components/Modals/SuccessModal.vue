@@ -2,6 +2,7 @@
 import { DsfrModal } from '@gouvminint/vue-dsfr'
 import svgSuccess from '@gouvfr/dsfr/dist/artwork/pictograms/system/success.svg'
 import type { ModalInterface } from '@/types/UITypes'
+const router = useRouter()
 const isSuccessModalOpened = ref(false)
 
 function openModal() {
@@ -10,6 +11,7 @@ function openModal() {
 
 function closeModal() {
   isSuccessModalOpened.value = false
+  void router.push({ name: 'repositories' })
 }
 
 const modalInterface: ModalInterface = {
@@ -38,12 +40,12 @@ defineExpose(modalInterface)
         Mes extractions
       </RouterLink>
     </p>
-
+<!-- 
     <hr>
 
     <p class="fr-mb-2w">
       Vous recevrez un courriel une fois l’extraction terminée à l’adresse associée à votre compte.
-    </p>
+    </p> -->
   </DsfrModal>
 </template>
 <style scoped>

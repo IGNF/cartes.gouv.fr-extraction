@@ -99,12 +99,28 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss">
+@use '@/assets/variables' as *;
+
 // le widget est intégré dans le container gauche
 // mais le bouton est caché (car intégré dans menus gauche et droite)
 
-form[id^='GPimportForm-'] {
-  margin-bottom: 0;
-  overflow: hidden;
+dialog.gpf-panel[id^='GPimportPanel-'] {
+  max-height: calc(100cqb - $gap * 2) !important;
+
+  > .gpf-panel__header {
+    flex-shrink: 0;
+  }
+
+  > .gpf-panel__body {
+    overflow-y: auto;
+  }
+
+  form[id^='GPimportForm-'] {
+    flex-shrink: 0;
+    height: auto;
+    margin-bottom: 0;
+    overflow: hidden;
+  }
 }
 
 button.GPButton.fr-icon-delete-line::after {

@@ -43,7 +43,11 @@ const createExtractionStore = useCreateExtractionStore();
 
 const map = computed(() => mapStore.getMapRef(props.mapId))
 
-const insee = ref(new InseeAdvancedSearch());
+const insee = ref(new InseeAdvancedSearch({
+  searchOptions: {
+    serverUrl: 'https://data.geopf.fr/geocodage/search',
+  },
+}));
 const location = ref(new LocationAdvancedSearch());
 const coordinates = ref(new CoordinateAdvancedSearch());
 const parcels = ref(new ParcelAdvancedSearch());

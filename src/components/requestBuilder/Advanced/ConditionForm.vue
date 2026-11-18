@@ -22,11 +22,11 @@ const operatorOptions = ([
 	{ operator: '>', simpleSqlOperator: 'est supérieur à', options: 'est supérieur à (>)' },
 	{ operator: '>=', simpleSqlOperator: 'est supérieur ou égal à', options: 'est supérieur ou égal à (>=)' },
 	{ operator: 'LIKE', simpleSqlOperator: 'commence par', options: 'commence par (LIKE \'string%\')' },
-	{ operator: 'NOT LIKE', simpleSqlOperator: 'ne commence pas par', options: 'ne commence pas par (NOT LIKE \'%string\')' },
+	{ operator: 'NOT LIKE', simpleSqlOperator: 'ne commence pas par', options: 'ne commence pas par (NOT LIKE \'string%\')' },
 	{ operator: 'LIKE', simpleSqlOperator: 'contient', options: 'contient (LIKE \'%string%\')' },
 	{ operator: 'NOT LIKE', simpleSqlOperator: 'ne contient pas', options: 'ne contient pas (NOT LIKE \'%string%\')' },
 	{ operator: 'LIKE', simpleSqlOperator: 'finit par', options: 'finit par (LIKE \'%string\')' },
-	{ operator: 'NOT LIKE', simpleSqlOperator: 'ne finit pas par', options: 'ne finit pas par (NOT LIKE \'string%\')' },
+	{ operator: 'NOT LIKE', simpleSqlOperator: 'ne finit pas par', options: 'ne finit pas par (NOT LIKE \'%string\')' },
 	{ operator: 'IN', simpleSqlOperator: 'est dans la liste', options: 'est dans la liste (IN)' },
 	{ operator: 'NOT IN', simpleSqlOperator: "n'est pas dans la liste", options: "n'est pas dans la liste (NOT IN)" },
 	{ operator: '=', simpleSqlOperator: 'est vide', options: "est vide (= '')" },
@@ -78,11 +78,11 @@ function restoreOperator(filter: Filter): { operator: simpleSqlOperator; value: 
 		if (value.startsWith('%') && value.endsWith('%') && value.length >= 2) {
 			return { operator: negative ? 'ne contient pas' : 'contient', value: value.slice(1, -1) }
 		}
-		if (value.startsWith('%')) {
-			return { operator: negative ? 'ne commence pas par' : 'commence par', value: value.slice(1) }
-		}
 		if (value.endsWith('%')) {
-			return { operator: negative ? 'ne finit pas par' : 'finit par', value: value.slice(0, -1) }
+			return { operator: negative ? 'ne commence pas par' : 'commence par', value: value.slice(0, -1) }
+		}
+		if (value.startsWith('%')) {
+			return { operator: negative ? 'ne finit pas par' : 'finit par', value: value.slice(1) }
 		}
 	}
 	if (filter?.value === '' && (filter.operator === '=' || filter.operator === '!=')) {
@@ -156,8 +156,8 @@ function buildFilter(attribute: string, simpleOperator: simpleSqlOperator, rawVa
 		return { attribute, operator, value: Number(rawValue) }
 	}
 
-	if (simpleOperator === 'commence par' || simpleOperator === 'ne commence pas par') rawValue = `%${rawValue}`
-	else if (simpleOperator === 'finit par' || simpleOperator === 'ne finit pas par') rawValue = `${rawValue}%`
+	if (simpleOperator === 'commence par' || simpleOperator === 'ne commence pas par') rawValue = `${rawValue}%`
+	else if (simpleOperator === 'finit par' || simpleOperator === 'ne finit pas par') rawValue = `%${rawValue}`
 	else if (simpleOperator.includes('contient')) rawValue = `%${rawValue}%`
 
 	return { attribute, operator, value: rawValue }

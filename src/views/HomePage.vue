@@ -45,7 +45,7 @@ const onConnect = async () => {
 		</div>
 		<div class="card-layer">
 			<div class="icon-container">
-			<span class="fr-icon-inbox-unarchive-line"></span>
+				<span class="extraction-icon" aria-hidden="true" />
 			</div>
 			<div>
 				<h1>
@@ -146,8 +146,13 @@ const onConnect = async () => {
 	border-radius: 500px;
 	width: 6rem;
 	height: 6rem;
-	span {
-		scale: 2;
+	.extraction-icon {
+		display: block;
+		width: 3rem;
+		height: 3rem;
+		background-color: #000091;
+		-webkit-mask: url('../assets/extraction-line.svg') no-repeat center / contain;
+		mask: url('../assets/extraction-line.svg') no-repeat center / contain;
 	}
 }
 </style>

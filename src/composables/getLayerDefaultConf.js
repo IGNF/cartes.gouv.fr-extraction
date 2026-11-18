@@ -785,3 +785,87 @@ export const DEFAULT_CONF2 =  {
     ]
   }
 }
+
+const PLANIGNV2_TILE_MATRIX_LIMITS = {
+  "0": { minTileRow: "0", maxTileRow: "0", minTileCol: "0", maxTileCol: "0" },
+  "1": { minTileRow: "0", maxTileRow: "1", minTileCol: "0", maxTileCol: "1" },
+  "2": { minTileRow: "0", maxTileRow: "3", minTileCol: "0", maxTileCol: "3" },
+  "3": { minTileRow: "0", maxTileRow: "7", minTileCol: "0", maxTileCol: "7" },
+  "4": { minTileRow: "0", maxTileRow: "15", minTileCol: "0", maxTileCol: "15" },
+  "5": { minTileRow: "0", maxTileRow: "31", minTileCol: "0", maxTileCol: "31" },
+  "6": { minTileRow: "0", maxTileRow: "63", minTileCol: "0", maxTileCol: "63" },
+  "7": { minTileRow: "0", maxTileRow: "127", minTileCol: "0", maxTileCol: "127" },
+  "8": { minTileRow: "0", maxTileRow: "255", minTileCol: "0", maxTileCol: "255" },
+  "9": { minTileRow: "0", maxTileRow: "511", minTileCol: "0", maxTileCol: "511" },
+  "10": { minTileRow: "1", maxTileRow: "1022", minTileCol: "0", maxTileCol: "1023" },
+  "11": { minTileRow: "3", maxTileRow: "2044", minTileCol: "0", maxTileCol: "2047" },
+  "12": { minTileRow: "6", maxTileRow: "4089", minTileCol: "1", maxTileCol: "4094" },
+  "13": { minTileRow: "13", maxTileRow: "8178", minTileCol: "2", maxTileCol: "8189" },
+  "14": { minTileRow: "26", maxTileRow: "16357", minTileCol: "4", maxTileCol: "16379" },
+  "15": { minTileRow: "53", maxTileRow: "32714", minTileCol: "9", maxTileCol: "32758" },
+  "16": { minTileRow: "107", maxTileRow: "65428", minTileCol: "18", maxTileCol: "65517" },
+  "17": { minTileRow: "214", maxTileRow: "130857", minTileCol: "36", maxTileCol: "131035" },
+  "18": { minTileRow: "429", maxTileRow: "261714", minTileCol: "72", maxTileCol: "262071" },
+  "19": { minTileRow: "858", maxTileRow: "523429", minTileCol: "145", maxTileCol: "524142" },
+};
+
+const PLANIGNV2_LEGEND = {
+  format: "image/png",
+  url: "https://data.geopf.fr/annexes/ressources/legendes/GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2-legend.png",
+  minScaleDenominator: "200",
+};
+
+const PLANIGNV2_DESCRIPTION = "Cartographie multi-échelles sur le territoire national, issue des bases de données vecteur de l’IGN, mis à jour régulièrement et réalisée selon un processus entièrement automatisé.";
+
+export const DEFAULT_CONF_PLANIGNV2 = {
+  ...DEFAULT_CONF,
+  name: "GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2",
+  visible: false,
+  title: "Plan IGN",
+  description: PLANIGNV2_DESCRIPTION,
+  globalConstraint: {
+    maxScaleDenominator: 559082264.0287179,
+    minScaleDenominator: 1066.364791924893,
+    bbox: { left: -179.9, right: 179.9, top: 85, bottom: -85 },
+  },
+  serviceParams: {
+    id: "OGC:WMTS",
+    version: "1.0.0",
+    serverUrl: { full: "https://data.geopf.fr/wmts" },
+  },
+  wmtsOptions: {
+    ...DEFAULT_CONF.wmtsOptions,
+    tileMatrixSetLink: "PM_0_19",
+    tileMatrixSetLimits: PLANIGNV2_TILE_MATRIX_LIMITS,
+  },
+  metadata: [
+    { url: "https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_PLAN-IGN", format: "" },
+    { url: "https://data.geopf.fr/csw?REQUEST=GetRecordById&SERVICE=CSW&VERSION=2.0.2&OUTPUTSCHEMA=http://standards.iso.org/iso/19115/-3/mdb/2.0&elementSetName=full&ID=IGNF_PLAN-IGN", format: "" },
+  ],
+  styles: [{ name: "normal", title: "Données GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2", current: true, url: null }],
+  legends: [PLANIGNV2_LEGEND],
+  thumbnail:"https://data.geopf.fr/annexes/ressources/metadata/thumbnail/vignette-plan-ign.jpg",
+  formats: [{ name: "image/png", current: true }],
+  key: "GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2$GEOPORTAIL:OGC:WMTS",
+  service: "WMTS",
+  label: "Plan IGN",
+  params: {
+    ...DEFAULT_CONF.params,
+    styles: "normal",
+    format: "image/png",
+    extent: { left: -179.9, right: 179.9, top: 85, bottom: -85 },
+    legends: [PLANIGNV2_LEGEND],
+    title: "Plan IGN",
+    description: PLANIGNV2_DESCRIPTION,
+    tileMatrixSetLimits: PLANIGNV2_TILE_MATRIX_LIMITS,
+  },
+};
+
+const DEFAULT_WMTS_CONFIGS = {
+  [DEFAULT_CONF.name]: DEFAULT_CONF,
+  [DEFAULT_CONF_PLANIGNV2.name]: DEFAULT_CONF_PLANIGNV2,
+};
+
+export function getDefaultWmtsConfig(gpfLayerName) {
+  return DEFAULT_WMTS_CONFIGS[gpfLayerName] || DEFAULT_CONF;
+}

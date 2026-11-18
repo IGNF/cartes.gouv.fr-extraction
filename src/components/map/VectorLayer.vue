@@ -58,6 +58,7 @@ function mountLayer() {
     ...(props.layerOptions || {}),
   });
 
+  vectorLayer.value.set("display", false);
   if (!currentMap.getLayers().getArray().includes(vectorLayer.value)) {
     currentMap.addLayer(vectorLayer.value);
   }

@@ -13,6 +13,20 @@ describe('hasNonSpatialFilter', () => {
 })
 
 describe('relationInputFilterToFilter', () => {
+	it.each(['IS NULL', 'IS NOT NULL'] as const)('sérialise et restaure %s sans valeur SQL supplémentaire', (operator) => {
+		const clause = {
+			table: 'buildings',
+			exportedAttributes: ['name'],
+			filter: { attribute: 'name', operator, value: null },
+		}
+		const relationInput = clauseWhereToRelationInput(clause)
+		expect(relationInput.buildings?.filters).toBe(`name ${operator}`)
+		expect(relationInputToClauseWhere(relationInput)).toEqual([clause])
+		expect(relationInputFilterToFilter(`(name ${operator})`)).toEqual({
+			logicalOperator: 'AND', filters: [clause.filter],
+		})
+	})
+
 	it('reconstruit les différents types de valeurs', () => {
 		expect(relationInputFilterToFilter("name = 'L''été'"))
 			.toEqual({ attribute: 'name', operator: '=', value: "L'été" })
@@ -22,6 +36,22 @@ describe('relationInputFilterToFilter', () => {
 			.toEqual({ attribute: 'active', operator: '!=', value: false })
 		expect(relationInputFilterToFilter("status IN ('ready', 2, true)"))
 			.toEqual({ attribute: 'status', operator: 'IN', value: ['ready', 2, true] })
+	})
+
+	it.each([
+		['LIKE', 'Paris%'],
+		['NOT LIKE', 'Paris%'],
+		['LIKE', '%Paris'],
+		['NOT LIKE', '%Paris'],
+	])('préserve les jokers lors de la reconstruction de %s', (operator, value) => {
+		const clause = {
+			table: 'buildings',
+			exportedAttributes: ['name'],
+			filter: { attribute: 'name', operator: operator as 'LIKE' | 'NOT LIKE', value },
+		}
+		const relationInput = clauseWhereToRelationInput(clause)
+
+		expect(relationInputToClauseWhere(relationInput)).toEqual([clause])
 	})
 
 	it('reconstruit les groupes imbriqués produits par clauseWhereToRelationInput', () => {

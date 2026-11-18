@@ -4,6 +4,7 @@ import { useMapStore } from '@/stores/mapStore'
 import { useCreateExtractionStore } from '@/stores/createExtractionStore'
 // ControlExtended n'est pas exporté par l'index de la lib
 import ControlExtended from 'geopf-extensions-openlayers/src/packages/Controls/Control'
+import SelectorID from 'geopf-extensions-openlayers/src/packages/Utils/SelectorID'
 
 const props = defineProps({
   mapId: {
@@ -28,7 +29,8 @@ const map = computed(() => mapStore.getMapRef(props.mapId))
 
 function createControl () {
   const element = document.createElement('div')
-  element.id = 'GPresetExtent-' + props.mapId
+  // PanelManager attend un suffixe numérique pour tous les widgets positionnés.
+  element.id = 'GPresetExtent-' + SelectorID.generate()
   element.classList.add('GPwidget', 'gpf-widget', 'gpf-widget-button')
   if (!props.gutter) {
     element.classList.add('gpf-button-no-gutter')

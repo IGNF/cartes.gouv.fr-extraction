@@ -34,7 +34,7 @@ const onDisconnect = () => logout();
     <CgfrHeader
       class="CgfrHeader header"
       badge-text="Extraction"
-      badge-icon="fr-icon-road-map-fill"
+      badge-icon="extraction-badge-icon"
       badge-color="pink-macaron"
       :authenticated="isAuthenticated"
       :user="user"
@@ -97,5 +97,17 @@ body {
 }
 .CgfrFooter {
   grid-row: footer;
+}
+
+// Contournement en attendant que la lib permette d'intégrer des icons personnalisées
+.fr-header__service-title .extraction-badge-icon::before,
+.CgfrHeader .fr-nav__link[href$="/extraire-une-donnee"]::before {
+  content: "";
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  background-color: currentColor;
+  -webkit-mask: url('../assets/extraction-line.svg') no-repeat center / contain;
+  mask: url('../assets/extraction-line.svg') no-repeat center / contain;
 }
 </style>

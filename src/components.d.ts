@@ -38,6 +38,7 @@ declare module 'vue' {
     FilterGroup: typeof import('./components/requestBuilder/Advanced/FilterGroup.vue')['default']
     Layer: typeof import('./components/map/Layer.vue')['default']
     LayerImport: typeof import('./components/map/Controls/LayerImport.vue')['default']
+    LayerSwitcher: typeof import('./components/map/Controls/LayerSwitcher.vue')['default']
     Map: typeof import('./components/map/Map.vue')['default']
     Modals: typeof import('./components/Modals.vue')['default']
     MyExtractionSkeleton: typeof import('./components/template-grid/MyExtractionSkeleton.vue')['default']
