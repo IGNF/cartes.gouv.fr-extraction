@@ -98,11 +98,14 @@ body {
 .CgfrFooter {
   grid-row: footer;
 }
-.fr-header__service-title .extraction-badge-icon::before {
+
+// Contournement en attendant que la lib permette d'intégrer des icons personnalisées
+.fr-header__service-title .extraction-badge-icon::before,
+.CgfrHeader .fr-nav__link[href$="/extraire-une-donnee"]::before {
   content: "";
   display: inline-block;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1rem;
+  height: 1rem;
   background-color: currentColor;
   -webkit-mask: url('../assets/extraction-line.svg') no-repeat center / contain;
   mask: url('../assets/extraction-line.svg') no-repeat center / contain;
