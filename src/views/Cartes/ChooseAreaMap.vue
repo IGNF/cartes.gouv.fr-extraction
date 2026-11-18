@@ -91,6 +91,7 @@ onMounted(() => {
   border: 1px solid var(--light-decisions-border-border-default-grey, #DDD);
   width: 100%;
   height: 60vh;
+  container-type: size;
   position: relative;
 }
 </style>
