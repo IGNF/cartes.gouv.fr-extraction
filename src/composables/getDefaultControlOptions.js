@@ -82,3 +82,15 @@ export const zoomOptions = {
   position: "bottom-right",
   id: "9",
 };
+export const layerSwitcherOptions = {
+  // Laisser la bibliothèque générer un ID unique pour chaque carte :
+  // la croix de fermeture retrouve le bouton du panneau par son ID DOM.
+  position: "top-right",
+  counter: false,
+  gutter: true,
+  panel: true,
+  collapsed: true,
+  advancedTools: [
+    { key: "greyscale" }
+  ]
+};

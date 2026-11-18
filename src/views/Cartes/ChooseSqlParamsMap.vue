@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Zoom from "@/components/map/Controls/Zoom.vue";
-import { zoomOptions } from "@/composables/getDefaultControlOptions.js";
+import LayerSwitcher from "@/components/map/Controls/LayerSwitcher.vue";
+import { layerSwitcherOptions, zoomOptions } from "@/composables/getDefaultControlOptions.js";
 import { sqlMap } from "@/composables/mapkeys.js";
 import { useCreateExtractionStore } from "@/stores/createExtractionStore";
 import { DEFAULT_GEOJSON_SRS, DEFAULT_MAP_SRS } from "@/composables/useMapConstants";
@@ -32,24 +33,6 @@ const extractibleLayerOptions = {
 
 const createExtractionStore = useCreateExtractionStore()
 const log = useLogger();
-const DEFAULT_LAYER2 = {
-  name: "PLAN.IGN",
-  service: "TMS", // issu de serviceParams.id = "GPP:TMS" -> split(":")[1]
-  key: "PLAN.IGN$GEOPORTAIL:GPP:TMS",
-  position: -1,
-  opacity: 1,
-  visible: true,
-  grayscale: false
-};
-const DEFAULT_LAYER = {
-  name: "ORTHOIMAGERY.ORTHOPHOTOS",
-  service: "WMTS", // issu de serviceParams.id = "OGC:WMTS" -> split(":")[1]
-  key: "ORTHOIMAGERY.ORTHOPHOTOS$GEOPORTAIL:OGC:WMTS",
-  position: -1,
-  opacity: 1,
-  visible: true,
-  grayscale: false
-};
 
 onMounted(() => {
   log.debug("CreateExtraction - ChooseArea mounted")
@@ -59,14 +42,13 @@ onMounted(() => {
     <Map 
         class="map" 
         :map-id="sqlMap">
-        <!-- <View
-          :map-id="sqlMap"
-          :center="mapStore.center"
-          :zoom="mapStore.zoom"
-        /> -->
         <Layer  
             :map-id="sqlMap" 
-            :layerOptions="DEFAULT_LAYER"
+            gpf-layer-name="ORTHOIMAGERY.ORTHOPHOTOS"
+        />
+        <Layer  
+            gpf-layer-name="GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2"
+            :map-id="sqlMap"
         />
         <VectorLayer
           v-if="extractibleSourceOptions"
@@ -83,6 +65,11 @@ onMounted(() => {
         <Controls
             :map-id="sqlMap" 
         >
+            <LayerSwitcher
+              visibility
+              :layer-switcher-options="layerSwitcherOptions"
+              :map-id="sqlMap"
+            />
             <Zoom
               visibility
               :zoom-options="zoomOptions"
@@ -95,7 +82,6 @@ onMounted(() => {
 .map {
   width: 100%;
   height: 100%;
-  /* min-height: 600px; */
   position: relative;
 }
 </style>
