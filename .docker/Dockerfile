@@ -38,7 +38,7 @@ RUN chmod -R 777 /app/dist/config
 #----------------------------------------------------------------------
 # cartesgouvfr-extraction : Config d'un serveur statique avec nginx
 #----------------------------------------------------------------------
-FROM nginxinc/nginx-unprivileged:stable-alpine AS production
+FROM nginx/nginx-unprivileged:1.31-alpine AS production
 
 # Utilisateur par défaut pour nginx
 ARG USER_ENV=nginx
